@@ -1,0 +1,76 @@
+{% load static %}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+    <meta name="author" content="J.Reiser" />
+    <meta name="author" content="Adam Stein" />
+    <meta name="description" content="Home Apps" />
+
+    <title>{% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/layout.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/color.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/error.css" />
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+</head>
+
+<body>
+<div id="perm-links">
+<ul>
+<li><a href="/home/">Home</a></li>
+<li><a href="/home/finance/">Finance</a></li>
+<li><a href="/home/utilities/">Utilities</a></li>
+{% if user.is_superuser %}
+    <li><a href="/home/admin/tools/">Admin</a></li>
+{% endif %}
+<li>&nbsp;</li>
+<li>&nbsp;</li>
+{% if user.is_authenticated %}
+    <li><a href="/home/accounts/logout/" style="color:#880000;">Logout</a></li>
+{% else %}
+    <li>Logout</li>
+{% endif %}
+</ul>
+</div>
+
+<h1>{% block header %}{% endblock %}</h1>
+
+<div id="main-menu">
+    {% if navigation %}
+        <h3>Navigation</h3>
+        <ul>
+            {% for label,link in navigation %}
+                {% if not label %}
+                    <li>&nbsp;</li>
+                {% else %}
+                    {% if not link %}
+                        <li style="text-align: center; border: solid 1px #666666;">{{ label }}</li>
+                    {% else %}
+                        <li><a href="{{ link }}">{{ label }}</a></li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <p style="text-align: center;">You are logged in as <em>{{ user }}</em></p>
+    {% endif %}
+</div>
+
+<div id="content">
+    {% block content %}{% endblock %}
+</div>
+
+<div style="margin-bottom: 1em;"></div>
+
+<div id="footer">
+    <h5 style="float: left;">{{ version }}</h5>
+    <h5>&copy; <a href="mailto:adam@csh.rit.edu">Adam Stein</a>.  All rights reserved.</h5>
+</div>
+</body>
+</html>

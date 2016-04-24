@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Home Applications
+{% endblock %}
+
+{% block header %}
+    Home Applications
+{% endblock %}
+
+{% block content %}
+    <p>
+        Applications to help track information in the home.
+    </p>
+
+    <table class="table_list">
+        {% for app in apps %}
+            <tr>
+                <td><a href="{% url app.url_name %}">{{ app.name }}</a></td>
+                <td><span class="table_desc">{{ app.desc }}</span></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
