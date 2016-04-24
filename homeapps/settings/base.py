@@ -103,14 +103,20 @@ TEMPLATE_LOADERS = [
 ]
 
 TEMPLATE_CONTEXT_PROCESSORS = [
+    # Django context processors
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.static',
+
+    # Home Apps context processors
+    'library.context_processors.apps',
     'library.context_processors.version'
 ]
 
 TEMPLATE_DIRS = [
     os.path.normpath(os.path.join(BASE_DIR, '..', 'templates'))
 ]
+
+# Version information
 
 VERSION = '3.0'
