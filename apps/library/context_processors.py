@@ -1,4 +1,13 @@
+import json
+
+from system_globals.models import SystemGlobal
+
 from django.conf import settings
+
+
+# noinspection PyUnusedLocal
+def apps(request):
+    return {'apps': json.loads(SystemGlobal.objects.get_value('apps'))}
 
 
 # noinspection PyUnusedLocal
@@ -8,8 +17,4 @@ def version(request):
     else:
         mode = ""
 
-    version_dict = {
-        "version": "Home Apps %sv" % mode + settings.VERSION
-    }
-
-    return version_dict
+    return {'version': 'Home Apps {}v{}'.format(mode, settings.VERSION)}
