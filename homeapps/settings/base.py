@@ -105,10 +105,12 @@ TEMPLATE_LOADERS = [
 TEMPLATE_CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.static'
-    # "common.context_processors.version",
+    'django.core.context_processors.static',
+    'library.context_processors.version'
 ]
 
 TEMPLATE_DIRS = [
     os.path.normpath(os.path.join(BASE_DIR, '..', 'templates'))
 ]
+
+VERSION = '3.0'
