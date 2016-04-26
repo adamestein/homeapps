@@ -1,3 +1,2 @@
 Django==1.6.11
 django-system-globals==0.0.4
-
