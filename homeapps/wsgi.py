@@ -8,7 +8,14 @@ https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 """
 
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "homeapps.settings")
+import sys
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "homeapps.settings.prod")
+
+sys.path.append(os.environ['OPENSHIFT_REPO_DIR'])
+
+from distutils.sysconfig import get_python_lib
+os.environ['PYTHON_EGG_CACHE'] = get_python_lib()
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
