@@ -12,7 +12,8 @@ import sys
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "homeapps.settings.prod")
 
-sys.path.append(os.environ['OPENSHIFT_REPO_DIR'])
+if 'OPENSHIFT_REPO_DIR' in os.environ:
+    sys.path.append(os.environ['OPENSHIFT_REPO_DIR'])
 
 from distutils.sysconfig import get_python_lib
 os.environ['PYTHON_EGG_CACHE'] = get_python_lib()

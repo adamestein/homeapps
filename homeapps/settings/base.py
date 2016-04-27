@@ -8,10 +8,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+# Add the apps directory to the path since all code lives under there
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'apps')))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -42,10 +46,10 @@ INSTALLED_APPS = [
     'system_globals',
 
     # Apps
-    'apps.finances',
-    'apps.library',
-    'apps.smoke_detectors',
-    'apps.utilities'
+    'finances',
+    'library',
+    'smoke_detectors',
+    'utilities'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -59,7 +63,7 @@ MIDDLEWARE_CLASSES = [
 
 ROOT_URLCONF = 'homeapps.urls'
 
-WSGI_APPLICATION = 'homeapps.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 
 # Database
