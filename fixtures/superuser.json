@@ -1,0 +1,20 @@
+[
+{
+    "pk": 1, 
+    "model": "auth.user", 
+    "fields": {
+        "username": "adam", 
+        "first_name": "", 
+        "last_name": "", 
+        "is_active": true, 
+        "is_superuser": true, 
+        "is_staff": true, 
+        "last_login": "2016-04-28T15:32:52Z", 
+        "groups": [], 
+        "user_permissions": [], 
+        "password": "pbkdf2_sha256$12000$ZiWShmpN6EzV$b7dMFAL7FLxnH4wUEBshURJ5BR7nIAb7jQOt48vHRA4=", 
+        "email": "adam@csh.rit.edu", 
+        "date_joined": "2016-04-28T15:32:52Z"
+    }
+}
+]
