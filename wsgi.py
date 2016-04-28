@@ -10,7 +10,7 @@ https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 import os
 import sys
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "homeapps.settings.prod")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "homeapps.settings")
 
 if 'OPENSHIFT_REPO_DIR' in os.environ:
     sys.path.append(os.environ['OPENSHIFT_REPO_DIR'])
