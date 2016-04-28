@@ -1,2 +1,9 @@
+#!/bin/bash
+
 echo "Collecting static files"
+if [ ! -d ${OPENSHIFT_REPO_DIR}wsgi/static ]
+then
+    mkdir -p ${OPENSHIFT_REPO_DIR}wsgi/static
+fi
+
 ${OPENSHIFT_REPO_DIR}manage.py collectstatic --noinput -v0 -l
