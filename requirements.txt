@@ -1,3 +1,5 @@
 Django==1.6.11
 django-system-globals==0.0.4
 MySQL-python==1.2.5
+South==1.0.2
+
