@@ -120,11 +120,6 @@ TEMPLATE_DIRS = [
     os.path.normpath(os.path.join(BASE_DIR, '..', 'templates'))
 ]
 
-# Global fixtures
-FIXTURE_DIRS = [
-    os.path.normpath(os.path.join(BASE_DIR, '..', 'fixtures'))
-]
-
 # Version information
 
 VERSION = '3.0'
