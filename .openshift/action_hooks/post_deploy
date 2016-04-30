@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Running migrations"
+${OPENSHIFT_REPO_DIR}manage.py syncdb --noinput
+
 echo "Collecting static files"
 if [ ! -d ${OPENSHIFT_REPO_DIR}wsgi/static ]
 then
