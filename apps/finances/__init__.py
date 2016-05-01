@@ -1,2 +1,8 @@
-APP_DESC = 'Create, track, and view bill statements'
-APP_NAME = 'Finances'
+APP = {
+    'desc': 'Create, track, and view bill statements',
+    'name': 'Finances',
+    'navigation': [
+        {
+        }
+    ]
+}

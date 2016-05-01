@@ -13,7 +13,7 @@ def app_autodiscover():
     Auto-discover INSTALLED_APPS information and fail silently when not present.
     """
 
-    apps = []
+    apps = {}
 
     for app in sorted(settings.INSTALLED_APPS):
         mod = import_module(app)
@@ -29,7 +29,10 @@ def app_autodiscover():
         else:
             # Get app info if there is any to get, otherwise ignore
             try:
-                apps.append({'desc': mod.APP_DESC, 'name': mod.APP_NAME, 'url_name': app.split('.')[-1]})
+                app_info = {'url_name': app.split('.')[-1]}
+                app_info.update(mod.APP)
+                # apps.append(app_info)
+                apps[mod.APP['name']] = app_info
             except AttributeError:
                 pass
 

@@ -27,8 +27,8 @@
             <ul>
                 <li><a href="{% url 'home' %}">Home</a></li>
 
-                {% for app in apps %}
-                    <li><a href="{% url app.url_name %}">{{ app.name }}</a></li>
+                {% for name, info in apps.items %}
+                    <li><a href="{% url info.url_name %}">{{ info.name }}</a></li>
                 {% endfor %}
 
                 {% if user.is_superuser %}
@@ -49,14 +49,14 @@
             {% if navigation %}
                 <h3>Navigation</h3>
                 <ul>
-                    {% for label,link in navigation %}
-                        {% if not label %}
+                    {% for info in navigation %}
+                        {% if not info.title %}
                             <li>&nbsp;</li>
                         {% else %}
-                            {% if not link %}
-                                <li style="text-align: center; border: solid 1px #666666;">{{ label }}</li>
+                            {% if not info.link %}
+                                <li style="text-align: center; border: solid 1px #666666;">{{ info.title }}</li>
                             {% else %}
-                                <li><a href="{{ link }}">{{ label }}</a></li>
+                                <li><a href="{% url info.link %}">{{ info.title }}</a></li>
                             {% endif %}
                         {% endif %}
                     {% endfor %}
