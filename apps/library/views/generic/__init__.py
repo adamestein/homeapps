@@ -1,2 +1,2 @@
-from .base import NavigationTemplateView
-from .list import NavigationListView
+from .base import AppTemplateView
+from .list import AppListView

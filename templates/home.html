@@ -14,10 +14,10 @@
     </p>
 
     <table class="table_list">
-        {% for app in apps %}
+        {% for name, info in apps.items %}
             <tr>
-                <td><a href="{% url app.url_name %}">{{ app.name }}</a></td>
-                <td><span class="table_desc">{{ app.desc }}</span></td>
+                <td><a href="{% url info.url_name %}">{{ info.name }}</a></td>
+                <td><span class="table_desc">{{ info.desc }}</span></td>
             </tr>
         {% endfor %}
     </table>

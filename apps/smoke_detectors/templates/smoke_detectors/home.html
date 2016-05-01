@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load format %}
+{% load dict %}
 
 {% block title %}Smoke Detector Applications{% endblock %}
 
@@ -11,33 +11,17 @@
     </p>
 
     <table class="table_list">
-        <tr>
-            <td><a href="">Add Smoke Detector</a></td>
-            <td><span class="table_desc">Add a new smoke detector</span></td>
-        </tr>
-
-        <tr>
-            <td><a href="">Edit Smoke Detector</a></td>
-            <td><span class="table_desc">Edit an existing smoke detector</span></td>
-        </tr>
-
-        <tr>
-            <td><a href="">Delete Smoke Detector</a></td>
-            <td><span class="table_desc">Delete an existing smoke detector</span></td>
-        </tr>
-
-        {% rspacer "0.8em" %}
-
-        <tr>
-            <td><a href="{% url 'list_smoke_detectors' %}">List Smoke Detectors</a></td>
-            <td><span class="table_desc">Delete an existing smoke detector</span></td>
-        </tr>
-
-        {% rspacer "0.8em" %}
-
-        <tr>
-            <td><a href="">Add Change Battery Event</a></td>
-            <td><span class="table_desc">Indicate when batteries have been changed</span></td>
-        </tr>
+        {% for nav_item in apps|dict_lookup:'Smoke Detectors'|dict_lookup:'navigation' %}
+            <tr>
+                <td>
+                    {% if nav_item.link %}
+                        <a href="{% url nav_item.link %}">{{ nav_item.title }}</a>
+                    {% else %}
+                        {{ nav_item.title }}
+                    {% endif %}
+                </td>
+                <td><span class="table_desc">{{ nav_item.desc }}</span></td>
+            </tr>
+        {% endfor %}
     </table>
 {% endblock %}
