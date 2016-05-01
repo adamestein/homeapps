@@ -11,11 +11,15 @@
 
         <title>{% block title %}{% endblock %}</title>
 
-        <link rel="stylesheet" type="text/css" href="{% static 'css/layout.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'css/color.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'css/error.css' %}" />
+        {% block css %}
+            <link rel="stylesheet" type="text/css" href="{% static 'css/layout.css' %}" />
+            <link rel="stylesheet" type="text/css" href="{% static 'css/color.css' %}" />
+            <link rel="stylesheet" type="text/css" href="{% static 'css/error.css' %}" />
+        {% endblock %}
 
-        <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+        {% block js %}
+            <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+        {% endblock %}
     </head>
 
     <body>

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/table.css' %}" />
+
+    <style>
+        .good {
+            background: lightgreen;
+        }
+
+        .marker {
+            display: inline-block;
+            width: 10px;
+        }
+
+        .no_date {
+            background: #c88141;
+        }
+
+        .replace {
+            background: #f75d59;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}Smoke Detectors: List Smoke Detectors{% endblock %}
+
+{% block header %}List Smoke Detectors{% endblock %}
+
+{% block content %}
+    <p>
+        This page will list details concerning the
+        <a href="http://en.wikipedia.org/wiki/Smoke_detector">smoke</a>,
+        <a href="http://en.wikipedia.org/wiki/Smoke_detector">fire</a>,
+        and <a href="http://en.wikipedia.org/wiki/Carbon_monoxide_detector">carbon
+        monoxide</a> detectors. The rows are color coded. The colors are as follows:
+    </p>
+
+    <ul>
+        <li>
+            <div class="no_date marker">&nbsp;</div> indicates that the detector has no change of battery event date
+            (were no batteries added?)
+        </li>
+        <li><span class="replace marker ">&nbsp;</span> indicates that the batteries need replacing</li>
+        <li><span class="good marker">&nbsp;</span> indicates no action is needed for that detector</li>
+    </ul>
+
+    {% if object_list %}
+        <div id="table">
+            <div class="header-row row">
+                <span class="cell primary">Location</span>
+                <span class="cell">Last Battery Change Date</span>
+                <span class="cell">Required Batteries</span>
+            </div>
+
+            {% for detector in object_list %}
+                <div class="row
+                    {% if not detector.last_event.date %}
+                        no_date
+                    {% elif detector.needs_batteries_replaced %}
+                        replace
+                    {% else %}
+                        good
+                    {% endif %}
+                    ">
+                    <input type="radio" name="expand">
+                    <span class="cell primary" data-label="Location">{{ detector.location }}</span>
+                    <span class="cell" data-label="Last Battery Change Date">{{ detector.last_event.date }}</span>
+                    <span class="cell" data-label="Required Batteries">{{ detector.battery_type }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>There are no smoke detectors to list.</p>
+    {% endif %}
+{% endblock %}
