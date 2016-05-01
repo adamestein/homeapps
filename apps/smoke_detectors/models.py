@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from django.db import models
 
@@ -55,4 +55,20 @@ class SmokeDetector(models.Model):
         ordering = ['location']
 
     def __unicode__(self):
-        return u'Smoke detector at {}'.format(self.location)
+        return u'Smoke detector in {}'.format(self.location)
+
+    @property
+    def last_event(self):
+        try:
+            return self.event_set.all().order_by('-date')[0]
+        except IndexError:
+            # There are no events connected to this detector
+            return ''
+
+    @property
+    def needs_batteries_replaced(self):
+        # Batteries should be changed every 6 months, so if the last battery event takes place older than 6 months,
+        # time to change
+
+        cutoff = date.today() - timedelta(weeks=24)
+        return self.last_event.date < cutoff
