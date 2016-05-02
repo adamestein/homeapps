@@ -15,6 +15,7 @@
             <link rel="stylesheet" type="text/css" href="{% static 'css/layout.css' %}" />
             <link rel="stylesheet" type="text/css" href="{% static 'css/color.css' %}" />
             <link rel="stylesheet" type="text/css" href="{% static 'css/error.css' %}" />
+            <link rel="stylesheet" type="text/css" href="{% static 'css/messages.css' %}" />
         {% endblock %}
 
         {% block js %}
@@ -23,6 +24,15 @@
     </head>
 
     <body>
+        <div id="messages">
+            <ul>
+                {% for message in messages %}
+                    <li class="message{% if message.tags %} {{ message.tags }}{% endif %}">{{ message }}</li>
+                    <a href="#" onclick="$('#messages').hide(); return false;" class="close">[x]</a>
+                {% endfor %}
+            </ul>
+        </div>
+
         <div id="perm-links">
             <ul>
                 <li><a href="{% url 'home' %}">Home</a></li>

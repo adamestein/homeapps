@@ -1,0 +1,38 @@
+#messages .close {
+    color: #6c7175;
+    font-size: 12px;
+    position: absolute;
+    right: 1em;
+    top: 1.5em;
+}
+
+#messages .message {
+    background: -moz-linear-gradient(top, #ffffff 0%, #e5e5e5 98%, #FFFFFF 100%); /* firefox */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(98%,#e5e5e5), color-stop(100%,#FFFFFF));
+    border-bottom: 1px solid #c8c8c8;
+    clear: both;
+    color: #6c7175;
+    font-size: 18px;
+    font-weight: bold;
+    list-style-type: none;
+    padding: 10px;
+    position: relative;
+    text-align: center;
+    text-shadow: #fff 0 1px 0;
+}
+
+#messages .message.error {
+    background: -moz-linear-gradient(top, #FF4848 0%, #FF7575 100%); /* firefox */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FF5858), color-stop(100%,#FF7575)); /* webkit */
+    border-bottom: 1px solid #FF7575;
+    color: #ffffff;
+    text-shadow: #333333 0 1px 0;
+}
+
+#messages .message.success {
+    background: -moz-linear-gradient(top, #cdeb8e 0%, #a5c956 100%); /* firefox */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#cdeb8e), color-stop(100%,#a5c956)); /* webkit */
+    border-bottom: 1px solid #a4c856;
+    color: #f5fef2;
+    text-shadow: #7c896b 0 1px 0;
+}
