@@ -36,3 +36,8 @@
     color: #f5fef2;
     text-shadow: #7c896b 0 1px 0;
 }
+
+#messages ul {
+    margin-left: -2.9em;
+}
+

@@ -2,6 +2,14 @@
     margin-top: 2em;
 }
 
+table {
+    border-collapse: collapse;
+}
+
+td {
+    padding-bottom: 0.5em;
+}
+
 th {
     padding-right: 1em;
     text-align: right;
