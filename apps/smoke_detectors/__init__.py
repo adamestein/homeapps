@@ -4,18 +4,13 @@ APP = {
     'navigation': [
         {
             'desc': 'Add a new smoke detector',
-            'link': '',
+            'link': 'add_smoke_detector',
             'title': 'Add Smoke Detector'
         },
         {
             'desc': 'Edit an existing smoke detector',
             'link': '',
             'title': 'Edit Smoke Detector'
-        },
-        {
-            'desc': 'Delete an existing smoke detector',
-            'link': '',
-            'title': 'Delete Smoke Detector'
         },
         {},
         {
