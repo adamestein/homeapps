@@ -24,6 +24,28 @@ urlpatterns = patterns(
     ),
 
     url(
+        '^edit/$',
+        AppListView.as_view(
+            app=APP['name'],
+            model=SmokeDetector,
+            template_name='smoke_detectors/edit_list.html'
+        ),
+        name='edit_smoke_detector_list'
+    ),
+
+    url(
+        '^edit/(?P<pk>[\d]+)$',
+        AppUpdateView.as_view(
+            app=APP['name'],
+            model=SmokeDetector,
+            success_message='Smoke detector in %(location)s successfully updated',
+            success_url=reverse_lazy('list_smoke_detectors'),
+            template_name='smoke_detectors/form.html'
+        ),
+        name='edit_smoke_detector'
+    ),
+
+    url(
         '^list/$',
         AppListView.as_view(
             app=APP['name'],

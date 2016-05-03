@@ -14,7 +14,8 @@
 {% block content %}
     <p>
         Set the <strong>Location</strong> and <strong>Battery type</strong> fields to the desired value. Click
-        <em>Add</em> to save your changes or <em>Reset</em> to reset the form.
+        <em>{% if object %}Update{% else %}Add{% endif %}</em> to save your changes or <em>Reset</em> to reset
+        the form.
     </p>
 
     <hr />
@@ -27,7 +28,7 @@
         </table>
 
         <div class="buttons">
-            <input type="submit" value="Add" />
+            <input type="submit" value="{% if object %}Update{% else %}Add{% endif %}" />
             <input type="reset" value="Reset" />
         </div>
     </form>

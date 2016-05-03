@@ -9,7 +9,7 @@ APP = {
         },
         {
             'desc': 'Edit an existing smoke detector',
-            'link': '',
+            'link': 'edit_smoke_detector_list',
             'title': 'Edit Smoke Detector'
         },
         {},
