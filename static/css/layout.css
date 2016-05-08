@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 h1 {padding: 10px 10px 10px 15px;}
-=======
-h1 {padding: 10px; padding-left: 15px;}
->>>>>>> 65f483095a46fc4e5154209dbf8b695a14a331e4
 h2 {margin: 0; padding: 0;}
 h3 {margin: 0; text-align: center;}
 p {text-align: justify;}
@@ -10,13 +6,9 @@ p {text-align: justify;}
 #perm-links {float: right; margin: 0; margin-top: 8px; margin-right: 5px; padding: 0; text-align: right;}
 #perm-links ul {margin: 0; padding: 5px;}
 #perm-links li {display: inline; width: 150px;}
-<<<<<<< HEAD
 #perm-links a {
     text-align: center; margin: 0; padding-top: 2px; padding-bottom: 2px;  padding-left: 10px; padding-right: 10px;
 }
-=======
-#perm-links a {text-align: center; margin: 0; padding-top: 2px; padding-bottom: 2px;  padding-left: 10px; padding-right: 10px; }
->>>>>>> 65f483095a46fc4e5154209dbf8b695a14a331e4
 
 #cool-links {width: 19%; float: right;  margin-bottom: 25px; padding: 3px; padding-bottom: 60px;}
 #cool-links ul {margin: 0; padding: 0;}

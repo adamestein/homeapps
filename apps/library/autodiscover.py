@@ -31,10 +31,6 @@ def app_autodiscover():
             try:
                 app_info = {'url_name': app.split('.')[-1]}
                 app_info.update(mod.APP)
-<<<<<<< HEAD
-=======
-                # apps.append(app_info)
->>>>>>> 65f483095a46fc4e5154209dbf8b695a14a331e4
                 apps[mod.APP['name']] = app_info
             except AttributeError:
                 pass

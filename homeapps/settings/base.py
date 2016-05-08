@@ -30,12 +30,9 @@ TEMPLATE_DEBUG = DEBUG
 
 from socket import gethostname
 ALLOWED_HOSTS = [
-    gethostname(), # For internal OpenShift load balancer security purposes.
-    os.environ.get('OPENSHIFT_APP_DNS'), # Dynamically map to the OpenShift gear name.
+    gethostname(),                          # For internal OpenShift load balancer security purposes.
+    os.environ.get('OPENSHIFT_APP_DNS'),    # Dynamically map to the OpenShift gear name.
 ]
-
-
-# Application definition
 
 INSTALLED_APPS = [
     # Django
@@ -49,10 +46,7 @@ INSTALLED_APPS = [
     # 3rd Party Apps
     'south',
     'system_globals',
-<<<<<<< HEAD
     'tekextensions',
-=======
->>>>>>> 65f483095a46fc4e5154209dbf8b695a14a331e4
 
     # Apps
     'finances',
@@ -91,6 +85,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
+# noinspection PyUnresolvedReferences
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'wsgi', 'static'))
 STATIC_URL = '/static/'
 
@@ -116,12 +111,9 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.static',
 
-<<<<<<< HEAD
     # 3rd Party processors
     'tekextensions.context_processors.static_url_prefix',
 
-=======
->>>>>>> 65f483095a46fc4e5154209dbf8b695a14a331e4
     # Home Apps context processors
     'library.context_processors.apps',
     'library.context_processors.version'

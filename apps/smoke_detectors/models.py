@@ -4,11 +4,7 @@ from django.db import models
 
 
 # Battery information
-<<<<<<< HEAD
 class BatteryInfo(models.Model):
-=======
-class Battery(models.Model):
->>>>>>> 65f483095a46fc4e5154209dbf8b695a14a331e4
     BATTERY_TYPES = (
         ("9v", "9 volt"),
         ("AA", "AA"),
@@ -53,11 +49,7 @@ class Location(models.Model):
 # Smoke detectors
 class SmokeDetector(models.Model):
     location = models.ForeignKey(Location, help_text='Location of the smoke detector')
-<<<<<<< HEAD
     battery_type = models.ForeignKey(BatteryInfo, help_text='Type of battery the smoke detector uses')
-=======
-    battery_type = models.ForeignKey(Battery, help_text='Type of battery the smoke detector uses')
->>>>>>> 65f483095a46fc4e5154209dbf8b695a14a331e4
 
     class Meta:
         ordering = ['location']
