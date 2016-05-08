@@ -49,7 +49,10 @@ INSTALLED_APPS = [
     # 3rd Party Apps
     'south',
     'system_globals',
+<<<<<<< HEAD
     'tekextensions',
+=======
+>>>>>>> 65f483095a46fc4e5154209dbf8b695a14a331e4
 
     # Apps
     'finances',
@@ -113,9 +116,12 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.static',
 
+<<<<<<< HEAD
     # 3rd Party processors
     'tekextensions.context_processors.static_url_prefix',
 
+=======
+>>>>>>> 65f483095a46fc4e5154209dbf8b695a14a331e4
     # Home Apps context processors
     'library.context_processors.apps',
     'library.context_processors.version'

@@ -18,8 +18,11 @@ urlpatterns = patterns(
     url(r'^accounts/login/$', login, {'extra_context': {'next': '/'}}, name='login'),
     url(r'^accounts/logout/$', logout, {'next_page': '/'}, name='logout'),
 
+<<<<<<< HEAD
     url(r'^add/(?P<model_name>\w+)/?$', 'tekextensions.views.add_new_model'),
 
+=======
+>>>>>>> 65f483095a46fc4e5154209dbf8b695a14a331e4
     # Top level home page URL pattern
     url(r'^$', TemplateView.as_view(template_name='home.html'), name='home'),
 
