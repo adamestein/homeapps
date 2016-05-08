@@ -2,6 +2,7 @@ from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse_lazy
 
 from . import APP
+from .forms import SmokeDetectorForm
 from .models import SmokeDetector
 
 from library.views.generic import AppCreateView, AppDeleteMultipleView, AppListView, AppTemplateView, AppUpdateView
@@ -15,10 +16,11 @@ urlpatterns = patterns(
         '^add/$',
         AppCreateView.as_view(
             app=APP['name'],
+            form_class=SmokeDetectorForm,
             model=SmokeDetector,
             success_message='Smoke detector in %(location)s successfully added',
             success_url=reverse_lazy('list_smoke_detectors'),
-            template_name='smoke_detectors/form.html'
+            template_name='smoke_detectors/smokedetector_form.html'
         ),
         name='add_smoke_detector'
     ),
@@ -49,10 +51,11 @@ urlpatterns = patterns(
         '^edit/(?P<pk>[\d]+)$',
         AppUpdateView.as_view(
             app=APP['name'],
+            form_class=SmokeDetectorForm,
             model=SmokeDetector,
             success_message='Smoke detector in %(location)s successfully updated',
             success_url=reverse_lazy('list_smoke_detectors'),
-            template_name='smoke_detectors/form.html'
+            template_name='smoke_detectors/smokedetector_form.html'
         ),
         name='edit_smoke_detector'
     ),

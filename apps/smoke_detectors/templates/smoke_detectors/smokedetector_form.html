@@ -9,6 +9,12 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/form_table.css' %}" />
 {% endblock %}
 
+{% block js %}
+    {{ block.super }}
+
+    {{ form.media }}
+{% endblock %}
+
 {% block header %}Add Smoke Detector{% endblock %}
 
 {% block content %}

@@ -15,7 +15,6 @@
             <link rel="stylesheet" type="text/css" href="{% static 'css/layout.css' %}" />
             <link rel="stylesheet" type="text/css" href="{% static 'css/color.css' %}" />
             <link rel="stylesheet" type="text/css" href="{% static 'css/error.css' %}" />
-            <link rel="stylesheet" type="text/css" href="{% static 'css/messages.css' %}" />
         {% endblock %}
 
         {% block js %}
@@ -24,71 +23,8 @@
     </head>
 
     <body>
-        <div id="messages">
-            {% if messages %}
-                <ul>
-                    {% for message in messages %}
-                        <li class="message{% if message.tags %} {{ message.tags }}{% endif %}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-                <a href="#" onclick="$('#messages').hide(); return false;" class="close">[x]</a>
-            {% endif %}
-        </div>
-
-        <div id="perm-links">
-            <ul>
-                <li><a href="{% url 'home' %}">Home</a></li>
-
-                {% for name, info in apps.items %}
-                    <li><a href="{% url info.url_name %}">{{ info.name }}</a></li>
-                {% endfor %}
-
-                {% if user.is_superuser %}
-                    <li style="padding-left: 1em;"><a href="{% url 'admin:index' %}" style="color: #F88017;">Admin</a></li>
-                {% endif %}
-
-                {% if user.is_authenticated %}
-                    <li style="padding-left: 1em;"><a href="{% url 'logout' %}" style="color:#880000;">Logout</a></li>
-                {% else %}
-                    <li style="padding-left: 1em;"><a href="{% url 'login' %}" style="color:#008800;">Login</a></li>
-                {% endif %}
-            </ul>
-        </div>
-
-        <h1>{% block header %}{% endblock %}</h1>
-
-        <div id="main-menu">
-            {% if navigation %}
-                <h3>Navigation</h3>
-                <ul>
-                    {% for info in navigation %}
-                        {% if not info.title %}
-                            <li>&nbsp;</li>
-                        {% else %}
-                            {% if not info.link %}
-                                <li style="text-align: center; border: solid 1px #666666;">{{ info.title }}</li>
-                            {% else %}
-                                <li><a href="{% url info.link %}">{{ info.title }}</a></li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            {% endif %}
-
-            {% if user.is_authenticated %}
-                <p style="text-align: center;">You are logged in as <em>{{ user }}</em></p>
-            {% endif %}
-        </div>
-
-        <div id="content">
+        <div>
             {% block content %}{% endblock %}
-        </div>
-
-        <div style="margin-bottom: 1em;"></div>
-
-        <div id="footer">
-            <h5 style="float: left;">{{ version }}</h5>
-            <h5>&copy; <a href="mailto:adam@csh.rit.edu">Adam Stein</a>.  All rights reserved.</h5>
         </div>
     </body>
 </html>

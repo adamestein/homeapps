@@ -1,0 +1,32 @@
+{% extends "base_popup.html" %}
+{% load static %}
+
+{% block title %}Add {{ field }}{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/form_table.css' %}" />
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <h1>Add {{ field }}</h1>
+
+    <form method="POST" action="/add/{{ field }}">
+        {% csrf_token %}
+        <table>
+            {{ form.as_table }}
+        </table>
+
+        <div style="margin-top: 1em;">
+            <input type="submit" value="Add" /> | <a href="javascript:window.close()">Cancel</a>
+        </div>
+    </form>
+{% endblock %}
+
