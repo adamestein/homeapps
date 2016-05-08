@@ -12,6 +12,11 @@ APP = {
             'link': 'edit_smoke_detector_list',
             'title': 'Edit Smoke Detector'
         },
+        {
+            'desc': 'Delete existing smoke detectors',
+            'link': 'delete_smoke_detectors',
+            'title': 'Delete Smoke Detectors'
+        },
         {},
         {
             'desc': 'Show information for all smoke detectors',
