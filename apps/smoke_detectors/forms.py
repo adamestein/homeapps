@@ -2,7 +2,15 @@ from django import forms
 
 from tekextensions.widgets import SelectWithPopUp
 
-from .models import SmokeDetector
+from .models import BatteryChangeEvent, SmokeDetector
+
+
+class BatteryChangeEventForm(forms.ModelForm):
+    class Meta:
+        model=BatteryChangeEvent
+        widgets = {
+            'date': forms.DateInput(format='%m/%d/%Y')
+        }
 
 
 class SmokeDetectorForm(forms.ModelForm):

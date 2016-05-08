@@ -3,6 +3,18 @@ from datetime import date, timedelta
 from django.db import models
 
 
+# Battery change event
+class BatteryChangeEvent(models.Model):
+    detector = models.ForeignKey('SmokeDetector', help_text='Smoke detector this event is for')
+    date = models.DateField(default=date.today, db_index=True, help_text='Battery change date')
+
+    class Meta:
+        ordering = ['date']
+
+    def __unicode__(self):
+        return u'Change battery event on {}'.format(date.strftime(self.date, '%A %B %d, %Y'))
+
+
 # Battery information
 class BatteryInfo(models.Model):
     BATTERY_TYPES = (
@@ -21,18 +33,6 @@ class BatteryInfo(models.Model):
 
     def __unicode__(self):
         return u'{} of type {}'.format(self.number, self.type)
-
-
-# Battery change event
-class Event(models.Model):
-    detector = models.ForeignKey('SmokeDetector', help_text='Smoke detector this event is for')
-    date = models.DateField(default=date.today, db_index=True, help_text='Battery change date')
-
-    class Meta:
-        ordering = ['date']
-
-    def __unicode__(self):
-        return u'Change battery event on {}'.format(date.strftime(self.date, '%A %B %d, %Y'))
 
 
 # Smoke detector location
@@ -60,7 +60,7 @@ class SmokeDetector(models.Model):
     @property
     def last_event(self):
         try:
-            return self.event_set.all().order_by('-date')[0]
+            return self.batterychangeevent_set.all().order_by('-date')[0]
         except IndexError:
             # There are no events connected to this detector
             return ''

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Smoke Detectors: Add Battery Change Event{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/form_table.css' %}" />
+
+    <style>
+        .ui-datepicker-trigger {
+            margin-left: 0.5em;
+        }
+    </style>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#id_date").datepicker({
+                showOn: "button",
+                buttonImage: "{% static 'img/calendar.gif' %}",
+                buttonImageOnly: true,
+                buttonText: "Select date"
+            })
+        });
+    </script>
+{% endblock %}
+
+{% block header %}Add Battery Change Event{% endblock %}
+
+{% block content %}
+    <p>
+        Specify which <strong>Detector</strong> this event is for as well as the <strong>Date</strong> of the event.
+        Click <em>Add</em> to add the event or <em>Reset</em> to reset the form.
+    </p>
+
+    <hr />
+
+    <form method="post">
+        {% csrf_token %}
+
+        <table>
+            {{ form.as_table }}
+        </table>
+
+        <div class="buttons">
+            <input type="submit" value="{% if object %}Update{% else %}Add{% endif %}" />
+            <input type="reset" value="Reset" />
+        </div>
+    </form>
+{% endblock %}

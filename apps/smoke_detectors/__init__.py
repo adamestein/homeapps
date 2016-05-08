@@ -27,7 +27,7 @@ APP = {
         {},
         {
             'desc': 'Indicate when batteries have been changed',
-            'link': '',
+            'link': 'add_battery_change_event',
             'title': 'Add Change Battery Event 	'
         }
     ]

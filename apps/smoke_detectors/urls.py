@@ -2,8 +2,8 @@ from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse_lazy
 
 from . import APP
-from .forms import SmokeDetectorForm
-from .models import SmokeDetector
+from .forms import BatteryChangeEventForm, SmokeDetectorForm
+from .models import BatteryChangeEvent, SmokeDetector
 
 from library.views.generic import AppCreateView, AppDeleteMultipleView, AppListView, AppTemplateView, AppUpdateView
 
@@ -23,6 +23,19 @@ urlpatterns = patterns(
             template_name='smoke_detectors/smokedetector_form.html'
         ),
         name='add_smoke_detector'
+    ),
+
+    url(
+        '^add/event/$',
+        AppCreateView.as_view(
+            app=APP['name'],
+            form_class=BatteryChangeEventForm,
+            model=BatteryChangeEvent,
+            success_message='Battery change event successfully added',
+            success_url=reverse_lazy('list_smoke_detectors'),
+            template_name='smoke_detectors/event_form.html'
+        ),
+        name='add_battery_change_event'
     ),
 
     url(
