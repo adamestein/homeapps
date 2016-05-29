@@ -1,6 +1,6 @@
 from django.db import models
 
-from library.models.abstract import Template
+from library.mixins.models.abstract import Template
 
 # Leave commented out until we have a Statement model in place
 # class AccountSummary(models.Model):
