@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load dict %}
+
+{% block title %}Financial Applications{% endblock %}
+
+{% block header %}Financial Applications{% endblock %}
+
+{% block content %}
+    <p>
+        Keep track of home finances.
+    </p>
+
+    <table class="table_list">
+        {% for nav_item in apps|dict_lookup:'Finances'|dict_lookup:'navigation' %}
+            <tr>
+                <td>
+                    {% if nav_item.link %}
+                        <a href="{% url nav_item.link %}">{{ nav_item.title }}</a>
+                    {% else %}
+                        {{ nav_item.title }}
+                    {% endif %}
+                </td>
+                <td><span class="table_desc">{{ nav_item.desc }}</span></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

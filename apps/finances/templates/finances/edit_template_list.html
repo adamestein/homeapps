@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#id_list").change(function() {
+                var url = "{% url 'edit_template' 0 %}".replace(0, $("#id_list").find("option:selected").val());
+                window.location.replace(url);
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block title %}Finances: Edit Template{% endblock %}
+
+{% block header %}Edit Template{% endblock %}
+
+{% block content %}
+    {% if object_list %}
+        <p>
+            Select the template to edit or disable.
+        </p>
+
+        <select id="id_list" title="Template list">
+            <option value="0" selected="selected">---------</option>
+            {% for item in object_list %}
+                <option value="{{ item.pk }}">{{ item }}</option>
+            {% endfor %}
+        </select>
+    {% else %}
+        <p>There are no templates to edit.</p>
+    {% endif %}
+{% endblock %}

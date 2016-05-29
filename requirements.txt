@@ -1,6 +1,8 @@
 Django==1.6.11
+django-money==0.8
 django-system-globals==0.0.5
 https://github.com/adamestein/django-tekextensions/archive/master.zip
 MySQL-python==1.2.5
+py-moneyed==0.6.0
 South==1.0.2
 

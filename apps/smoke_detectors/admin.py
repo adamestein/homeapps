@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import BatteryInfo, BatteryChangeEvent, Location, SmokeDetector
+from .models import BatteryInfo, BatteryChangeEvent, Location, SmokeDetector
 
 admin.site.register(BatteryInfo)
 admin.site.register(BatteryChangeEvent)
