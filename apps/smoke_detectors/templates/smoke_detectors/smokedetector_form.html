@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Smoke Detectors: Add Smoke Detector{% endblock %}
+{% block title %}Smoke Detectors: {% if object %}Update{% else %}Add{% endif %} Smoke Detector{% endblock %}
 
 {% block css %}
     {{ block.super }}
@@ -15,7 +15,7 @@
     {{ form.media }}
 {% endblock %}
 
-{% block header %}Add Smoke Detector{% endblock %}
+{% block header %}{% if object %}Update{% else %}Add{% endif %} Smoke Detector{% endblock %}
 
 {% block content %}
     <p>

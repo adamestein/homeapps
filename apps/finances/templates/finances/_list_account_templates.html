@@ -1,0 +1,18 @@
+<div id="table">
+    <div class="header-row row">
+        <span class="cell primary">Name</span>
+        <span class="cell">Account Number</span>
+    </div>
+
+    {% for template in templates %}
+        <div class="row">
+            <input type="radio" name="expand" title="expand">
+            <span class="cell primary" data-label="Name">{{ template.name }}</span>
+            <span class="cell" data-label="Account Number">
+                {% if template.account_number %}
+                    {{ template.account_number }}
+                {% endif %}
+            </span>
+        </div>
+    {% endfor %}
+</div>

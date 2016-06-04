@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Finances: Update Template{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/form_table.css' %}" />
+{% endblock %}
+
+{% block header %}Update Template{% endblock %}
+
+{% block content %}
+    <p>
+        Update the information as desired. Check <strong>Disable</strong> to no longer have this template appear
+        as a choice to be used in statements.
+    </p>
+
+    <p>
+        Click <em>Update</em> to save your changes or <em>Reset</em> to reset the form.
+    </p>
+
+    <hr />
+
+    <form method="post">
+        {% csrf_token %}
+
+        <table>
+            {{ form }}
+        </table>
+
+        <div class="buttons">
+            <input id="submit" type="submit" value="Update" />
+            <input type="reset" value="Reset" />
+        </div>
+    </form>
+{% endblock %}

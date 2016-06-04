@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Finances: Create Template{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/form_table.css' %}" />
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    {{ form.media }}
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var template_type = $("#id_template_type-template_type");
+
+            template_type.change(function () {
+                formDisplay(template_type.find(":selected").val());
+            });
+
+            // Display a form if we have errors (in which case template_type will be set)
+            formDisplay(template_type.find(":selected").val());
+        });
+
+        function formDisplay(selected) {
+            if (selected == "account") {
+                $("#account").show();
+                $("#bill").hide();
+                $("#submit").prop("disabled", false);
+            } else if (selected == "bill") {
+                $("#account").hide();
+                $("#bill").show();
+                $("#submit").prop("disabled", false);
+            } else {
+                // Picked the 'nothing selected' choice
+                $("#account").hide();
+                $("#bill").hide();
+                $("#submit").prop("disabled", true);
+            }
+        }
+    </script>
+{% endblock %}
+
+{% block header %}Create Template{% endblock %}
+
+{% block content %}
+    <p>
+        Fill out the <strong>Name</strong> for this template. All other attributes are optional.
+    </p>
+
+    <p>
+        Click <em>Create</em> to save your changes or <em>Reset</em> to reset
+        the form.
+    </p>
+
+    <hr />
+
+    <form method="post">
+        {% csrf_token %}
+
+        <table>
+            {{ form.template_type }}
+
+            <tbody id="account" style="display: none;">
+                {{ form.account.as_table }}
+            </tbody>
+
+            <tbody id="bill" style="display: none;">
+                {{ form.bill.as_table }}
+            </tbody>
+        </table>
+
+        <div class="buttons">
+            <input id="submit" type="submit" value="Create" disabled="disabled" />
+            <input type="reset" value="Reset" />
+        </div>
+    </form>
+{% endblock %}

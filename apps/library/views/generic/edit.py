@@ -1,17 +1,18 @@
 from django import forms
-from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.loading import get_model
 from django.views.generic import CreateView, FormView, UpdateView
 
-from .mixins import LoginRequiredMixin, NavigationContextMixin
+from .mixins.auth import LoginRequiredMixin
+from .mixins.messages import AppSuccessMessageMixin
+from .mixins.navigation import  NavigationContextMixin
 
 
-class AppCreateView(LoginRequiredMixin, NavigationContextMixin, SuccessMessageMixin, CreateView):
+class AppCreateView(LoginRequiredMixin, NavigationContextMixin, AppSuccessMessageMixin, CreateView):
     pass
 
 
-class AppDeleteMultipleView(LoginRequiredMixin, NavigationContextMixin, SuccessMessageMixin, FormView):
+class AppDeleteMultipleView(LoginRequiredMixin, NavigationContextMixin, AppSuccessMessageMixin, FormView):
     label = ''
     queryset = None
 
@@ -58,5 +59,5 @@ class AppDeleteMultipleView(LoginRequiredMixin, NavigationContextMixin, SuccessM
         return form_kwargs
 
 
-class AppUpdateView(LoginRequiredMixin, NavigationContextMixin, SuccessMessageMixin, UpdateView):
+class AppUpdateView(LoginRequiredMixin, NavigationContextMixin, AppSuccessMessageMixin, UpdateView):
     pass

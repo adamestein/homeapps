@@ -3,9 +3,9 @@ APP = {
     'name': 'Finances',
     'navigation': [
         {
-            'desc': 'Add a new template',
-            'link': 'add_template',
-            'title': 'Add Template'
+            'desc': 'Create a new template',
+            'link': 'create_template',
+            'title': 'Create Template'
         },
         {
             'desc': 'Edit/Disable an existing template',

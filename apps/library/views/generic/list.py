@@ -1,6 +1,7 @@
 from django.views.generic import ListView
 
-from .mixins import LoginRequiredMixin, NavigationContextMixin
+from .mixins.auth import LoginRequiredMixin
+from .mixins.navigation import NavigationContextMixin
 
 
 class AppListView(LoginRequiredMixin, NavigationContextMixin, ListView):

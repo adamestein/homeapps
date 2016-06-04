@@ -12,29 +12,23 @@
 {% block header %}List Templates{% endblock %}
 
 {% block content %}
-    <p>
-        This page will list all the templates defined in the system.
-    </p>
+    {% if total_templates %}
+        <p>
+            This page will list all the templates defined in the system.
+        </p>
 
-    {% if object_list %}
-        <div id="table">
-            <div class="header-row row">
-                <span class="cell primary">Name</span>
-                <span class="cell">Account Number</span>
-            </div>
+        <hr />
 
-            {% for template in object_list %}
-                <div class="row">
-                    <input type="radio" name="expand" title="expand">
-                    <span class="cell primary" data-label="Name">{{ template.name }}</span>
-                    <span class="cell" data-label="Account Number">
-                        {% if template.account_number %}
-                            {{ template.account_number }}
-                        {% endif %}
-                    </span>
+        {% for name, items in templates.items %}
+            {% if items|length %}
+                <div class="caption" {% if not forloop.first %}style="margin-top: 2em;"{% endif %}>{{ name|title }}
                 </div>
-            {% endfor %}
-        </div>
+
+                {% with html_name='finances/_list_'|add:name|add:'_templates.html' %}
+                    {% include html_name with templates=items %}
+                {% endwith %}
+            {% endif %}
+        {% endfor %}
     {% else %}
         <p>There are no templates to list.</p>
     {% endif %}

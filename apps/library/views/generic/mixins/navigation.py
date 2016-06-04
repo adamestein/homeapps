@@ -2,16 +2,8 @@ import json
 
 from system_globals.models import SystemGlobal
 
-from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.views.generic.base import ContextMixin, View
-
-
-class LoginRequiredMixin(View):
-    @classmethod
-    def as_view(cls, **initkwargs):
-        view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
-        return login_required(view)
+from django.views.generic.base import ContextMixin
 
 
 class NavigationContextMixin(ContextMixin):
