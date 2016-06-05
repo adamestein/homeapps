@@ -96,9 +96,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.normpath(os.path.join(BASE_DIR, '..', 'static'))
 ]
-import sys
-print >>sys.stderr, 'Static Root = [{}]'.format(STATIC_ROOT)
-print >>sys.stderr, 'Static Dirs = [{}]'.format(STATICFILES_DIRS)
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
