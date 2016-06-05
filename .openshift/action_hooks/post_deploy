@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source $OPENSHIFT_HOMEDIR/python/virtenv/bin/activate
+
 echo ""
 echo "Running migrations"
 ${OPENSHIFT_REPO_DIR}manage.py syncdb --noinput
