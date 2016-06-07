@@ -7,7 +7,9 @@
     {% for template in templates %}
         <div class="row">
             <input type="radio" name="expand" title="expand">
-            <span class="cell primary" data-label="Name">{{ template.name }}</span>
+            <span class="cell primary" data-label="Name">
+                <a href="{% url 'edit_template' 'account' template.pk %}">{{ template.name }}</a>
+            </span>
             <span class="cell" data-label="Account Number">
                 {% if template.account_number %}
                     {{ template.account_number }}

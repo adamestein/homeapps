@@ -1,7 +1,12 @@
-from .forms import UpdateAccountTemplateForm, UpdateBillTemplateForm
 from .models import AccountTemplate, BillTemplate
 
 from library.views.generic import AppCreateView, AppListView, AppUpdateView
+
+TEMPLATE_CHOICES = (
+    ('account', 'Account'),
+    ('bill', 'Bill'),
+    ('income', 'Income')
+)
 
 
 class TemplateCreateView(AppCreateView):
@@ -29,7 +34,10 @@ class TemplateListView(AppListView):
 
 
 class TemplateUpdateView(AppUpdateView):
+
     def get_form_class(self):
+        from .forms import UpdateAccountTemplateForm, UpdateBillTemplateForm
+
         if self.kwargs['template_type'] == 'account':
             return UpdateAccountTemplateForm
         elif self.kwargs['template_type'] == 'bill':

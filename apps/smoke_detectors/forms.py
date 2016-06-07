@@ -1,6 +1,6 @@
-from django import forms
-
 from tekextensions.widgets import SelectWithPopUp
+
+from django import forms
 
 from .models import BatteryChangeEvent, SmokeDetector
 

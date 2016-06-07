@@ -40,6 +40,13 @@
     text-align: center;
 }
 
+.cell-left_align {
+    border-bottom: 1px solid #e5e5e5;
+    display: table-cell;
+    padding: 6px;
+    text-align: left;
+}
+
 .primary {
     text-align: left;
 }
