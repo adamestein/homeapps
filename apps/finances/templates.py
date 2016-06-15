@@ -1,4 +1,4 @@
-from .models import AccountTemplate, BillTemplate
+from .models import AccountTemplate, BillTemplate, IncomeTemplate
 
 from library.views.generic import AppCreateView, AppListView, AppUpdateView
 
@@ -26,7 +26,8 @@ class TemplateListView(AppListView):
         context = super(TemplateListView, self).get_context_data(**kwargs)
         context['templates'] = {
             'account': AccountTemplate.objects.exclude(disabled=True),
-            'bill': BillTemplate.objects.exclude(disabled=True)
+            'bill': BillTemplate.objects.exclude(disabled=True),
+            'income': IncomeTemplate.objects.exclude(disabled=True)
         }
         context['total_templates'] = sum(context['templates'][name].count() for name in context['templates'])
 
@@ -36,12 +37,14 @@ class TemplateListView(AppListView):
 class TemplateUpdateView(AppUpdateView):
 
     def get_form_class(self):
-        from .forms import UpdateAccountTemplateForm, UpdateBillTemplateForm
+        from .forms import UpdateAccountTemplateForm, UpdateBillTemplateForm, UpdateIncomeTemplateForm
 
         if self.kwargs['template_type'] == 'account':
             return UpdateAccountTemplateForm
         elif self.kwargs['template_type'] == 'bill':
             return UpdateBillTemplateForm
+        elif self.kwargs['template_type'] == 'income':
+            return UpdateIncomeTemplateForm
         else:
             raise RuntimeError(
                 'TemplateUpdateView.get_form_class(): unknown template type ({})'.format(self.kwargs['template_type'])
@@ -52,6 +55,8 @@ class TemplateUpdateView(AppUpdateView):
             return AccountTemplate.objects.get(pk=self.kwargs.get(self.pk_url_kwarg))
         elif self.kwargs['template_type'] == 'bill':
             return BillTemplate.objects.get(pk=self.kwargs.get(self.pk_url_kwarg))
+        elif self.kwargs['template_type'] == 'income':
+            return IncomeTemplate.objects.get(pk=self.kwargs.get(self.pk_url_kwarg))
         else:
             raise RuntimeError(
                 'TemplateUpdateView.get_object(): unknown template type ({})'.format(self.kwargs['template_type'])

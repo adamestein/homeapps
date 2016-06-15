@@ -48,18 +48,18 @@ class BillTemplate(Template):
         return fstr
 
 
-# Wait til we get options working for Bill templates, then do IncomeTemplate
-# class IncomeTemplate(Template):
-#     account_number = models.PositiveIntegerField(
-#         db_index=True, blank=True, null=True, default='', help_text="Account number."
-#     )
-#     amount = MoneyField(
-#         max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True, help_text='Amount of the bill.'
-#     )
-#     due_day = models.PositiveSmallIntegerField(
-#         blank=True, null=True, help_text='Day of the month this bill is due (0 means last day of the month).'
-#     )
-#     options = models.PositiveIntegerField(default=0, blank=True)
+class IncomeTemplate(Template):
+    account_number = models.PositiveIntegerField(
+        db_index=True, blank=True, null=True, default='', help_text="Account number."
+    )
+    amount = MoneyField(
+        max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True, help_text='Income amount.'
+    )
+    arrival_day = models.PositiveSmallIntegerField(
+        blank=True, null=True,
+        help_text='Day of the month this income is expected to arrive (0 means last day of the month).'
+    )
+    options = models.ManyToManyField('Option', help_text='Options for the income.', blank=True)
 
 
 class Option(models.Model):

@@ -27,19 +27,30 @@
         });
 
         function formDisplay(selected) {
-            if (selected == "account") {
+            if (selected == "") {
+                // Picked the 'nothing selected' choice
+                $("#account").hide();
+                $("#bill").hide();
+                $("#income").hide();
+                $("#submit").prop("disabled", true);
+            } else if (selected == "account") {
                 $("#account").show();
                 $("#bill").hide();
+                $("#income").hide();
                 $("#submit").prop("disabled", false);
             } else if (selected == "bill") {
                 $("#account").hide();
                 $("#bill").show();
+                $("#income").hide();
                 $("#submit").prop("disabled", false);
-            } else {
-                // Picked the 'nothing selected' choice
+            } else if (selected == "income") {
                 $("#account").hide();
                 $("#bill").hide();
-                $("#submit").prop("disabled", true);
+                $("#income").show();
+                $("#submit").prop("disabled", false);
+            } else {
+                // Choice is not implemented
+                alert("'" + selected + "' is not implemented yet");
             }
         }
     </script>
@@ -71,6 +82,10 @@
 
             <tbody id="bill" style="display: none;">
                 {{ form.bill.as_table }}
+            </tbody>
+
+            <tbody id="income" style="display: none;">
+                {{ form.income.as_table }}
             </tbody>
         </table>
 

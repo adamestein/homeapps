@@ -24,7 +24,7 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $("#account, #bill").selectmenu({
+            $("#account, #bill, #income").selectmenu({
                 change: function(event, ui) {
                     var url = "{% url 'edit_template' 'type' 0 %}";
                     window.location.href = url.replace("type", ui.item.optgroup).replace("0", ui.item.value);

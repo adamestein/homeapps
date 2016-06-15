@@ -12,13 +12,21 @@ class FinancesMultiModelForm(MultiModelForm):
         return self.forms[self.forms.values()[0].cleaned_data['template_type']]
 
     def is_valid(self):
-        # If the TemplateType form is valid, then verify that the form it's pointing to is valid. If both are valid,
-        # the whole thing is valid
+        template_type = self.forms.values()[0].cleaned_data['template_type']
+
+        # If the TemplateType form is valid, verify that the form it's pointing to is valid. If the other form is
+        # also valid, the whole multi form is valid.
         if self.forms.values()[0].is_valid():
-            if self.forms.values()[0].cleaned_data['template_type'] == 'account':
+            if template_type == 'account':
                 forms_valid = self.forms.values()[1].is_valid()
-            else:
+            elif template_type == 'bill':
                 forms_valid = self.forms.values()[2].is_valid()
+            elif template_type == 'income':
+                forms_valid = self.forms.values()[3].is_valid()
+            else:
+                raise RuntimeError(
+                    'FinancesMultiModelForm:is_valid(): unknown template type ({})'.format(template_type)
+                )
         else:
             forms_valid = False
 

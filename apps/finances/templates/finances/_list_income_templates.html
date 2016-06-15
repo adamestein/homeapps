@@ -3,9 +3,7 @@
         <span class="cell primary">Name</span>
         <span class="cell">Account Number</span>
         <span class="cell">Amount</span>
-        <span class="cell">Total</span>
-        <span class="cell">Due Day</span>
-        <span class="cell">URL</span>
+        <span class="cell">Arrival Day</span>
         <span class="cell">Options</span>
     </div>
 
@@ -13,7 +11,7 @@
         <div class="row">
             <input type="radio" name="expand" title="expand">
             <span class="cell primary" data-label="Name">
-                <a href="{% url 'edit_template' 'bill' template.pk %}">{{ template.name }}</a>
+                <a href="{% url 'edit_template' 'income' template.pk %}">{{ template.name }}</a>
             </span>
             <span class="cell" data-label="Account Number">
                 {% if template.account_number %}
@@ -25,19 +23,9 @@
                     {{ template.amount }}
                 {% endif %}
             </span>
-            <span class="cell" data-label="Total">
-                {% if template.total %}
-                    {{ template.total }}
-                {% endif %}
-            </span>
-            <span class="cell" data-label="Due Day">
-                {% if template.due_day %}
-                    {{ template.due_day }}
-                {% endif %}
-            </span>
-            <span class="cell" data-label="URL">
-                {% if template.url %}
-                    <a href="{{ template.url }}" target="_blank">{{ template.url }}</a>
+            <span class="cell" data-label="Arrival Day">
+                {% if template.arrival_day %}
+                    {{ template.arrival_day }}
                 {% endif %}
             </span>
             <span class="cell-left_align" data-label="Options">
