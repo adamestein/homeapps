@@ -1,0 +1,41 @@
+<tr>
+    <td><span style="font-size: 1.6em"><strong>{{ label }}</strong></span></td>
+</tr>
+
+<tr>
+    <td>
+        <table class="statement">
+            {% for row in data %}
+                <tr class="{% cycle 'row1' 'row2' %}">
+                    <td>
+                        {{ row.name }}
+                    </td>
+
+                    <td style="text-align: right;">
+                        {{ row.amount }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <table class="totals">
+            <tr>
+                <td class="totals"><strong>Total =</strong></td>
+                <td style="text-align: right;"><strong>{{ total }}</strong></td>
+            </tr>
+
+            {% if diff_label %}
+                <tr>
+                    <td class="totals"><strong>{{ diff_label }} =</strong></td>
+                    <td style="text-align: right;">
+                        <strong>
+                            <span style="color: {% if diff.amount < 0 %}red{% else %}green{% endif %};">
+                                {{ diff }}
+                            </span>
+                        </strong>
+                    </td>
+                </tr>
+            {% endif %}
+        </table>
+    </td>
+</tr>

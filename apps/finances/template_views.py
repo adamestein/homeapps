@@ -37,7 +37,7 @@ class TemplateListView(AppListView):
 class TemplateUpdateView(AppUpdateView):
 
     def get_form_class(self):
-        from .forms import UpdateAccountTemplateForm, UpdateBillTemplateForm, UpdateIncomeTemplateForm
+        from .template_forms import UpdateAccountTemplateForm, UpdateBillTemplateForm, UpdateIncomeTemplateForm
 
         if self.kwargs['template_type'] == 'account':
             return UpdateAccountTemplateForm

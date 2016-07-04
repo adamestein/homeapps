@@ -1,21 +1,35 @@
 from datetime import date
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.dateformat import DateFormat
+
 from djmoney.models.fields import MoneyField
 
-from library.abstract_models import Template
+from library.abstract_models import Auth, StatementItem, Template
 
-# Leave commented out until we have a Statement model in place
-# class AccountSummary(models.Model):
-#     account = models.ForeignKey("AccountTemplate", help_text="Account template.")
-#     amount = MoneyField(help_text='Current amount in this account.')
-#     statement = models.ForeignKey("Statement", help_text = "To which statement this account summary belongs.",)
+
+class Account(StatementItem, models.Model):
+    account_number = models.PositiveIntegerField(
+        db_index=True, blank=True, null=True, default='', help_text='Account number.'
+    )
+
+    class Meta:
+        ordering = ('name', 'statement__date')
+
+    @classmethod
+    def str_format(cls, name, account_number, amount, item_date=None):
+        acct_num = ' (acct #{})'.format(account_number) if account_number else ''
+        date_val = ' as of {}'.format(DateFormat(item_date).format('F jS, Y')) if item_date else ''
+        return '{}{} with {}{}'.format(name, acct_num, amount, date_val)
+
+    def __unicode__(self):
+        return Account.str_format(self.name, self.account_number, self.amount, self.statement.date)
 
 
 class AccountTemplate(Template):
     account_number = models.PositiveIntegerField(
-        db_index=True, blank=True, null=True, default='', help_text="Account number."
+        db_index=True, blank=True, null=True, default='', help_text='Account number.'
     )
 
 
@@ -63,7 +77,7 @@ class IncomeTemplate(Template):
 
 
 class Option(models.Model):
-    from .templates import TEMPLATE_CHOICES
+    from .template_views import TEMPLATE_CHOICES
 
     template_type = models.CharField(max_length=7, choices=TEMPLATE_CHOICES[1:])    # Don't include 'account'
     name = models.CharField(max_length=50)
@@ -75,3 +89,14 @@ class Option(models.Model):
 
     def __unicode__(self):
         return u'{}: {} - {}'.format(self.template_type, self.name, self.description)
+
+
+class Statement(Auth, models.Model):
+    date = models.DateField(db_index=True, help_text='Statement date')
+
+    class Meta:
+        ordering = ('date', )
+        unique_together = (('user', 'date'), )
+
+    def __unicode__(self):
+        return DateFormat(self.date).format('F jS, Y')

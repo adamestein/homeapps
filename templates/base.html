@@ -20,6 +20,28 @@
 
         {% block js %}
             <script type="text/javascript" src="http://code.jquery.com/jquery-1.12.3.min.js"></script>
+            <script type="text/javascript" src="{% static 'js/js.cookie.js' %}"></script>
+
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    // Get the CSRF token and set up jquery AJAX calls to pass the CSRF token if needed
+
+                    var csrftoken = Cookies.get('csrftoken');
+
+                    $.ajaxSetup({
+                        beforeSend: function(xhr, settings) {
+                            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                            }
+                        }
+                    });
+
+                    function csrfSafeMethod(method) {
+                        // These HTTP methods do not require CSRF protection
+                        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+                    }
+                });
+            </script>
         {% endblock %}
     </head>
 

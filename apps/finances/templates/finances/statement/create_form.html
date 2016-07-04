@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Finances: Create Statement{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jquery-impromptu.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/popr.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/form_table.css' %}" />
+
+    <style>
+        div.jqi {
+            width: 500px;
+        }
+
+        strong {
+            font-weight: bold !important;
+        }
+
+        .ui-datepicker-trigger {
+            margin-left: 0.5em;
+        }
+    </style>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/jquery-impromptu.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/popr.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/datadumper.js' %}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var dateField = $("#id_statement-date");
+
+            dateField.datepicker({
+                buttonImage: "{% static 'img/calendar.gif' %}",
+                buttonImageOnly: true,
+                buttonText: "Select date",
+                onSelect: function(dateText, inst) {
+                    if (dateText !== inst.lastVal) {
+                        $(this).change();
+                    }
+                },
+                showOn: "button"
+            });
+
+            dateField.change(function() {
+                submitButtonStatus();
+            });
+
+            $(".popr").popr();
+
+            // Click on the green plus sign to popup a form to fill out
+            $(document).on('click', '.popr-item', function() {
+                var pk = $(this).data("pk");
+                var sectionInfo = {
+                    "pk": pk,
+                    "table_type": $(this).data("type"),
+                    "total_forms": $("#id_account-TOTAL_FORMS").val()
+                };
+
+                $.post(
+                    "{% url 'get_statement_section_form' %}",
+                    sectionInfo,
+                    function(encoded) {
+                        var focus = (pk == "") ? "name" : "amount_0";
+                        var info = JSON.parse(encoded);
+
+                        $.prompt(
+                            createPopupHTML(pk, info["form"]),
+                            {
+                                buttons: {
+                                    Ok: "Ok",
+                                    Cancel: "Cancel"
+                                },
+                                focus: "input[name='" + focus + "']",   // Seems to only work for "text" inputs in FF
+                                submit: function(event, value, message, formVals) {
+                                    validateForm(event, value, message, formVals, sectionInfo)
+                                }
+                            }
+                        );
+                    }
+                ).fail(function(jqXHR, textStatus, errorThrown) {
+                    $.prompt.close();
+                    alert(
+                        "Could not retrieve the information.\n\nError: " + jqXHR.responseText
+                    );
+                });
+            })
+        });
+
+        // Create the HTML for the popup
+        function createPopupHTML(pk, form) {
+            var html;
+            var title = (pk == "") ? "Create New Account" : "Edit Account";
+
+            html =  '<div id="popup">' +
+                    '<h2 style="margin-bottom: 1em; text-align: center;">' + title + '</h2>' +
+                    '<table>' + form + '</table>' +
+                    '</div>';
+
+            return html;
+        }
+
+        // Delete a listed item and restore the name back to the popup menu
+        function deleteListItem(button) {
+            /*
+                Put the name back in the drop drown list if not 'new' (the item created by the 'new' choice won't
+                match any menu item unless somebody uses the nsame as a menu item for some reason, but we're not
+                going to worry about that.
+             */
+
+            var accountFormSet = $("#account_formset");
+            var menu = $("div").find("[data-box-id='account']");
+            var name = $(button).parent().data('name');
+
+            menu.children().filter(function() {
+                return $(this).text() == name;
+            }).show();
+
+            // Remove the button and formset
+            $(button).parent().remove();
+            accountFormSet.find("[data-name='" + name + "']").remove();
+
+            // Update formset
+            var totalForms = $("#id_account-TOTAL_FORMS");
+            totalForms.val(parseInt(totalForms.val()) - 1);
+
+            // If no more items, show the 'no' message
+            if ($("#accounts").find("div").length == 0) {
+                $("#no_accounts_message").show();
+            } else {
+                var regex = new RegExp("account-\\d+");
+
+                // Make sure formset items are numbered 0-totalForms
+                accountFormSet.find("div").each(function(index, value) {
+                    var pattern = "account-" + index;
+
+                    $(value).find("label").each(function(index, value) {
+                        var newValue = $(value).attr("for").replace(regex, pattern);
+                        $(value).attr("for", newValue);
+                    });
+
+                    $(value).find("input").each(function(index, value) {
+                        var newIDValue = $(value).attr("id").replace(regex, pattern);
+                        var newNameValue = $(value).attr("name").replace(regex, pattern);
+                        $(value).attr("id", newIDValue).attr("name", newNameValue);
+                    });
+
+                    $(value).find("select").each(function(index, value) {
+                        var newIDValue = $(value).attr("id").replace(regex, pattern);
+                        var newNameValue = $(value).attr("name").replace(regex, pattern);
+                        $(value).attr("id", newIDValue).attr("name", newNameValue);
+                    });
+                });
+            }
+
+            submitButtonStatus();
+        }
+
+        // Insert so that the list is alphabetical (by name)
+        function insertListItem(sectionID, name, buttonHTML) {
+            var inserted = false;
+
+            $(sectionID).find('div').each(function(index, value) {
+                if (name < $(value).data("name")) {
+                    $(value).before(buttonHTML);
+                    inserted = true;
+                }
+            });
+
+            if (inserted == false) {
+                $(sectionID).append(buttonHTML);
+            }
+        }
+
+        function submitButtonStatus() {
+            var date = $("#id_statement-date").val().length;
+            var items = $("#accounts").find("div").length;
+            var submitButton = $("#submit");
+
+            // Enable the submit button if we have a date and items on the statement
+            if (date && items) {
+                submitButton.prop("disabled", false);
+            } else {
+                submitButton.prop("disabled", true);
+            }
+        }
+
+        // Validate the values from the popup form
+        function validateForm(event, value, message, formVals, sectionInfo) {
+            if (value == "Ok") {
+                // Don't let the popup disappear until we know everything is alright
+                event.preventDefault();
+
+                formVals = $.extend(formVals, sectionInfo);
+
+                $.post(
+                    "{% url 'statement_section_form_validation' %}",
+                    formVals,
+                    function(encoded) {
+                        var info = JSON.parse(encoded);
+
+                        if (info["errors"]) {
+                            $("#popup").html(createPopupHTML(sectionInfo['table_type'], info["errors"]));
+                        } else {
+                            var dataName = 'data-name="' + info["name"] + '"';
+                            var divBegin = '<div ' + dataName + '>';
+
+                            var buttonHTML = divBegin +
+                                             '  <button>' +
+                                                  info["button_text"] +
+                                             '  </button>' +
+                                             '  <img style="cursor: pointer; margin-left: 0.5em;" ' +
+                                             '       src="{% static 'admin/img/icon_deletelink.gif' %}" ' +
+                                             '       alt="[Delete fund]" title="Delete account from list" ' +
+                                             '       onclick="deleteListItem(this);" />' +
+                                             '</div>';
+
+                            // Hide this from the drop down list if not the 'new' choice
+                            if (sectionInfo['pk']) {
+                                var menu = $("div").find("[data-box-id='account']");
+                                menu.find("[data-pk='" + sectionInfo['pk'] + "']").hide();
+                            }
+
+                            // Update the formset
+                            var totalForms = $("#id_account-TOTAL_FORMS");
+                            totalForms.val(parseInt(totalForms.val()) + 1);
+
+                            // Update GUI
+                            $.prompt.close();
+                            $("#account_formset").append(divBegin + info["form"] + '</div>');
+                            $("#no_accounts_message").hide();
+                            insertListItem("#accounts", info["name"], buttonHTML);
+                            submitButtonStatus();
+                        }
+                    }
+                ).fail(function(jqXHR, textStatus, errorThrown) {
+                    $.prompt.close();
+                    alert(
+                        "Could not validate the information.\n\nError: " + jqXHR.responseText
+                    );
+                });
+            }
+        }
+    </script>
+{% endblock %}
+
+{% block header %}Create Statement{% endblock %}
+
+{% block content %}
+    <p>
+        Fill out the form below and click <strong>Create</strong> to generate a new statement. Click the green plus
+        sign (<img src="{% static 'admin/img/icon_addlink.gif' %}" />) to add an item to this statement.  Click the
+        red x sign (<img src="{% static 'admin/img/icon_deletelink.gif' %}" />) to delete the item.
+    </p>
+
+    <hr />
+
+    <form method="post">
+        {% csrf_token %}
+
+        <table style="margin-bottom: 2em;">
+            {{ form.statement }}
+        </table>
+
+        <fieldset>
+            <legend>
+                <strong>Accounts</strong>
+
+                <span class="popr" data-id="account">
+                    <img src="{% static 'admin/img/icon_addlink.gif' %}" alt="[Add Account]" title="Add Account" />
+                </span>
+            </legend>
+
+            {{ form.account.management_form }}
+            {{ form.account.non_form_errors }}
+
+            <div id="accounts">
+                {% ifequal form.account|length 0 %}
+                    <p id="no_accounts_message">
+                        There are currently no accounts to list.
+                    </p>
+                {% endifequal %}
+            </div>
+        </fieldset>
+
+        <div class="buttons">
+            <input id="submit" type="submit" value="Create" disabled="disabled" />
+            <input type="reset" value="Reset" />
+        </div>
+
+        <div id="account_formset" style="display: none;">
+            {% for account in form.account %}
+                {{ account }}
+            {% endfor %}
+        </div>
+    </form>
+
+    <div class="popr-box" data-box-id="account">
+        {% for choice in account_choices %}
+            <div class="popr-item" data-pk="{{ choice.pk }}" data-type="account">{{ choice.name }}</div>
+        {% endfor %}
+        <div class="popr-item" data-pk="" data-type="account"><strong>New Account</strong></div>
+    </div>
+{% endblock %}

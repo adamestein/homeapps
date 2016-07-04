@@ -24,7 +24,7 @@
                 <div class="caption" {% if not forloop.first %}style="margin-top: 2em;"{% endif %}>{{ name|title }}
                 </div>
 
-                {% with html_name='finances/_list_'|add:name|add:'_templates.html' %}
+                {% with html_name='finances/template/_list_'|add:name|add:'.html' %}
                     {% include html_name with templates=items %}
                 {% endwith %}
             {% endif %}

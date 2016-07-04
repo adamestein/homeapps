@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Finances: Statement for {{ object.date|date:"F d, Y" }}{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+
+    <style type="text/css">
+        table.statement {
+            border: 2px outset black;
+            border-collapse: collapse;
+            border-spacing: 2px;
+            table-layout: fixed;
+            width: 50em;
+        }
+
+        table.statement.td {
+            border: 2px inset;
+            padding: 1px;
+        }
+
+        tr.row1 td {
+            background-color: #C0C0C0; color: black;
+        }
+
+        tr.row2 td {
+            background-color: white; color: black;
+        }
+
+        table.totals {
+            text-align: right;
+            width: 50em;
+        }
+
+        table.totals td.totals {
+            width: 88%;
+        }
+    </style>
+{% endblock %}
+
+{% block header %}Statement for {{ object.date|date:"F d, Y" }}{% endblock %}
+
+{% block content %}
+    <table>
+        {% with data=object.account_set.all label="Accounts" total=total.account %}
+            {% include "finances/statement/_section_table.html" %}
+        {% endwith %}
+    </table>
+{% endblock %}

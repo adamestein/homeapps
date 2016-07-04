@@ -5,7 +5,17 @@ from betterforms.multiform import MultiModelForm
 from django.core.exceptions import ValidationError
 
 
-class FinancesMultiModelForm(MultiModelForm):
+class StatementMultiForm(MultiModelForm):
+    def is_valid(self):
+        forms_valid = all(form.is_valid() for form in self.forms.values())
+        try:
+            self.clean()
+        except ValidationError as e:
+            self.add_crossform_error(e)
+        return forms_valid and not self.crossform_errors
+
+
+class TemplateMultiModelForm(MultiModelForm):
     save_m2m = None
 
     def get_selected_template(self):
