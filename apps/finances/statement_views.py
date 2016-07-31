@@ -4,8 +4,8 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
 
-from .models import Account, AccountTemplate
-from .statement_forms import AccountForm
+from .models import Account, AccountTemplate, Income, IncomeTemplate
+from .statement_forms import AccountForm, IncomeForm
 
 from library.views.generic import AppCreateView, AppDetailView
 from library.views.generic.mixins.ajax import AJAXResponseMixin
@@ -15,7 +15,8 @@ class StatementCreateView(AppCreateView):
     def get_context_data(self, **kwargs):
         context = super(StatementCreateView, self).get_context_data(**kwargs)
         context.update({
-            'account_choices': _get_account_choices(self.request.user)
+            'account_choices': _get_account_choices(self.request.user),
+            'income_choices': _get_income_choices(self.request.user)
         })
 
         return context
@@ -37,6 +38,12 @@ class StatementCreateView(AppCreateView):
             account.statement = statement
             account.save()
 
+        for form in multiform.forms['income']:
+            income = form.save(commit=False)
+            income.statement = statement
+            income.save()
+            form.save_m2m()
+
         return HttpResponseRedirect(reverse('statement_detail', args=[statement.pk]))
 
 
@@ -44,11 +51,10 @@ class StatementDetailView(AppDetailView):
     def get_context_data(self, **kwargs):
         context = super(StatementDetailView, self).get_context_data(**kwargs)
 
-        account_total = sum([account.amount for account in self.object.account_set.all()])
-
         context.update({
             'total': {
-                'account': account_total
+                'account': sum([account.amount for account in self.object.account_set.all()]),
+                'income': sum([income.amount for income in self.object.income_set.all()])
             }
         })
 
@@ -74,10 +80,27 @@ class StatementSectionForm(AJAXResponseMixin, TemplateView):
                 )
             else:
                 form = AccountForm(prefix=prefix)
+        elif table_type == 'income':
+            if pk:
+                template = IncomeTemplate.objects.get(pk=pk)
+                form = IncomeForm(
+                    initial={
+                        'account_number': template.account_number,
+                        'name': template.name,
+                        'options': template.options.all()
+                    },
+                    prefix=prefix
+                )
+
+                if template.arrival_day:
+                    today = date.today()
+                    form.initial['date'] = date(today.year, today.month, template.arrival_day).strftime('%m/%d/%Y')
+            else:
+                form = IncomeForm(prefix=prefix)
         else:
             raise RuntimeError('StatementSectionForm:get_context_data(): unknown table type ({})'.format(table_type))
 
-        return {"form": str(form)}
+        return {'form': str(form), 'table_type': table_type}
 
 
 class StatementSectionFormValidation(AJAXResponseMixin, TemplateView):
@@ -94,19 +117,41 @@ class StatementSectionFormValidation(AJAXResponseMixin, TemplateView):
                         form.cleaned_data['name'],
                         form.cleaned_data['account_number'],
                         form.cleaned_data['amount']
-                    ),
-                    'form': form.as_p(),
-                    'name': form.cleaned_data['name']
+                    )
                 }
             else:
                 info = {'errors': str(form)}
-
-            return info
+        elif table_type == 'income':
+            form = IncomeForm(self.request.POST, prefix=prefix)
+            if form.is_valid():
+                info = {
+                    'button_text': str(
+                        Income(
+                            account_number=form.cleaned_data['account_number'],
+                            amount=form.cleaned_data['amount'],
+                            date=form.cleaned_data['date'],
+                            name=form.cleaned_data['name']
+                        )
+                    )
+                }
+            else:
+                info = {'errors': str(form)}
         else:
             raise RuntimeError(
                 'StatementSectionFormValidation:get_context_data(): unknown table type ({})'.format(table_type)
             )
 
+        if 'button_text' in info:
+            # Add common items that all returned info will have
+            info['form'] = form.as_table()
+            info['name'] = form.cleaned_data['name']
+
+        return info
+
 
 def _get_account_choices(user):
     return AccountTemplate.objects.filter(user=user, disabled=False)
+
+
+def _get_income_choices(user):
+    return IncomeTemplate.objects.filter(user=user, disabled=False)

@@ -3,39 +3,50 @@
 </tr>
 
 <tr>
-    <td>
-        <table class="statement">
-            {% for row in data %}
-                <tr class="{% cycle 'row1' 'row2' %}">
-                    <td>
-                        {{ row.name }}
-                    </td>
+    {% if data|length %}
+        <td>
+            <table class="statement">
+                {% for row in data %}
+                    <tr class="{% cycle 'row1' 'row2' %}">
+                        <td>
+                            {{ row.name }}
+                            {% if row.options %}
+                                <ul class="options">
+                                    {% for option in row.options.all %}
+                                        <li class="option" title="{{ option.description }}">{{ option.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </td>
 
-                    <td style="text-align: right;">
-                        {{ row.amount }}
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
+                        <td style="text-align: right;">
+                            {{ row.amount }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
 
-        <table class="totals">
-            <tr>
-                <td class="totals"><strong>Total =</strong></td>
-                <td style="text-align: right;"><strong>{{ total }}</strong></td>
-            </tr>
-
-            {% if diff_label %}
+            <table class="totals">
                 <tr>
-                    <td class="totals"><strong>{{ diff_label }} =</strong></td>
-                    <td style="text-align: right;">
-                        <strong>
-                            <span style="color: {% if diff.amount < 0 %}red{% else %}green{% endif %};">
-                                {{ diff }}
-                            </span>
-                        </strong>
-                    </td>
+                    <td class="totals"><strong>Total =</strong></td>
+                    <td style="text-align: right;"><strong>{{ total }}</strong></td>
                 </tr>
-            {% endif %}
-        </table>
-    </td>
+
+                {% if diff_label %}
+                    <tr>
+                        <td class="totals"><strong>{{ diff_label }} =</strong></td>
+                        <td style="text-align: right;">
+                            <strong>
+                                <span style="color: {% if diff.amount < 0 %}red{% else %}green{% endif %};">
+                                    {{ diff }}
+                                </span>
+                            </strong>
+                        </td>
+                    </tr>
+                {% endif %}
+            </table>
+        </td>
+    {% else %}
+        <td>No items</td>
+    {% endif %}
 </tr>

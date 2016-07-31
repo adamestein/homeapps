@@ -11,7 +11,7 @@ class OptionForm(forms.ModelForm):
 
         super(OptionForm, self).__init__(*args, **kwargs)
 
-        if template_type:
+        if 'options' in self.fields:
             self.fields['options'] = forms.ModelMultipleChoiceField(
                 help_text='Options for the {}.'.format(template_type),
                 queryset=Option.objects.filter(template_type=template_type),

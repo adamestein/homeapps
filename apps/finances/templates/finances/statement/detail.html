@@ -6,6 +6,8 @@
 {% block css %}
     {{ block.super }}
 
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
+
     <style type="text/css">
         table.statement {
             border: 2px outset black;
@@ -36,7 +38,23 @@
         table.totals td.totals {
             width: 88%;
         }
+
+        .options {
+            font-size: 80%;
+        }
     </style>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(".option").tooltip();
+        });
+    </script>
 {% endblock %}
 
 {% block header %}Statement for {{ object.date|date:"F d, Y" }}{% endblock %}
@@ -44,6 +62,12 @@
 {% block content %}
     <table>
         {% with data=object.account_set.all label="Accounts" total=total.account %}
+            {% include "finances/statement/_section_table.html" %}
+        {% endwith %}
+    </table>
+
+    <table>
+        {% with data=object.income_set.all label="Income" total=total.income %}
             {% include "finances/statement/_section_table.html" %}
         {% endwith %}
     </table>

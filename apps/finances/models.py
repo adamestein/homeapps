@@ -21,7 +21,7 @@ class Account(StatementItem, models.Model):
     def str_format(cls, name, account_number, amount, item_date=None):
         acct_num = ' (acct #{})'.format(account_number) if account_number else ''
         date_val = ' as of {}'.format(DateFormat(item_date).format('F jS, Y')) if item_date else ''
-        return '{}{} with {}{}'.format(name, acct_num, amount, date_val)
+        return u'{}{} with {}{}'.format(name, acct_num, amount, date_val)
 
     def __unicode__(self):
         return Account.str_format(self.name, self.account_number, self.amount, self.statement.date)
@@ -47,7 +47,9 @@ class BillTemplate(Template):
         max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True,
         help_text="Total amount of the bill if 'amount' is partial."
     )
-    options = models.ManyToManyField('Option', help_text='Options for the bill.', blank=True)
+    options = models.ManyToManyField(
+        'Option', help_text='Options for the bill.', blank=True, limit_choices_to={'template_type': 'bill'}
+    )
     url = models.URLField(blank=True, null=True, help_text='Web site URL used to pay this bill.')
 
     def __unicode__(self):
@@ -59,7 +61,26 @@ class BillTemplate(Template):
         if self.due_day:
             fstr += ' due on the {} of the month'.format(DateFormat(date(1, 1, self.due_day)).format('jS'))
 
-        return fstr
+        return unicode(fstr)
+
+
+class Income(StatementItem, models.Model):
+    account_number = models.PositiveIntegerField(
+        db_index=True, blank=True, null=True, default='', help_text="Account number."
+    )
+    date = models.DateField(db_index=True, help_text="Transaction date (date it was deposited).",)
+    options = models.ManyToManyField(
+        'Option', help_text='Options for the income.', blank=True, limit_choices_to={'template_type': 'income'}
+    )
+
+    class Meta:
+        ordering = ('date', 'name')
+
+    def __unicode__(self):
+        fstr = '{} for {} deposited on {}'.format(self.name, self.amount, DateFormat(self.date).format('F jS, Y'))
+        if self.account_number:
+            fstr += ' into account #{}'.format(self.account_number)
+        return unicode(fstr)
 
 
 class IncomeTemplate(Template):
@@ -73,7 +94,9 @@ class IncomeTemplate(Template):
         blank=True, null=True,
         help_text='Day of the month this income is expected to arrive (0 means last day of the month).'
     )
-    options = models.ManyToManyField('Option', help_text='Options for the income.', blank=True)
+    options = models.ManyToManyField(
+        'Option', help_text='Options for the income.', blank=True, limit_choices_to={'template_type': 'income'}
+    )
 
 
 class Option(models.Model):
@@ -99,4 +122,4 @@ class Statement(Auth, models.Model):
         unique_together = (('user', 'date'), )
 
     def __unicode__(self):
-        return DateFormat(self.date).format('F jS, Y')
+        return unicode(DateFormat(self.date).format('F jS, Y'))

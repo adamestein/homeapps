@@ -35,20 +35,23 @@
     <script type="text/javascript" src="{% static 'js/datadumper.js' %}"></script>
 
     <script type="text/javascript">
+        // Options to use for all date pickers
+        var datePickerOptions = {
+            buttonImage: "{% static 'img/calendar.gif' %}",
+            buttonImageOnly: true,
+            buttonText: "Select date",
+            onSelect: function(dateText, inst) {
+                if (dateText !== inst.lastVal) {
+                    $(this).change();
+                }
+            },
+            showOn: "button"
+        };
+
         $(document).ready(function() {
             var dateField = $("#id_statement-date");
 
-            dateField.datepicker({
-                buttonImage: "{% static 'img/calendar.gif' %}",
-                buttonImageOnly: true,
-                buttonText: "Select date",
-                onSelect: function(dateText, inst) {
-                    if (dateText !== inst.lastVal) {
-                        $(this).change();
-                    }
-                },
-                showOn: "button"
-            });
+            dateField.datepicker(datePickerOptions);
 
             dateField.change(function() {
                 submitButtonStatus();
@@ -62,29 +65,16 @@
                 var sectionInfo = {
                     "pk": pk,
                     "table_type": $(this).data("type"),
-                    "total_forms": $("#id_account-TOTAL_FORMS").val()
+                    "total_forms": $("#id_" + $(this).data("type") + "-TOTAL_FORMS").val()
                 };
 
                 $.post(
                     "{% url 'get_statement_section_form' %}",
                     sectionInfo,
                     function(encoded) {
-                        var focus = (pk == "") ? "name" : "amount_0";
                         var info = JSON.parse(encoded);
 
-                        $.prompt(
-                            createPopupHTML(pk, info["form"]),
-                            {
-                                buttons: {
-                                    Ok: "Ok",
-                                    Cancel: "Cancel"
-                                },
-                                focus: "input[name='" + focus + "']",   // Seems to only work for "text" inputs in FF
-                                submit: function(event, value, message, formVals) {
-                                    validateForm(event, value, message, formVals, sectionInfo)
-                                }
-                            }
-                        );
+                        showEditPopup(pk, info, sectionInfo, info["table_type"], false);
                     }
                 ).fail(function(jqXHR, textStatus, errorThrown) {
                     $.prompt.close();
@@ -92,13 +82,22 @@
                         "Could not retrieve the information.\n\nError: " + jqXHR.responseText
                     );
                 });
-            })
+            });
+
+            /*
+                Need to redo the buttons if we have any form data. The easiest thing to do is to call the
+                validation function and let the code create the button text like it did the first time. There
+                should be no errors otherwise the form data wouldn't be here to collect.
+            */
+            $.each(["account", "income"], function(index, tableType) {
+                restoreButtons(tableType);
+            });
         });
 
         // Create the HTML for the popup
-        function createPopupHTML(pk, form) {
+        function createPopupHTML(pk, form, tableType) {
             var html;
-            var title = (pk == "") ? "Create New Account" : "Edit Account";
+            var title = ((pk == "") ? "Create New " : "Edit ") + tableType.substr(0,1).toUpperCase() + tableType.substr(1);
 
             html =  '<div id="popup">' +
                     '<h2 style="margin-bottom: 1em; text-align: center;">' + title + '</h2>' +
@@ -109,15 +108,15 @@
         }
 
         // Delete a listed item and restore the name back to the popup menu
-        function deleteListItem(button) {
+        function deleteListItem(button, tableType) {
             /*
                 Put the name back in the drop drown list if not 'new' (the item created by the 'new' choice won't
                 match any menu item unless somebody uses the nsame as a menu item for some reason, but we're not
                 going to worry about that.
              */
 
-            var accountFormSet = $("#account_formset");
-            var menu = $("div").find("[data-box-id='account']");
+            var formSet = $("#" + tableType + "_formset");
+            var menu = $("div").find("[data-box-id='" + tableType + "']");
             var name = $(button).parent().data('name');
 
             menu.children().filter(function() {
@@ -126,21 +125,21 @@
 
             // Remove the button and formset
             $(button).parent().remove();
-            accountFormSet.find("[data-name='" + name + "']").remove();
+            formSet.find("[data-name='" + name + "']").remove();
 
             // Update formset
-            var totalForms = $("#id_account-TOTAL_FORMS");
+            var totalForms = $("#id_" + tableType + "-TOTAL_FORMS");
             totalForms.val(parseInt(totalForms.val()) - 1);
 
             // If no more items, show the 'no' message
-            if ($("#accounts").find("div").length == 0) {
-                $("#no_accounts_message").show();
+            if ($("#" + tableType).find("div").length == 0) {
+                $("#no_" + tableType + "_message").show();
             } else {
-                var regex = new RegExp("account-\\d+");
+                var regex = new RegExp(tableType + "-\\d+");
 
                 // Make sure formset items are numbered 0-totalForms
-                accountFormSet.find("div").each(function(index, value) {
-                    var pattern = "account-" + index;
+                formSet.find("div").each(function(index, value) {
+                    var pattern = tableType + "-" + index;
 
                     $(value).find("label").each(function(index, value) {
                         var newValue = $(value).attr("for").replace(regex, pattern);
@@ -164,6 +163,14 @@
             submitButtonStatus();
         }
 
+        /*
+            Escape single quotes which is needed for those times when the text will have a single quote and be used
+            in a jQuery expression which is also using single quotes
+         */
+        function escapeQuote(text) {
+            return text.replace(/'/g, "\\'");
+        }
+
         // Insert so that the list is alphabetical (by name)
         function insertListItem(sectionID, name, buttonHTML) {
             var inserted = false;
@@ -180,9 +187,51 @@
             }
         }
 
+        function restoreButtons(tableType) {
+            $("#" + tableType + "_formset").find("> div").each(function(index1, div) {
+                var formVals = {};
+
+                $(div).find("input, select").each(function(index2, input) {
+                    if ($(input).attr("type") != "hidden") {
+                        formVals[$(input).attr('name')] = $(input).val()
+                    }
+                });
+
+                var sectionInfo = {
+                    "pk": $(".popr-box").find(":contains('" + name + "')").data("pk"),
+                    "table_type": tableType,
+                    "total_forms": index1
+                };
+
+                validateForm(null, "Ok", null, formVals, sectionInfo, true);
+            });
+        }
+
+        function showEditPopup(pk, info, sectionInfo, tableType, editMode) {
+            var focus = (pk == "") ? "name" : "amount_0";
+
+            $.prompt(
+                createPopupHTML(pk, info["form"], tableType),
+                {
+                    buttons: {
+                        Ok: "Ok",
+                        Cancel: "Cancel"
+                    },
+                    focus: "input[name='" + focus + "']",   // Seems to only work for "text" inputs in FF
+                    submit: function(event, value, message, formVals) {
+                        validateForm(event, value, message, formVals, sectionInfo, editMode)
+                    }
+                }
+            );
+
+            if (tableType == "income") {
+                $("[id$=date]").datepicker(datePickerOptions);
+            }
+        }
+
         function submitButtonStatus() {
             var date = $("#id_statement-date").val().length;
-            var items = $("#accounts").find("div").length;
+            var items = $("#account").find("div").length + $("#income").find("div").length;
             var submitButton = $("#submit");
 
             // Enable the submit button if we have a date and items on the statement
@@ -193,11 +242,74 @@
             }
         }
 
-        // Validate the values from the popup form
-        function validateForm(event, value, message, formVals, sectionInfo) {
-            if (value == "Ok") {
-                // Don't let the popup disappear until we know everything is alright
+        function updateButtonSection(editMode, tableType, info, sectionInfo, updateFormSet) {
+            var name = escapeQuote(info["name"]);
+
+            var dataName = 'data-name="' + name + '"';
+            var divBegin = '<div ' + dataName + '>';
+            var nameSlug = name.replace(/ /g, "_");
+
+            var buttonID = "id_" + tableType + "-" + nameSlug;
+
+            var buttonHTML = divBegin +
+                             '  <button id="' + buttonID + '">' +
+                                  info["button_text"] +
+                             '  </button>' +
+                             '  <img style="cursor: pointer; margin-left: 0.5em;" ' +
+                             '       src="{% static 'admin/img/icon_deletelink.gif' %}" ' +
+                             '       alt="[Delete ' + tableType + ']" ' +
+                             '       title="Delete ' + tableType + ' from list" ' +
+                             '       onclick="deleteListItem(this, \'' + tableType + '\');" />' +
+                             '</div>';
+
+            /*
+                Hide this from the drop down list if not the 'new' choice. No problems if the isn't
+                on the drop down list because it's an edit and not a new entry.
+             */
+            if (sectionInfo['pk']) {
+                var menu = $("div").find("[data-box-id='" + tableType + "']");
+                menu.find("[data-pk='" + sectionInfo['pk'] + "']").hide();
+            }
+
+            // Update the formset if a new entry
+            if (!editMode) {
+                var totalForms = $("#id_" + tableType + "-TOTAL_FORMS");
+                totalForms.val(parseInt(totalForms.val()) + 1);
+            }
+
+            // Update GUI
+            $.prompt.close();
+            if (editMode) {
+                // Need to remove the existing button before we add the new one
+                $("#" + tableType).find("[data-name='" + name + "']").remove();
+            } else {
+                /*
+                    Only need to hide the "no" message for new entries. It will already be hidden
+                    if doing an edit.
+                 */
+                $("#no_" + tableType + "_message").hide();
+            }
+
+            if (updateFormSet) {
+                $("#" + tableType + "_formset").append(divBegin + info["form"] + '</div>');
+            }
+            insertListItem("#" + tableType, name, buttonHTML);
+            submitButtonStatus();
+
+            // Set up so clicking a button brings up the pop up to edit the item
+            $("#" + buttonID).click(function(event) {
                 event.preventDefault();
+                showEditPopup(sectionInfo["pk"], info, sectionInfo, tableType, true);
+            });
+        }
+
+        // Validate the values from the popup form
+        function validateForm(event, value, message, formVals, sectionInfo, editMode) {
+            if (value == "Ok") {
+                if (event) {
+                    // Don't let the popup disappear until we know everything is alright
+                    event.preventDefault();
+                }
 
                 formVals = $.extend(formVals, sectionInfo);
 
@@ -206,39 +318,15 @@
                     formVals,
                     function(encoded) {
                         var info = JSON.parse(encoded);
+                        var tableType = sectionInfo["table_type"];
 
                         if (info["errors"]) {
-                            $("#popup").html(createPopupHTML(sectionInfo['table_type'], info["errors"]));
-                        } else {
-                            var dataName = 'data-name="' + info["name"] + '"';
-                            var divBegin = '<div ' + dataName + '>';
-
-                            var buttonHTML = divBegin +
-                                             '  <button>' +
-                                                  info["button_text"] +
-                                             '  </button>' +
-                                             '  <img style="cursor: pointer; margin-left: 0.5em;" ' +
-                                             '       src="{% static 'admin/img/icon_deletelink.gif' %}" ' +
-                                             '       alt="[Delete fund]" title="Delete account from list" ' +
-                                             '       onclick="deleteListItem(this);" />' +
-                                             '</div>';
-
-                            // Hide this from the drop down list if not the 'new' choice
-                            if (sectionInfo['pk']) {
-                                var menu = $("div").find("[data-box-id='account']");
-                                menu.find("[data-pk='" + sectionInfo['pk'] + "']").hide();
+                            $("#popup").html(createPopupHTML(tableType, info["errors"], tableType));
+                            if (tableType == "income") {
+                                $("[id$=date]").datepicker(datePickerOptions);
                             }
-
-                            // Update the formset
-                            var totalForms = $("#id_account-TOTAL_FORMS");
-                            totalForms.val(parseInt(totalForms.val()) + 1);
-
-                            // Update GUI
-                            $.prompt.close();
-                            $("#account_formset").append(divBegin + info["form"] + '</div>');
-                            $("#no_accounts_message").hide();
-                            insertListItem("#accounts", info["name"], buttonHTML);
-                            submitButtonStatus();
+                        } else {
+                            updateButtonSection(editMode, tableType, info, sectionInfo, true);
                         }
                     }
                 ).fail(function(jqXHR, textStatus, errorThrown) {
@@ -270,7 +358,7 @@
             {{ form.statement }}
         </table>
 
-        <fieldset>
+        <fieldset style="margin-top: 1em;">
             <legend>
                 <strong>Accounts</strong>
 
@@ -282,10 +370,32 @@
             {{ form.account.management_form }}
             {{ form.account.non_form_errors }}
 
-            <div id="accounts">
+            <div id="account">
                 {% ifequal form.account|length 0 %}
-                    <p id="no_accounts_message">
+                    <p id="no_account_message">
                         There are currently no accounts to list.
+                    </p>
+                {% endifequal %}
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>
+                <strong>Income</strong>
+
+                <span class="popr" data-id="income">
+                    <img src="{% static 'admin/img/icon_addlink.gif' %}" alt="[Add Income Transaction]"
+                         title="Add Income Transaction" />
+                </span>
+            </legend>
+
+            {{ form.income.management_form }}
+            {{ form.income.non_form_errors }}
+
+            <div id="income">
+                {% ifequal form.income|length 0 %}
+                    <p id="no_income_message">
+                        There are currently no income transactions to list.
                     </p>
                 {% endifequal %}
             </div>
@@ -297,8 +407,18 @@
         </div>
 
         <div id="account_formset" style="display: none;">
-            {% for account in form.account %}
-                {{ account }}
+            {% for subform in form.account %}
+                <div data-name="{{ subform.name.value }}">
+                    {{ subform }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div id="income_formset" style="display: none;">
+            {% for subform in form.income %}
+                <div data-name="{{ subform.name.value }}">
+                    {{ subform }}
+                </div>
             {% endfor %}
         </div>
     </form>
@@ -308,5 +428,12 @@
             <div class="popr-item" data-pk="{{ choice.pk }}" data-type="account">{{ choice.name }}</div>
         {% endfor %}
         <div class="popr-item" data-pk="" data-type="account"><strong>New Account</strong></div>
+    </div>
+
+    <div class="popr-box" data-box-id="income">
+        {% for choice in income_choices %}
+            <div class="popr-item" data-pk="{{ choice.pk }}" data-type="income">{{ choice.name }}</div>
+        {% endfor %}
+        <div class="popr-item" data-pk="" data-type="income"><strong>New Account</strong></div>
     </div>
 {% endblock %}

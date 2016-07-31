@@ -45,4 +45,4 @@ class Template(Auth, Base, models.Model):
         unique_together = ("name", "user")
 
     def __unicode__(self):
-        return self.name
+        return unicode(self.name)
