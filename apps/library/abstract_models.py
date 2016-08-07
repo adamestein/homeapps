@@ -13,8 +13,7 @@ class Auth(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
-        # Before we can save an instance of Template, we need to fill in the user field so that we know who
-        # the instance belongs to
+        # Before we can save the instance, we need to fill in the user field so that we know who the instance belongs to
         self.user = get_user()
         super(Auth, self).save(*args, **kwargs)
 

@@ -10,10 +10,16 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/jquery-impromptu.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/popr.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/form_table.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/busy.css' %}" />
 
     <style>
         div.jqi {
             width: 500px;
+        }
+
+        .missing_section_header {
+            margin-bottom: -0.5em;
+            color: red;
         }
 
         strong {
@@ -84,12 +90,68 @@
                 });
             });
 
+            $('#confirmDialog').dialog({
+                autoOpen: false,
+                buttons: {
+                    "Create Statement": function () {
+                        $(this).dialog("close");
+                        $("body").addClass("busy");
+                        $("form").submit();
+                    },
+                    "Cancel": function () {
+                        $(this).dialog("close");
+                    }
+                },
+                modal: true,
+                resizable: false,
+                width: 500
+            });
+
+            $("#submit_button").click(function(e) {
+                var missing = {};
+
+                // [data-show='1']
+                $(".popr-item[data-pk!=''][data-show='1']").each(function(index, poprItem) {
+                    var type = $(poprItem).data("type");
+
+                    if(!(type in missing)) {
+                        missing[type] = [];
+                    }
+
+                    missing[type].push($(poprItem).text().trim());
+                });
+
+                var keys = Object.keys(missing);
+
+                if (keys.length > 0) {
+                    e.preventDefault();
+
+                    var html = "";
+                    var mapping = {"account": "Accounts", "bill": "Bills", "income": "Income"};
+
+                    $.each(keys, function(index, key) {
+                        html += "<h4 class='missing_section_header'>" + mapping[key] + "</h4><ul>";
+
+                        $.each(missing[key], function(index2, entry) {
+                            html += "<li>" + entry + "</li>";
+                        });
+
+                        html += "</ul>";
+                    });
+
+                    $("#missing_entries").html(html);
+                    $('#confirmDialog').dialog('open');
+                } else {
+                    $("body").addClass("busy");
+                }
+            });
+
             /*
                 Need to redo the buttons if we have any form data. The easiest thing to do is to call the
                 validation function and let the code create the button text like it did the first time. There
                 should be no errors otherwise the form data wouldn't be here to collect.
             */
-            $.each(["account", "income"], function(index, tableType) {
+            $.each(["account", "bill", "income"], function(index, tableType) {
                 restoreButtons(tableType);
             });
         });
@@ -120,12 +182,14 @@
             var name = $(button).parent().data('name');
 
             menu.children().filter(function() {
-                return $(this).text() == name;
-            }).show();
+                return escapeQuote($(this).text().trim()) == name;
+            }).attr("data-show", "1").show();
 
             // Remove the button and formset
             $(button).parent().remove();
-            formSet.find("[data-name='" + name + "']").remove();
+            formSet.children().filter(function() {
+                return $(this).attr("data-name") == name;
+            }).remove();
 
             // Update formset
             var totalForms = $("#id_" + tableType + "-TOTAL_FORMS");
@@ -190,15 +254,19 @@
         function restoreButtons(tableType) {
             $("#" + tableType + "_formset").find("> div").each(function(index1, div) {
                 var formVals = {};
+                var name = null;
 
                 $(div).find("input, select").each(function(index2, input) {
                     if ($(input).attr("type") != "hidden") {
-                        formVals[$(input).attr('name')] = $(input).val()
+                        formVals[$(input).attr('name')] = $(input).val();
+                        if ($(input).attr('name').indexOf("name") > -1) {
+                            name = $(input).val();
+                        }
                     }
                 });
 
                 var sectionInfo = {
-                    "pk": $(".popr-box").find(":contains('" + name + "')").data("pk"),
+                    "pk": $(".popr-item:contains('" + name + "')").data("pk"),
                     "table_type": tableType,
                     "total_forms": index1
                 };
@@ -224,15 +292,19 @@
                 }
             );
 
-            if (tableType == "income") {
+            if (tableType == "bill" || tableType == "income") {
                 $("[id$=date]").datepicker(datePickerOptions);
             }
         }
 
         function submitButtonStatus() {
             var date = $("#id_statement-date").val().length;
-            var items = $("#account").find("div").length + $("#income").find("div").length;
-            var submitButton = $("#submit");
+            var items = 0;
+            var submitButton = $("#submit_button");
+
+            $.each(["account", "bill", "income"], function(index, tableType) {
+                items += $("#" + tableType).find("div").length;
+            });
 
             // Enable the submit button if we have a date and items on the statement
             if (date && items) {
@@ -263,12 +335,13 @@
                              '</div>';
 
             /*
-                Hide this from the drop down list if not the 'new' choice. No problems if the isn't
+                Hide this in the drop down list if not the 'new' choice. No problems if the isn't
                 on the drop down list because it's an edit and not a new entry.
              */
+            console.log('PK = [' + sectionInfo['pk'] + ']');
             if (sectionInfo['pk']) {
                 var menu = $("div").find("[data-box-id='" + tableType + "']");
-                menu.find("[data-pk='" + sectionInfo['pk'] + "']").hide();
+                menu.find("[data-pk='" + sectionInfo['pk'] + "']").attr("data-show", "0").hide();
             }
 
             // Update the formset if a new entry
@@ -322,7 +395,7 @@
 
                         if (info["errors"]) {
                             $("#popup").html(createPopupHTML(tableType, info["errors"], tableType));
-                            if (tableType == "income") {
+                            if (tableType == "bill" || tableType == "income") {
                                 $("[id$=date]").datepicker(datePickerOptions);
                             }
                         } else {
@@ -381,6 +454,28 @@
 
         <fieldset>
             <legend>
+                <strong>Bills</strong>
+
+                <span class="popr" data-id="bill">
+                    <img src="{% static 'admin/img/icon_addlink.gif' %}" alt="[Add Bill Transaction]"
+                         title="Add Bill Transaction" />
+                </span>
+            </legend>
+
+            {{ form.bill.management_form }}
+            {{ form.bill.non_form_errors }}
+
+            <div id="bill">
+                {% ifequal form.bill|length 0 %}
+                    <p id="no_bill_message">
+                        There are currently no bills to list.
+                    </p>
+                {% endifequal %}
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>
                 <strong>Income</strong>
 
                 <span class="popr" data-id="income">
@@ -402,12 +497,20 @@
         </fieldset>
 
         <div class="buttons">
-            <input id="submit" type="submit" value="Create" disabled="disabled" />
+            <input id="submit_button" type="submit" value="Create" disabled="disabled" />
             <input type="reset" value="Reset" />
         </div>
 
         <div id="account_formset" style="display: none;">
             {% for subform in form.account %}
+                <div data-name="{{ subform.name.value }}">
+                    {{ subform }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div id="bill_formset" style="display: none;">
+            {% for subform in form.bill %}
                 <div data-name="{{ subform.name.value }}">
                     {{ subform }}
                 </div>
@@ -425,15 +528,38 @@
 
     <div class="popr-box" data-box-id="account">
         {% for choice in account_choices %}
-            <div class="popr-item" data-pk="{{ choice.pk }}" data-type="account">{{ choice.name }}</div>
+            <div class="popr-item" data-pk="{{ choice.pk }}" data-show="1" data-type="account">
+                {{ choice.name }}
+            </div>
         {% endfor %}
         <div class="popr-item" data-pk="" data-type="account"><strong>New Account</strong></div>
     </div>
 
+    <div class="popr-box" data-box-id="bill">
+        {% for choice in bill_choices %}
+            <div class="popr-item" data-pk="{{ choice.pk }}" data-show="1" data-type="bill">
+                {{ choice.name }}
+            </div>
+        {% endfor %}
+        <div class="popr-item" data-pk="" data-type="bill"><strong>New Bill</strong></div>
+    </div>
+
     <div class="popr-box" data-box-id="income">
         {% for choice in income_choices %}
-            <div class="popr-item" data-pk="{{ choice.pk }}" data-type="income">{{ choice.name }}</div>
+            <div class="popr-item" data-pk="{{ choice.pk }}" data-show="1" data-type="income">
+                {{ choice.name }}
+            </div>
         {% endfor %}
-        <div class="popr-item" data-pk="" data-type="income"><strong>New Account</strong></div>
+        <div class="popr-item" data-pk="" data-type="income"><strong>New Income</strong></div>
     </div>
+
+    <div id="confirmDialog" title="Missing Entries">
+        <p>The following entries were not used:</p>
+
+        <section id="missing_entries" style="margin-left: 1em;"></section>
+
+        <p style="margin-top: 2em;">What would you like to do?</p>
+    </div>
+
+    {% include 'busy.html' %}
 {% endblock %}

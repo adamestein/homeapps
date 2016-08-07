@@ -67,8 +67,21 @@
     </table>
 
     <table>
+        {% with data=object.bill_set.all label="Bills" total=total.bill %}
+            {% include "finances/statement/_section_table.html" %}
+        {% endwith %}
+    </table>
+
+    <table>
         {% with data=object.income_set.all label="Income" total=total.income %}
             {% include "finances/statement/_section_table.html" %}
         {% endwith %}
     </table>
+
+    <p style="font-style: italic; font-weight: bold; margin-top: 1em;">
+        The amount left over after paying bills is
+        <span style="color: {% if diff < 0 %}red{% else %}green{% endif %};">
+            {{ diff }}
+        </span>
+    </p>
 {% endblock %}

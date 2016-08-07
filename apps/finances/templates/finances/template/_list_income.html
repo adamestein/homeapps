@@ -1,9 +1,10 @@
 <div id="table">
     <div class="header-row row">
         <span class="cell primary">Name</span>
-        <span class="cell">Account Number</span>
+        <span class="cell">Acct Number</span>
         <span class="cell">Amount</span>
         <span class="cell">Arrival Day</span>
+        <span class="cell">Snap #</span>
         <span class="cell">Options</span>
     </div>
 
@@ -13,7 +14,7 @@
             <span class="cell primary" data-label="Name">
                 <a href="{% url 'edit_template' 'income' template.pk %}">{{ template.name }}</a>
             </span>
-            <span class="cell" data-label="Account Number">
+            <span class="cell" data-label="Acct Number">
                 {% if template.account_number %}
                     {{ template.account_number }}
                 {% endif %}
@@ -27,6 +28,9 @@
                 {% if template.arrival_day %}
                     {{ template.arrival_day }}
                 {% endif %}
+            </span>
+            <span class="cell" data-label="Snap #">
+                {{ template.snap_section }}
             </span>
             <span class="cell-left_align" data-label="Options">
                 {% if template.options.count %}

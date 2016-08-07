@@ -7,6 +7,7 @@ from django.utils.dateformat import DateFormat
 from djmoney.models.fields import MoneyField
 
 from library.abstract_models import Auth, StatementItem, Template
+from library.ordinal import ordinal
 
 
 class Account(StatementItem, models.Model):
@@ -33,6 +34,39 @@ class AccountTemplate(Template):
     )
 
 
+class Bill(StatementItem, models.Model):
+    account_number = models.PositiveIntegerField(
+        db_index=True, blank=True, null=True, default='', help_text='Account number.'
+    )
+    actual = MoneyField(
+        max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True, help_text='Actual amount paid.'
+    )
+    date = models.DateField(db_index=True, help_text='Due date.')
+    paid_date = models.DateField(blank=True, null=True, help_text='The date the bill was paid')
+    total = MoneyField(
+        max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True,
+        help_text="Total amount of the bill if 'amount' is partial."
+    )
+    options = models.ManyToManyField(
+        'Option', help_text='Options for the income.', blank=True, limit_choices_to={'template_type': 'bill'}
+    )
+    url = models.URLField(blank=True, null=True, help_text='Web site URL used to pay this bill.')
+
+    class Meta:
+        ordering = ('date', 'name')
+
+    def __unicode__(self):
+        total = ' (total is {})'.format(self.total) if self.total else ''
+
+        fstr = '{} for {}{} due on {}'.format(self.name, self.amount, total, DateFormat(self.date).format('F jS, Y'))
+
+        if self.paid_date:
+            fstr += ' and paid on ' + DateFormat(self.paid_date).format('F jS, Y')
+            fstr += ' ({})'.format(self.actual) if self.actual else ' (PIF)'
+
+        return unicode(fstr)
+
+
 class BillTemplate(Template):
     account_number = models.PositiveIntegerField(
         db_index=True, blank=True, null=True, default='', help_text="Account number."
@@ -50,6 +84,7 @@ class BillTemplate(Template):
     options = models.ManyToManyField(
         'Option', help_text='Options for the bill.', blank=True, limit_choices_to={'template_type': 'bill'}
     )
+    snap_section = models.PositiveSmallIntegerField(help_text='Snap section in which this template should be shown')
     url = models.URLField(blank=True, null=True, help_text='Web site URL used to pay this bill.')
 
     def __unicode__(self):
@@ -97,6 +132,7 @@ class IncomeTemplate(Template):
     options = models.ManyToManyField(
         'Option', help_text='Options for the income.', blank=True, limit_choices_to={'template_type': 'income'}
     )
+    snap_section = models.PositiveSmallIntegerField(help_text='Snap section in which this template should be shown')
 
 
 class Option(models.Model):
@@ -112,6 +148,33 @@ class Option(models.Model):
 
     def __unicode__(self):
         return u'{}: {} - {}'.format(self.template_type, self.name, self.description)
+
+
+class Preference(models.Model):
+    user = models.OneToOneField(User)
+    snap_days = models.CommaSeparatedIntegerField(max_length=5)
+
+    def __unicode__(self):
+        days = [int(day) for day in self.snap_days.split(',')]
+
+        if len(days) == 1:
+            return u'Snap day set to the {} of the month'.format(ordinal(days[0]))
+        else:
+            text = 'Snap days set to the '
+
+            if len(days) == 2:
+                text += '{} and {}'.format(ordinal(days[0]), ordinal(days[1]))
+            else:
+                for index, day in enumerate(days):
+                    if index == len(days) - 1:
+                        text += ', and {}'.format(ordinal(int(day)))
+                    elif index:
+                        text += ', {}'.format(ordinal(int(day)))
+                    else:
+                        text += '{}'.format(ordinal(int(day)))
+
+            text += ' of the month'
+            return unicode(text)
 
 
 class Statement(Auth, models.Model):

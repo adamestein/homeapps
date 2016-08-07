@@ -1,31 +1,71 @@
 from datetime import date
 
+from dateutil.relativedelta import relativedelta
+
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
 
-from .models import Account, AccountTemplate, Income, IncomeTemplate
-from .statement_forms import AccountForm, IncomeForm
+from .models import Account, AccountTemplate, Bill, BillTemplate, Income, IncomeTemplate
+from .statement_forms import AccountForm, BillForm, IncomeForm
 
 from library.views.generic import AppCreateView, AppDetailView
 from library.views.generic.mixins.ajax import AJAXResponseMixin
 
 
 class StatementCreateView(AppCreateView):
+    snap_section = None
+
     def get_context_data(self, **kwargs):
         context = super(StatementCreateView, self).get_context_data(**kwargs)
         context.update({
             'account_choices': _get_account_choices(self.request.user),
-            'income_choices': _get_income_choices(self.request.user)
+            'bill_choices': _get_bill_choices(self.request.user, self.snap_section),
+            'income_choices': _get_income_choices(self.request.user, self.snap_section)
         })
 
         return context
 
-    @staticmethod
-    def get_initial():
+    def get_initial(self):
+        prev_dates = []
+        current_dates = []
+        next_dates = []
+        today = date.today()
+
+        # Create dates based on the snap day settings for the previous, current, and next month. Which every today
+        # comes the closest to is the date we'll snap to.
+        for day in self.request.user.preference.snap_days.split(','):
+            current_dates.append(date(today.year, today.month, int(day)))
+            prev_dates.append(current_dates[-1] - relativedelta(months=1))
+            next_dates.append(current_dates[-1] + relativedelta(months=1))
+
+        prev_diff = [abs(calc_date - today) for calc_date in prev_dates]
+        current_diff = [abs(calc_date - today) for calc_date in current_dates]
+        next_diff = [abs(calc_date - today) for calc_date in next_dates]
+
+        values = [min(prev_diff), min(current_diff), min(next_diff)]
+        index_min = min(xrange(len(values)), key=values.__getitem__)
+
+        if index_min == 0:
+            # Previous month has the closest date
+            index_min = min(xrange(len(prev_diff)), key=prev_diff.__getitem__)
+            closest_date = prev_dates[index_min]
+        elif index_min == 1:
+            # Current month has the closest date
+            index_min = min(xrange(len(current_diff)), key=current_diff.__getitem__)
+            closest_date = current_dates[index_min]
+        else:
+            # Next month has the closest date
+            index_min = min(xrange(len(next_diff)), key=next_diff.__getitem__)
+            closest_date = next_dates[index_min]
+
+        # Snap section is 1-based
+        self.snap_section = index_min + 1
+
         return {
             'statement': {
-                'date': date.today().strftime('%m/%d/%Y')
+                'date': closest_date.strftime('%m/%d/%Y')
             }
         }
 
@@ -37,6 +77,12 @@ class StatementCreateView(AppCreateView):
             account = form.save(commit=False)
             account.statement = statement
             account.save()
+
+        for form in multiform.forms['bill']:
+            bill = form.save(commit=False)
+            bill.statement = statement
+            bill.save()
+            form.save_m2m()
 
         for form in multiform.forms['income']:
             income = form.save(commit=False)
@@ -51,10 +97,15 @@ class StatementDetailView(AppDetailView):
     def get_context_data(self, **kwargs):
         context = super(StatementDetailView, self).get_context_data(**kwargs)
 
+        bill_sum = sum([bill.amount for bill in self.object.bill_set.all()])
+        income_sum = sum([income.amount for income in self.object.income_set.all()])
+
         context.update({
+            'diff': income_sum - bill_sum,
             'total': {
                 'account': sum([account.amount for account in self.object.account_set.all()]),
-                'income': sum([income.amount for income in self.object.income_set.all()])
+                'bill': bill_sum,
+                'income': income_sum
             }
         })
 
@@ -80,12 +131,33 @@ class StatementSectionForm(AJAXResponseMixin, TemplateView):
                 )
             else:
                 form = AccountForm(prefix=prefix)
+        elif table_type == 'bill':
+            if pk:
+                template = BillTemplate.objects.get(pk=pk)
+                form = BillForm(
+                    initial={
+                        'account_number': template.account_number,
+                        'amount': template.amount,
+                        'name': template.name,
+                        'options': template.options.all(),
+                        'total': template.total,
+                        'url': template.url
+                    },
+                    prefix=prefix
+                )
+
+                if template.due_day:
+                    today = date.today()
+                    form.initial['date'] = date(today.year, today.month, template.due_day).strftime('%m/%d/%Y')
+            else:
+                form = BillForm(prefix=prefix)
         elif table_type == 'income':
             if pk:
                 template = IncomeTemplate.objects.get(pk=pk)
                 form = IncomeForm(
                     initial={
                         'account_number': template.account_number,
+                        'amount': template.amount,
                         'name': template.name,
                         'options': template.options.all()
                     },
@@ -117,6 +189,22 @@ class StatementSectionFormValidation(AJAXResponseMixin, TemplateView):
                         form.cleaned_data['name'],
                         form.cleaned_data['account_number'],
                         form.cleaned_data['amount']
+                    )
+                }
+            else:
+                info = {'errors': str(form)}
+        elif table_type == 'bill':
+            form = BillForm(self.request.POST, prefix=prefix)
+            if form.is_valid():
+                info = {
+                    'button_text': str(
+                        Bill(
+                            account_number=form.cleaned_data['account_number'],
+                            amount=form.cleaned_data['amount'],
+                            date=form.cleaned_data['date'],
+                            name=form.cleaned_data['name'],
+                            total=form.cleaned_data['total']
+                        )
                     )
                 }
             else:
@@ -153,5 +241,11 @@ def _get_account_choices(user):
     return AccountTemplate.objects.filter(user=user, disabled=False)
 
 
-def _get_income_choices(user):
-    return IncomeTemplate.objects.filter(user=user, disabled=False)
+def _get_bill_choices(user, snap_section):
+    snap_section_query = Q(snap_section=snap_section) | Q(snap_section=0)
+    return BillTemplate.objects.filter(snap_section_query, user=user, disabled=False)
+
+
+def _get_income_choices(user, snap_section):
+    snap_section_query = Q(snap_section=snap_section) | Q(snap_section=0)
+    return IncomeTemplate.objects.filter(snap_section_query, user=user, disabled=False)

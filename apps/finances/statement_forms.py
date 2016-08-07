@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.models import modelformset_factory, BaseModelFormSet
 
-from .models import Account, Income, Statement
+from .models import Account, Bill, Income, Statement
 from .multiform import StatementMultiForm
 
 
@@ -18,6 +18,23 @@ class EmptyAccountFormSet(BaseModelFormSet):
         self.queryset = Account.objects.none()
 
 AccountFormSet = modelformset_factory(Account, form=AccountForm, formset=EmptyAccountFormSet, extra=0)
+
+
+class BillForm(forms.ModelForm):
+    class Meta:
+        fields = ['name', 'account_number', 'amount', 'total', 'date', 'url', 'options']
+        model = Bill
+        widgets = {
+            'options': forms.MultipleHiddenInput
+        }
+
+
+class EmptyBillFormSet(BaseModelFormSet):
+    def __init__(self, *args, **kwargs):
+        super(EmptyBillFormSet, self).__init__(*args, **kwargs)
+        self.queryset = Bill.objects.none()
+
+BillFormSet = modelformset_factory(Bill, form=BillForm, formset=EmptyBillFormSet, extra=0)
 
 
 class IncomeForm(forms.ModelForm):
@@ -54,6 +71,7 @@ class StatementForm(forms.ModelForm):
 class CreateStatementMultiForm(StatementMultiForm):
     form_classes = {
         'account': AccountFormSet,
+        'bill': BillFormSet,
         'income': IncomeFormSet,
         'statement': StatementForm
     }
