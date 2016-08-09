@@ -95,6 +95,7 @@
                 buttons: {
                     "Create Statement": function () {
                         $(this).dialog("close");
+                        $("#busy_text").text("Creating Statement");
                         $("body").addClass("busy");
                         $("form").submit();
                     },

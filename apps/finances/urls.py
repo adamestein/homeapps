@@ -6,7 +6,7 @@ from .statement_forms import CreateStatementMultiForm
 from .template_forms import CreateTemplateMultiForm, UpdateTemplateForm
 from .models import AccountTemplate, Statement
 from .statement_views import (
-    StatementCreateView, StatementDetailView, StatementSectionForm, StatementSectionFormValidation
+    StatementCreateView, StatementDetailView, StatementListView, StatementSectionForm, StatementSectionFormValidation
 )
 from .template_views import TemplateCreateView, TemplateUpdateView, TemplateListView
 
@@ -49,6 +49,16 @@ urlpatterns = patterns(
         '^statement/section_form/validation/$',
         StatementSectionFormValidation.as_view(),
         name='statement_section_form_validation'
+    ),
+
+    url(
+        '^statement/view/$',
+        StatementListView.as_view(
+            app=APP['name'],
+            queryset=Statement.objects.all(),
+            template_name='finances/statement/list.html'
+        ),
+        name='view_statement_list'
     ),
 
     url(

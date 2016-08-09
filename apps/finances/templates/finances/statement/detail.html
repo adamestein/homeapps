@@ -80,8 +80,10 @@
 
     <p style="font-style: italic; font-weight: bold; margin-top: 1em;">
         The amount left over after paying bills is
-        <span style="color: {% if diff < 0 %}red{% else %}green{% endif %};">
-            {{ diff }}
-        </span>
+        {% with left_over=diff.amount %}
+            <span style="color: {% if left_over < 0 %}red{% else %}green{% endif %};">
+                ${{ left_over }}
+            </span>
+        {% endwith %}
     </p>
 {% endblock %}

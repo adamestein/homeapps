@@ -1,6 +1,7 @@
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
+from moneyed import Money, USD
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
@@ -10,7 +11,7 @@ from django.views.generic import TemplateView
 from .models import Account, AccountTemplate, Bill, BillTemplate, Income, IncomeTemplate
 from .statement_forms import AccountForm, BillForm, IncomeForm
 
-from library.views.generic import AppCreateView, AppDetailView
+from library.views.generic import AppCreateView, AppDetailView, AppListView
 from library.views.generic.mixins.ajax import AJAXResponseMixin
 
 
@@ -97,8 +98,11 @@ class StatementDetailView(AppDetailView):
     def get_context_data(self, **kwargs):
         context = super(StatementDetailView, self).get_context_data(**kwargs)
 
-        bill_sum = sum([bill.amount for bill in self.object.bill_set.all()])
-        income_sum = sum([income.amount for income in self.object.income_set.all()])
+        bills = self.object.bill_set.all()
+        income = self.object.income_set.all()
+
+        bill_sum = sum([bill.amount for bill in bills]) if bills.count() else Money(0, USD)
+        income_sum = sum([income.amount for income in income]) if income.count() else Money(0, USD)
 
         context.update({
             'diff': income_sum - bill_sum,
@@ -110,6 +114,10 @@ class StatementDetailView(AppDetailView):
         })
 
         return context
+
+
+class StatementListView(AppListView):
+    pass
 
 
 class StatementSectionForm(AJAXResponseMixin, TemplateView):

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Finances: Statement List{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/busy.css' %}" />
+
+    <style>
+        .no-style { text-decoration: none !important }
+        .ui-menu { width: 6em; }
+    </style>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#menu").menu({
+                select: function(event, ui) {
+                    if (ui.item.data('statement-id') !== undefined)
+                    {
+                        // Only do something if we clicked on a statement link
+
+                        $("#busy_text").text("Retrieving Statement Data");
+                        $("body").addClass("busy");
+
+                        // Get the URL to go to
+                        {% ifequal action "edit" %}
+{#                            var link = "{% url 'edit_specific_statement' 0 %}";#}
+                        {% else %}
+                            var link = "{% url 'statement_detail' 0 %}";
+                        {% endifequal %}
+
+                        link = link.replace("0", ui.item.data('statement-id'));
+
+                        // Cause the click to go to the actual edit/view statement page
+                        window.location.href = link;
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block header %}Finances: Statement List{% endblock %}
+
+{% block content %}
+    {% if object_list %}
+        <p>Select the statement you wish to view.</p>
+
+        {% regroup object_list|dictsort:"date.year" by date.year as by_year %}
+
+        <ul id="menu">
+            {% for year in by_year %}
+                <li>
+                    <a href="#" class="no-style">{{ year.grouper }}</a>
+
+                    <ul style="width: 20em;">
+                        {% for statement in year.list %}
+                            <li data-statement-id="{{ statement.id }}">
+                                <a href="#" class="no-style">{{ statement }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>There are no statements to list.</p>
+    {% endif %}
+
+
+    {% include 'busy.html' %}
+{% endblock %}

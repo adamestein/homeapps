@@ -14,8 +14,8 @@ APP = {
         },
         {
             'desc': 'View statement',
-            'link': '',
-            'title': 'View previous statements'
+            'link': 'view_statement_list',
+            'title': 'View Previous Statements'
         },
         {},
         {
