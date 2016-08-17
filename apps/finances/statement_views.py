@@ -13,9 +13,52 @@ from .statement_forms import AccountForm, BillForm, IncomeForm
 from library.views.generic import AppCreateView, AppDetailView, AppListView, AppUpdateView
 from library.views.generic.mixins.ajax import AJAXResponseMixin
 
+from django.views.generic.edit import ModelFormMixin, ProcessFormView
 
-class StatementCreateView(AppCreateView):
+
+class BaseStatementView(ModelFormMixin, ProcessFormView):
     snap_section = None
+    success_message = ''
+
+    class Meta:
+        abstract = True
+
+    def determine_closest_date(self, target_date):
+        prev_dates = []
+        current_dates = []
+        next_dates = []
+
+        # Create dates based on the snap day settings for the previous, current, and next month. Which every today
+        # comes the closest to is the date we'll snap to.
+        for day in self.request.user.preference.snap_days.split(','):
+            current_dates.append(date(target_date.year, target_date.month, int(day)))
+            prev_dates.append(current_dates[-1] - relativedelta(months=1))
+            next_dates.append(current_dates[-1] + relativedelta(months=1))
+
+        prev_diff = [abs(calc_date - target_date) for calc_date in prev_dates]
+        current_diff = [abs(calc_date - target_date) for calc_date in current_dates]
+        next_diff = [abs(calc_date - target_date) for calc_date in next_dates]
+
+        values = [min(prev_diff), min(current_diff), min(next_diff)]
+        index_min = min(xrange(len(values)), key=values.__getitem__)
+
+        if index_min == 0:
+            # Previous month has the closest date
+            index_min = min(xrange(len(prev_diff)), key=prev_diff.__getitem__)
+            closest_date = prev_dates[index_min]
+        elif index_min == 1:
+            # Current month has the closest date
+            index_min = min(xrange(len(current_diff)), key=current_diff.__getitem__)
+            closest_date = current_dates[index_min]
+        else:
+            # Next month has the closest date
+            index_min = min(xrange(len(next_diff)), key=next_diff.__getitem__)
+            closest_date = next_dates[index_min]
+
+        # Snap section is 1-based
+        self.snap_section = index_min + 1
+
+        return closest_date
 
     def form_valid(self, multiform):
         statement = multiform.forms['statement'].save()
@@ -37,62 +80,40 @@ class StatementCreateView(AppCreateView):
             income.save()
             form.save_m2m()
 
-        return super(StatementCreateView, self).form_valid(multiform)
+        return super(BaseStatementView, self).form_valid(multiform)
 
     def get_context_data(self, **kwargs):
-        context = super(StatementCreateView, self).get_context_data(**kwargs)
+        context = super(BaseStatementView, self).get_context_data(**kwargs)
         context.update({
-            'account_choices': _get_account_choices(self.request.user),
-            'bill_choices': _get_bill_choices(self.request.user, self.snap_section),
-            'income_choices': _get_income_choices(self.request.user, self.snap_section)
+            'account_choices': self._get_account_choices(),
+            'bill_choices': self._get_bill_choices(),
+            'income_choices': self._get_income_choices()
         })
 
         return context
 
-    def get_initial(self):
-        prev_dates = []
-        current_dates = []
-        next_dates = []
-        today = date.today()
-
-        # Create dates based on the snap day settings for the previous, current, and next month. Which every today
-        # comes the closest to is the date we'll snap to.
-        for day in self.request.user.preference.snap_days.split(','):
-            current_dates.append(date(today.year, today.month, int(day)))
-            prev_dates.append(current_dates[-1] - relativedelta(months=1))
-            next_dates.append(current_dates[-1] + relativedelta(months=1))
-
-        prev_diff = [abs(calc_date - today) for calc_date in prev_dates]
-        current_diff = [abs(calc_date - today) for calc_date in current_dates]
-        next_diff = [abs(calc_date - today) for calc_date in next_dates]
-
-        values = [min(prev_diff), min(current_diff), min(next_diff)]
-        index_min = min(xrange(len(values)), key=values.__getitem__)
-
-        if index_min == 0:
-            # Previous month has the closest date
-            index_min = min(xrange(len(prev_diff)), key=prev_diff.__getitem__)
-            closest_date = prev_dates[index_min]
-        elif index_min == 1:
-            # Current month has the closest date
-            index_min = min(xrange(len(current_diff)), key=current_diff.__getitem__)
-            closest_date = current_dates[index_min]
-        else:
-            # Next month has the closest date
-            index_min = min(xrange(len(next_diff)), key=next_diff.__getitem__)
-            closest_date = next_dates[index_min]
-
-        # Snap section is 1-based
-        self.snap_section = index_min + 1
-
-        return {
-            'statement': {
-                'date': closest_date
-            }
-        }
-
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(date=DateFormat(cleaned_data['date']).format('F jS, Y'))
+
+    def _get_account_choices(self):
+        return AccountTemplate.objects.filter(user=self.request.user, disabled=False)
+
+    def _get_bill_choices(self):
+        snap_section_query = Q(snap_section=self.snap_section) | Q(snap_section=0)
+        return BillTemplate.objects.filter(snap_section_query, user=self.request.user, disabled=False)
+
+    def _get_income_choices(self):
+        snap_section_query = Q(snap_section=self.snap_section) | Q(snap_section=0)
+        return IncomeTemplate.objects.filter(snap_section_query, user=self.request.user, disabled=False)
+
+
+class StatementCreateView(BaseStatementView, AppCreateView):
+    def get_initial(self):
+        return {
+            'statement': {
+                'date': self.determine_closest_date(date.today())
+            }
+        }
 
 
 class StatementDetailView(AppDetailView):
@@ -265,41 +286,10 @@ class StatementSectionFormValidation(AJAXResponseMixin, TemplateView):
         return info
 
 
-class StatementUpdateView(AppUpdateView):
-    snap_section = 1        # FIXME
-
-    def form_valid(self, multiform):
-        statement = multiform.forms['statement'].save()
-
-        for form in multiform.forms['account']:
-            account = form.save(commit=False)
-            account.statement = statement
-            account.save()
-
-        for form in multiform.forms['bill']:
-            bill = form.save(commit=False)
-            bill.statement = statement
-            bill.save()
-            form.save_m2m()
-
-        for form in multiform.forms['income']:
-            income = form.save(commit=False)
-            income.statement = statement
-            income.save()
-            form.save_m2m()
-
-        return super(StatementUpdateView, self).form_valid(multiform)
-
+class StatementUpdateView(BaseStatementView, AppUpdateView):
     def get_context_data(self, **kwargs):
-        context = super(StatementUpdateView, self).get_context_data(**kwargs)
-        context.update({
-            'account_choices': _get_account_choices(self.request.user),
-            'bill_choices': _get_bill_choices(self.request.user, self.snap_section),
-            'income_choices': _get_income_choices(self.request.user, self.snap_section),
-            'update': True
-        })
-
-        return context
+        self.determine_closest_date(self.object.date)
+        return super(StatementUpdateView, self).get_context_data(**kwargs)
 
     def get_form_kwargs(self):
         kwargs = super(StatementUpdateView, self).get_form_kwargs()
@@ -313,20 +303,3 @@ class StatementUpdateView(AppUpdateView):
 
     def get_object(self):
         return Statement.objects.get(pk=self.kwargs.get(self.pk_url_kwarg))
-
-    def get_success_message(self, cleaned_data):
-        return self.success_message % dict(date=DateFormat(cleaned_data['date']).format('F jS, Y'))
-
-
-def _get_account_choices(user):
-    return AccountTemplate.objects.filter(user=user, disabled=False)
-
-
-def _get_bill_choices(user, snap_section):
-    snap_section_query = Q(snap_section=snap_section) | Q(snap_section=0)
-    return BillTemplate.objects.filter(snap_section_query, user=user, disabled=False)
-
-
-def _get_income_choices(user, snap_section):
-    snap_section_query = Q(snap_section=snap_section) | Q(snap_section=0)
-    return IncomeTemplate.objects.filter(snap_section_query, user=user, disabled=False)
