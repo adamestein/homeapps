@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Finances: Create Statement{% endblock %}
+{% block title %}Finances: {% if update %}Update{% else %}Create{% endif %} Statement{% endblock %}
 
 {% block css %}
     {{ block.super }}
@@ -93,9 +93,9 @@
             $('#confirmDialog').dialog({
                 autoOpen: false,
                 buttons: {
-                    "Create Statement": function () {
+                    "{% if update %}Update{% else %}Create{% endif %} Statement": function () {
                         $(this).dialog("close");
-                        $("#busy_text").text("Creating Statement");
+                        $("#busy_text").text("{% if update %}Updating{% else %}Creating{% endif %} Statement");
                         $("body").addClass("busy");
                         $("form").submit();
                     },
@@ -280,7 +280,7 @@
             var focus = (pk == "") ? "name" : "amount_0";
 
             $.prompt(
-                createPopupHTML(pk, info["form"], tableType),
+                createPopupHTML(pk, info["form"].replace(/id_/g, "popup_id_"), tableType),
                 {
                     buttons: {
                         Ok: "Ok",
@@ -294,7 +294,8 @@
             );
 
             if (tableType == "bill" || tableType == "income") {
-                $("[id$=date]").datepicker(datePickerOptions);
+                var dateID = "#popup_id_" + tableType + "-" + sectionInfo["total_forms"] + "-date";
+                $(dateID).datepicker(datePickerOptions);
             }
         }
 
@@ -339,7 +340,6 @@
                 Hide this in the drop down list if not the 'new' choice. No problems if the isn't
                 on the drop down list because it's an edit and not a new entry.
              */
-            console.log('PK = [' + sectionInfo['pk'] + ']');
             if (sectionInfo['pk']) {
                 var menu = $("div").find("[data-box-id='" + tableType + "']");
                 menu.find("[data-pk='" + sectionInfo['pk'] + "']").attr("data-show", "0").hide();
@@ -414,11 +414,12 @@
     </script>
 {% endblock %}
 
-{% block header %}Create Statement{% endblock %}
+{% block header %}{% if update %}Update{% else %}Create{% endif %} Statement{% endblock %}
 
 {% block content %}
     <p>
-        Fill out the form below and click <strong>Create</strong> to generate a new statement. Click the green plus
+        Fill out the form below and click <strong>{% if update %}Update{% else %}Create{% endif %}</strong> to
+        {% if update %}update the statement{% else %}generate a new statement{% endif %}. Click the green plus
         sign (<img src="{% static 'admin/img/icon_addlink.gif' %}" />) to add an item to this statement.  Click the
         red x sign (<img src="{% static 'admin/img/icon_deletelink.gif' %}" />) to delete the item.
     </p>
@@ -498,7 +499,8 @@
         </fieldset>
 
         <div class="buttons">
-            <input id="submit_button" type="submit" value="Create" disabled="disabled" />
+            <input id="submit_button" type="submit" value="{% if update %}Update{% else %}Create{% endif %}"
+                   disabled="disabled" />
             <input type="reset" value="Reset" />
         </div>
 

@@ -2,11 +2,12 @@ from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse_lazy
 
 from . import APP
-from .statement_forms import CreateStatementMultiForm
+from .statement_forms import CreateUpdateStatementMultiForm
 from .template_forms import CreateTemplateMultiForm, UpdateTemplateForm
 from .models import AccountTemplate, Statement
 from .statement_views import (
-    StatementCreateView, StatementDetailView, StatementListView, StatementSectionForm, StatementSectionFormValidation
+    StatementCreateView, StatementDetailView, StatementListView, StatementSectionForm, StatementSectionFormValidation,
+    StatementUpdateView
 )
 from .template_views import TemplateCreateView, TemplateUpdateView, TemplateListView
 
@@ -21,15 +22,14 @@ urlpatterns = patterns(
         '^statement/create/$',
         StatementCreateView.as_view(
             app=APP['name'],
-            form_class=CreateStatementMultiForm,
+            form_class=CreateUpdateStatementMultiForm,
             success_message="Statement for '%(date)s' successfully created",
-            success_url=reverse_lazy('statement_detail'),
-            template_name='finances/statement/create_form.html'
+            template_name='finances/statement/create_update_form.html'
         ),
         name='create_statement'
     ),
 
-     url(
+    url(
         '^statement/detail/(?P<pk>\d+)$',
         StatementDetailView.as_view(
             app=APP['name'],
@@ -37,6 +37,28 @@ urlpatterns = patterns(
             template_name='finances/statement/detail.html'
         ),
         name='statement_detail'
+    ),
+
+    url(
+        '^statement/edit/$',
+        StatementListView.as_view(
+            action='edit',
+            app=APP['name'],
+            queryset=Statement.objects.all(),
+            template_name='finances/statement/list.html'
+        ),
+        name='edit_statement_list'
+    ),
+
+    url(
+        '^statement/edit/(?P<pk>[\d]+)$',
+        StatementUpdateView.as_view(
+            app=APP['name'],
+            form_class=CreateUpdateStatementMultiForm,
+            success_message="Statement for '%(date)s' successfully updated",
+            template_name='finances/statement/create_update_form.html'
+        ),
+        name='edit_statement'
     ),
 
     url(
@@ -54,6 +76,7 @@ urlpatterns = patterns(
     url(
         '^statement/view/$',
         StatementListView.as_view(
+            action='view',
             app=APP['name'],
             queryset=Statement.objects.all(),
             template_name='finances/statement/list.html'

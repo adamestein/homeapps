@@ -1,6 +1,7 @@
 from datetime import date
 
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.dateformat import DateFormat
 
@@ -183,6 +184,9 @@ class Statement(Auth, models.Model):
     class Meta:
         ordering = ('date', )
         unique_together = (('user', 'date'), )
+
+    def get_absolute_url(self):
+        return reverse('statement_detail', kwargs={'pk': self.pk})
 
     def __unicode__(self):
         return unicode(DateFormat(self.date).format('F jS, Y'))

@@ -31,11 +31,13 @@
                         $("#busy_text").text("Retrieving Statement Data");
                         $("body").addClass("busy");
 
+                        var link;
+
                         // Get the URL to go to
                         {% ifequal action "edit" %}
-{#                            var link = "{% url 'edit_specific_statement' 0 %}";#}
+                            link = "{% url 'edit_statement' 0 %}";
                         {% else %}
-                            var link = "{% url 'statement_detail' 0 %}";
+                            link = "{% url 'statement_detail' 0 %}";
                         {% endifequal %}
 
                         link = link.replace("0", ui.item.data('statement-id'));
@@ -53,7 +55,7 @@
 
 {% block content %}
     {% if object_list %}
-        <p>Select the statement you wish to view.</p>
+        <p>Select the statement you wish to {{ action }}.</p>
 
         {% regroup object_list|dictsort:"date.year" by date.year as by_year %}
 

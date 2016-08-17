@@ -14,10 +14,6 @@ class AppSuccessMessageMixin(SuccessMessageMixin):
     def form_valid(self, form):
         if hasattr(form, 'forms'):
             # Form is a multi form
-            if self.success_message:
-                messages.success(self.request, self.success_message % form.get_selected_template().cleaned_data)
-
-            # noinspection PyUnresolvedReferences
-            return HttpResponseRedirect(self.get_success_url())
+            return super(AppSuccessMessageMixin, self).form_valid(form.get_selected_form())
         else:
             return super(AppSuccessMessageMixin, self).form_valid(form)

@@ -6,6 +6,10 @@ from django.core.exceptions import ValidationError
 
 
 class StatementMultiForm(MultiModelForm):
+    def get_selected_form(self):
+        # Return data from the Statement form
+        return self.forms.values()[2]
+
     def is_valid(self):
         forms_valid = all(form.is_valid() for form in self.forms.values())
         try:
@@ -18,10 +22,11 @@ class StatementMultiForm(MultiModelForm):
 class TemplateMultiModelForm(MultiModelForm):
     save_m2m = None
 
-    def get_selected_template(self):
+    def get_selected_form(self):
         return self.forms[self.forms.values()[0].cleaned_data['template_type']]
 
     def is_valid(self):
+        self.forms.values()[0].is_valid()   # Force cleaned_data to be created if it hasn't already
         template_type = self.forms.values()[0].cleaned_data['template_type']
 
         # If the TemplateType form is valid, verify that the form it's pointing to is valid. If the other form is

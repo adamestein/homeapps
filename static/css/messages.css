@@ -31,9 +31,9 @@
 }
 
 #messages .message.success {
-    background: -moz-linear-gradient(top, #cdeb8e 0%, #a5c956 100%); /* firefox */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#cdeb8e), color-stop(100%,#a5c956)); /* webkit */
-    border-bottom: 1px solid #a4c856;
+    background: -moz-linear-gradient(top, #CBD5BF 0%, #7f9760 100%); /* firefox */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#CBD5BF), color-stop(100%,#7f9760)); /* webkit */
+    border-bottom: 1px solid #7f9760;
     color: #f5fef2;
     text-shadow: #7c896b 0 1px 0;
 }

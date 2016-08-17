@@ -15,7 +15,7 @@ class TemplateCreateView(AppCreateView):
 
     def form_valid(self, form):
         # Save the correct template form (based on the template type chosen)
-        self.object = form.get_selected_template().save()
+        self.object = form.get_selected_form().save()
 
         return super(TemplateCreateView, self).form_valid(form)
 
@@ -35,7 +35,6 @@ class TemplateListView(AppListView):
 
 
 class TemplateUpdateView(AppUpdateView):
-
     def get_form_class(self):
         from .template_forms import UpdateAccountTemplateForm, UpdateBillTemplateForm, UpdateIncomeTemplateForm
 

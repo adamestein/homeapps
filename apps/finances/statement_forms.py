@@ -12,12 +12,10 @@ class AccountForm(forms.ModelForm):
         model = Account
 
 
-class EmptyAccountFormSet(BaseModelFormSet):
+class AccountFormSet(BaseModelFormSet):
     def __init__(self, *args, **kwargs):
-        super(EmptyAccountFormSet, self).__init__(*args, **kwargs)
-        self.queryset = Account.objects.none()
-
-AccountFormSet = modelformset_factory(Account, form=AccountForm, formset=EmptyAccountFormSet, extra=0)
+        kwargs.update({'queryset': kwargs.pop('instance', Account.objects.none())})
+        super(AccountFormSet, self).__init__(*args, **kwargs)
 
 
 class BillForm(forms.ModelForm):
@@ -25,16 +23,15 @@ class BillForm(forms.ModelForm):
         fields = ['name', 'account_number', 'amount', 'total', 'date', 'url', 'options']
         model = Bill
         widgets = {
+            'date': forms.DateInput(format='%m/%d/%Y'),
             'options': forms.MultipleHiddenInput
         }
 
 
-class EmptyBillFormSet(BaseModelFormSet):
+class BillFormSet(BaseModelFormSet):
     def __init__(self, *args, **kwargs):
-        super(EmptyBillFormSet, self).__init__(*args, **kwargs)
-        self.queryset = Bill.objects.none()
-
-BillFormSet = modelformset_factory(Bill, form=BillForm, formset=EmptyBillFormSet, extra=0)
+        kwargs.update({'queryset': kwargs.pop('instance', Bill.objects.none())})
+        super(BillFormSet, self).__init__(*args, **kwargs)
 
 
 class IncomeForm(forms.ModelForm):
@@ -42,36 +39,39 @@ class IncomeForm(forms.ModelForm):
         fields = ['name', 'account_number', 'amount', 'date', 'options']
         model = Income
         widgets = {
+            'date': forms.DateInput(format='%m/%d/%Y'),
             'options': forms.MultipleHiddenInput
         }
 
 
-class EmptyIncomeFormSet(BaseModelFormSet):
+class IncomeFormSet(BaseModelFormSet):
     def __init__(self, *args, **kwargs):
-        super(EmptyIncomeFormSet, self).__init__(*args, **kwargs)
-        self.queryset = Income.objects.none()
-
-IncomeFormSet = modelformset_factory(Income, form=IncomeForm, formset=EmptyIncomeFormSet, extra=0)
+        kwargs.update({'queryset': kwargs.pop('instance', Income.objects.none())})
+        super(IncomeFormSet, self).__init__(*args, **kwargs)
 
 
 class StatementForm(forms.ModelForm):
     class Meta:
         fields = ['date']
         model = Statement
+        widgets = {
+            'date': forms.DateInput(format='%m/%d/%Y')
+        }
 
     def clean_date(self):
-        if Statement.objects.filter(date=self.cleaned_data['date']).exists():
-            raise ValidationError('A statement for {} already exists'.format(
-                self.cleaned_data['date'].strftime('%B %d, %Y'))
-            )
-        else:
-            return self.cleaned_data['date']
+        if self.instance.id is None:
+            if Statement.objects.filter(date=self.cleaned_data['date']).exists():
+                raise ValidationError('A statement for {} already exists'.format(
+                    self.cleaned_data['date'].strftime('%B %d, %Y'))
+                )
+
+        return self.cleaned_data['date']
 
 
-class CreateStatementMultiForm(StatementMultiForm):
+class CreateUpdateStatementMultiForm(StatementMultiForm):
     form_classes = {
-        'account': AccountFormSet,
-        'bill': BillFormSet,
-        'income': IncomeFormSet,
+        'account': modelformset_factory(Account, form=AccountForm, formset=AccountFormSet, extra=0),
+        'bill': modelformset_factory(Bill, form=BillForm, formset=BillFormSet, extra=0),
+        'income': modelformset_factory(Income, form=IncomeForm, formset=IncomeFormSet, extra=0),
         'statement': StatementForm
     }

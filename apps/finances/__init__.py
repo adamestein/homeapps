@@ -9,7 +9,7 @@ APP = {
         },
         {
             'desc': 'Edit an existing statement',
-            'link': '',
+            'link': 'edit_statement_list',
             'title': 'Edit Statement'
         },
         {

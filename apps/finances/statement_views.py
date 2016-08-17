@@ -3,20 +3,41 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from moneyed import Money, USD
 
-from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.utils.dateformat import DateFormat
 from django.views.generic import TemplateView
 
-from .models import Account, AccountTemplate, Bill, BillTemplate, Income, IncomeTemplate
+from .models import Account, AccountTemplate, Bill, BillTemplate, Income, IncomeTemplate, Statement
 from .statement_forms import AccountForm, BillForm, IncomeForm
 
-from library.views.generic import AppCreateView, AppDetailView, AppListView
+from library.views.generic import AppCreateView, AppDetailView, AppListView, AppUpdateView
 from library.views.generic.mixins.ajax import AJAXResponseMixin
 
 
 class StatementCreateView(AppCreateView):
     snap_section = None
+
+    def form_valid(self, multiform):
+        statement = multiform.forms['statement'].save()
+
+        for form in multiform.forms['account']:
+            account = form.save(commit=False)
+            account.statement = statement
+            account.save()
+
+        for form in multiform.forms['bill']:
+            bill = form.save(commit=False)
+            bill.statement = statement
+            bill.save()
+            form.save_m2m()
+
+        for form in multiform.forms['income']:
+            income = form.save(commit=False)
+            income.statement = statement
+            income.save()
+            form.save_m2m()
+
+        return super(StatementCreateView, self).form_valid(multiform)
 
     def get_context_data(self, **kwargs):
         context = super(StatementCreateView, self).get_context_data(**kwargs)
@@ -66,32 +87,12 @@ class StatementCreateView(AppCreateView):
 
         return {
             'statement': {
-                'date': closest_date.strftime('%m/%d/%Y')
+                'date': closest_date
             }
         }
 
-    @staticmethod
-    def form_valid(multiform):
-        statement = multiform.forms['statement'].save()
-
-        for form in multiform.forms['account']:
-            account = form.save(commit=False)
-            account.statement = statement
-            account.save()
-
-        for form in multiform.forms['bill']:
-            bill = form.save(commit=False)
-            bill.statement = statement
-            bill.save()
-            form.save_m2m()
-
-        for form in multiform.forms['income']:
-            income = form.save(commit=False)
-            income.statement = statement
-            income.save()
-            form.save_m2m()
-
-        return HttpResponseRedirect(reverse('statement_detail', args=[statement.pk]))
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(date=DateFormat(cleaned_data['date']).format('F jS, Y'))
 
 
 class StatementDetailView(AppDetailView):
@@ -117,7 +118,26 @@ class StatementDetailView(AppDetailView):
 
 
 class StatementListView(AppListView):
-    pass
+    action = None
+
+    def __init__(self, **kwargs):
+        try:
+            action = kwargs.pop("action")
+        except KeyError:
+            raise RuntimeError(
+                'StatementListView:__init__(): action must be specified'
+            )
+        else:
+            super(StatementListView, self).__init__(**kwargs)
+
+            self.action = action
+
+    def get_context_data(self, **kwargs):
+        context = super(StatementListView, self).get_context_data(**kwargs)
+        context.update({
+            "action": self.action
+        })
+        return context
 
 
 class StatementSectionForm(AJAXResponseMixin, TemplateView):
@@ -243,6 +263,59 @@ class StatementSectionFormValidation(AJAXResponseMixin, TemplateView):
             info['name'] = form.cleaned_data['name']
 
         return info
+
+
+class StatementUpdateView(AppUpdateView):
+    snap_section = 1        # FIXME
+
+    def form_valid(self, multiform):
+        statement = multiform.forms['statement'].save()
+
+        for form in multiform.forms['account']:
+            account = form.save(commit=False)
+            account.statement = statement
+            account.save()
+
+        for form in multiform.forms['bill']:
+            bill = form.save(commit=False)
+            bill.statement = statement
+            bill.save()
+            form.save_m2m()
+
+        for form in multiform.forms['income']:
+            income = form.save(commit=False)
+            income.statement = statement
+            income.save()
+            form.save_m2m()
+
+        return super(StatementUpdateView, self).form_valid(multiform)
+
+    def get_context_data(self, **kwargs):
+        context = super(StatementUpdateView, self).get_context_data(**kwargs)
+        context.update({
+            'account_choices': _get_account_choices(self.request.user),
+            'bill_choices': _get_bill_choices(self.request.user, self.snap_section),
+            'income_choices': _get_income_choices(self.request.user, self.snap_section),
+            'update': True
+        })
+
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super(StatementUpdateView, self).get_form_kwargs()
+        kwargs.update(instance={
+            'account': self.object.account_set.all(),
+            'bill': self.object.bill_set.all(),
+            'income': self.object.income_set.all(),
+            'statement': self.object
+        })
+        return kwargs
+
+    def get_object(self):
+        return Statement.objects.get(pk=self.kwargs.get(self.pk_url_kwarg))
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(date=DateFormat(cleaned_data['date']).format('F jS, Y'))
 
 
 def _get_account_choices(user):
