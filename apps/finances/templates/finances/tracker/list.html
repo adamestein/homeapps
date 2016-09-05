@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Finances: Trackable Statements{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#statement_list").selectmenu({
+                change: function() {
+                    /*
+                        Don't have to worry about the blank choice being selected since as soon as a choice is made,
+                        we redirect to the tracker page
+                     */
+                    var url = "{% url 'tracker' 0 %}";
+                    window.location = url.replace(0, $(this).val());
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block header %}Finances: Trackable Statements{% endblock %}
+
+{% block content %}
+    {% if object_list %}
+        <p>Select the statement in which to track payments from the menu below.</p>
+
+        <select id="statement_list" title="">
+            <option value=""></option>
+            {% for statement in object_list %}
+                <option value="{{ statement.id }}">{{ statement }}</option>
+            {% endfor %}
+        </select>
+    {% else %}
+        <p>There are no statements with unpaid bills to list.</p>
+    {% endif %}
+{% endblock %}

@@ -2,14 +2,15 @@ from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse_lazy
 
 from . import APP
-from .statement_forms import CreateUpdateStatementMultiForm
-from .template_forms import CreateTemplateMultiForm, UpdateTemplateForm
 from .models import AccountTemplate, Statement
+from .statement_forms import CreateUpdateStatementMultiForm
 from .statement_views import (
     StatementCreateView, StatementDetailView, StatementListView, StatementSectionForm, StatementSectionFormValidation,
     StatementUpdateView
 )
+from .template_forms import CreateTemplateMultiForm, UpdateTemplateForm
 from .template_views import TemplateCreateView, TemplateUpdateView, TemplateListView
+from .tracker_view import ChangeBillState, SavePaymentInfo, TrackableList, TrackerUpdateView
 
 from library.views.generic import AppTemplateView
 
@@ -23,7 +24,7 @@ urlpatterns = patterns(
         StatementCreateView.as_view(
             app=APP['name'],
             form_class=CreateUpdateStatementMultiForm,
-            success_message="Statement for '%(date)s' successfully created",
+            success_message="Statement for %(date)s successfully created",
             template_name='finances/statement/create_update_form.html'
         ),
         name='create_statement'
@@ -62,6 +63,17 @@ urlpatterns = patterns(
     ),
 
     url(
+        '^statement/list/$',
+        StatementListView.as_view(
+            action='view',
+            app=APP['name'],
+            queryset=Statement.objects.all(),
+            template_name='finances/statement/list.html'
+        ),
+        name='list_statements'
+    ),
+
+    url(
         '^statement/section_form/$',
         StatementSectionForm.as_view(),
         name='get_statement_section_form'
@@ -71,17 +83,6 @@ urlpatterns = patterns(
         '^statement/section_form/validation/$',
         StatementSectionFormValidation.as_view(),
         name='statement_section_form_validation'
-    ),
-
-    url(
-        '^statement/view/$',
-        StatementListView.as_view(
-            action='view',
-            app=APP['name'],
-            queryset=Statement.objects.all(),
-            template_name='finances/statement/list.html'
-        ),
-        name='view_statement_list'
     ),
 
     url(
@@ -126,5 +127,36 @@ urlpatterns = patterns(
             template_name='finances/template/list.html'
         ),
         name='list_templates'
+    ),
+
+    url(
+        r'^tracker/(?P<pk>\d+)$',
+        TrackerUpdateView.as_view(
+            app=APP['name'],
+            model=Statement,
+            template_name='finances/tracker/tracker.html'
+        ),
+        name='tracker'
+    ),
+
+    url(
+        '^tracker/bill_state/$',
+        ChangeBillState.as_view(),
+        name='change_bill_state'
+    ),
+
+    url(
+        '^tracker/list/$',
+        TrackableList.as_view(
+            app=APP['name'],
+            template_name='finances/tracker/list.html'
+        ),
+        name='trackable_list'
+    ),
+
+    url(
+        '^tracker/validate/$',
+        SavePaymentInfo.as_view(),
+        name='save_payment_info'
     )
 )

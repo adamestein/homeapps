@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Finances: Bill Payment Tracker{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jquery-impromptu.min.css' %}" />
+
+    <style>
+        h2 {
+            text-align: center;
+        }
+
+        select {
+            width: 100%;
+        }
+
+        .ui-datepicker-trigger {
+            padding-left: 0.75em;
+        }
+    </style>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/jquery-impromptu.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/datadumper.js' %}"></script>
+
+    <script type="text/javascript">
+        // Options to use for all date pickers
+        var datePickerOptions = {
+            buttonImage: "{% static 'img/calendar.gif' %}",
+            buttonImageOnly: true,
+            buttonText: "Select date",
+            onSelect: function(dateText, inst) {
+                if (dateText !== inst.lastVal) {
+                    $(this).change();
+                }
+            },
+            showOn: "button"
+        };
+
+        $(document).ready(function() {
+            $(".unfunded").click(function() {
+                updateBill($(this), {{ UNPAID }});
+            });
+
+            $(".unpaid").click(function() {
+                handleUnpaid($(this));
+            });
+        });
+
+        function handleUnpaid(bill) {
+            var form_html = $("#" + bill.data("name")).html().replace(/"id_/g, '"popup_id_');
+
+            var html =  '<div id="popup">' +
+                        '    <h2 style="padding-bottom: 1.5em; text-align: center;">Payment Information</h2>' +
+                        '    <p>' +
+                        '        Fill in the form after the payment has been made and click ' +
+                        '        <strong>Save</strong> to save the information.' +
+                        '    </p>' +
+                        '    <div id="popup_form">' + form_html + '</div>' +
+                        '</div>';
+
+            $.prompt(
+                html,
+                {
+                    buttons: {
+                        Ok: "Ok",
+                        Cancel: "Cancel"
+                    },
+                    focus: "input[name$='payment_method']",
+                    submit: function(event, value, message, formVals) {
+                        if (value == "Ok") {
+                            savePaymentInfo(bill, formVals);
+                            return false;
+                        }
+                    }
+                }
+            );
+
+            var popup = $("#popup");
+
+            // Set the actual amount paid to the amount of the bill as the initial value
+            popup.find("input[id*='actual_0']").val(bill.data("amount").replace('$', ''));
+
+            // Add date picker to any date fields in the popup with the initial value of today's date
+            popup.find("input[id$='date']").datepicker(datePickerOptions).datepicker("setDate", new Date());
+
+            /*
+                If the user needs to manually pay a bill and it has a URL, open it in a new window so the
+                user can pay it
+             */
+            if ($("#" + bill.data("name") + " input[id$='has_auto_pay']").val() === "False") {
+                var url = $("#" + bill.data("name") + " input[id$='url']").val();
+
+                if (url.length) {
+                    window.open(url);
+                }
+            }
+        }
+
+        function savePaymentInfo(bill, formVals) {
+            $.post(
+                "{% url 'save_payment_info' %}",
+                formVals,
+                function(feedback) {
+                    if (feedback == '""') {
+                        $.prompt.close();
+
+                        // Copy the values from the popup form to the actual hidden form
+                        $.each(formVals, function (key, value) {
+                            $("#id_" + key).val(value);
+                        });
+
+                        // Move bill to next <select>
+                        updateBill(bill, {{ PAID }});
+                    } else {
+                        // Validation failed
+                        $("#popup_form").html(JSON.parse(feedback).replace(/"id_/g, '"popup_id_'));
+
+                        // Add date picker to any date fields in the popup
+                        $("#popup").find("input[id$='date']").datepicker(datePickerOptions);
+                    }
+                }
+            ).fail(function(jqXHR, textStatus, errorThrown) {
+                $.prompt.close();
+                alert(
+                    "Could not save payment information.\n\nError: " + jqXHR.responseText
+                );
+            });
+        }
+
+        function updateBill(bill, new_state) {
+            $.post(
+                "{% url 'change_bill_state' %}",
+                {
+                    'bill_id': bill.val(),
+                    'new_state': new_state
+                },
+                function() {
+                    // Figure out which <select> the bill is moving to (a bill can only move to unpaid or paid)
+                    var stateName = (new_state == {{ UNPAID }}) ? "unpaid" : "paid";
+                    var select = $("#" + stateName);
+
+                    var inserted = false;
+
+                    // Move it so it fits into the new <select> alphabetically
+                    select.find("option").each(function(index, value) {
+                        if (bill.data("name") < $(value).data("name")) {
+                            $(value).before(bill);
+                            inserted = true;
+                            return false;
+                        }
+                    });
+
+                    if (inserted == false) {
+                        select.append(bill);
+                    }
+
+                    // Update the class since it's in a new section
+                    bill.attr('class', stateName);
+
+                    if (new_state == {{ UNPAID }}) {
+                        // Item moved, need to redo the click handler for the new section
+                        $(".unpaid").click(function() {
+                            handleUnpaid($(this));
+                        });
+                    }
+                }
+            ).fail(function(jqXHR, textStatus, errorThrown) {
+                $.prompt.close();
+                alert(
+                    "Could not update the bill state.\n\nError: " + jqXHR.responseText
+                );
+            });
+        }
+    </script>
+{% endblock %}
+
+{% block header %}Finances: Bill Payment Tracker{% endblock %}
+
+{% block content %}
+    <p>
+        Clicking on a bill will advance it to the next section (unfunded -> unpaid -> paid). Bills start in the
+        <strong>unfunded</strong> state. Those bills that are set with the <em>Auto Pay</em> option are automatically
+        moved to the <strong>unpaid</strong> state (since they are funded automatically).
+    </p>
+
+    <p>
+        Click <strong>unfunded</strong> bills once money is moved into the appropriate account to pay the bill. This
+        will move the bill to <em>Unpaid Bills</em>.
+    </p>
+
+    <p>
+        Click <strong>unpaid</strong> bills once the bill is paid. This will move the bill to <em>Paid Bills</em>. A
+        popup dialog will appear for you to fill in the payment details. If the bill has a URL set and does NOT have the
+        <em>Auto Transfer</em> option, the URL will open in a new window allowing you to pay the bill.
+    </p>
+
+    <div style="margin-bottom: 2em; margin-top: 2em;">
+        <h2>Unfunded Bills</h2>
+
+        <select id="unfunded" size="10" title="Unfunded bills">
+            {% for form in formset %}
+                {% ifequal form.instance.state UNFUNDED %}
+                    <option class="unfunded" value="{{ form.instance.id }}"
+                            data-amount="{{ form.instance.amount }}"
+                            data-name="{{ form.instance.name|slugify }}">
+                        {{ form.instance.tracker_display }}
+                    </option>
+                {% endifequal %}
+            {% endfor %}
+        </select>
+    </div>
+
+    <div style="margin-bottom: 2em;">
+        <h2>Unpaid Bills</h2>
+
+        <select id="unpaid" size="10" title="Unpaid bills">
+            {% for form in formset %}
+                {% ifequal form.instance.state UNPAID %}
+                    <option class="unpaid" value="{{ form.instance.id }}"
+                            data-amount="{{ form.instance.amount }}"
+                            data-name="{{ form.instance.name|slugify }}">
+                        {{ form.instance.tracker_display }}
+                    </option>
+                {% endifequal %}
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <h2>Paid Bills</h2>
+
+        <select id="paid" size="10" title="Unpaid bills">
+            {% for form in formset %}
+                {% ifequal form.instance.state PAID %}
+                    <option value="{{ form.instance.id }}" data-name="{{ form.instance.name|slugify }}">
+                        {{ form.instance.tracker_display_paid }}
+                    </option>
+                {% endifequal %}
+            {% endfor %}
+        </select>
+    </div>
+
+    {% comment %}
+        Even though we really don't use the form (we save payment information and update bill state via AJAX),
+        the individual forms in the formset are still needed to popuplate the popup when the unpaid bills are
+        clicked. The forms need to be in a layout that the popup can just copy (hence the as_table even thought the
+        actual forms are never seen directly by the user.
+    {% endcomment %}
+    <div style="display: none;">
+        {% for form in formset %}
+            <div id="{{ form.instance.name|slugify }}">
+                <table>
+                    {{ form.as_table }}
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

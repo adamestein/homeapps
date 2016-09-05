@@ -119,6 +119,7 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     'tekextensions.context_processors.static_url_prefix',
 
     # Home Apps context processors
+    'finances.context_processors.bill_states',
     'library.context_processors.apps',
     'library.context_processors.version'
 ]

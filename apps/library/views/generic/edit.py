@@ -5,7 +5,7 @@ from django.views.generic import CreateView, FormView, UpdateView
 
 from .mixins.auth import LoginRequiredMixin
 from .mixins.messages import AppSuccessMessageMixin
-from .mixins.navigation import  NavigationContextMixin
+from .mixins.navigation import NavigationContextMixin
 
 
 class AppCreateView(LoginRequiredMixin, NavigationContextMixin, AppSuccessMessageMixin, CreateView):

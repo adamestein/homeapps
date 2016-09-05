@@ -38,7 +38,6 @@
     <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{% static 'js/jquery-impromptu.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/popr.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/datadumper.js' %}"></script>
 
     <script type="text/javascript">
         // Options to use for all date pickers
@@ -240,10 +239,11 @@
         function insertListItem(sectionID, name, buttonHTML) {
             var inserted = false;
 
-            $(sectionID).find('div').each(function(index, value) {
+            $(sectionID).find("div").each(function(index, value) {
                 if (name < $(value).data("name")) {
                     $(value).before(buttonHTML);
                     inserted = true;
+                    return false;
                 }
             });
 

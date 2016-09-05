@@ -253,7 +253,7 @@ class StatementSectionFormValidation(AJAXResponseMixin, TemplateView):
                             date=form.cleaned_data['date'],
                             name=form.cleaned_data['name'],
                             total=form.cleaned_data['total']
-                        )
+                        ).create_display
                     )
                 }
             else:

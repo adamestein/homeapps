@@ -36,14 +36,39 @@ class AccountTemplate(Template):
 
 
 class Bill(StatementItem, models.Model):
+    PAYMENT_METHOD_CHECK = 0
+    PAYMENT_METHOD_DISCOVER = 1
+    PAYMENT_METHOD_MASTERCARD = 2
+    PAYMENT_METHOD_VISA = 3
+
+    PAYMENT_METHODS = (
+        (PAYMENT_METHOD_CHECK, 'Check'),
+        (PAYMENT_METHOD_DISCOVER, 'Credit Card: Discover'),
+        (PAYMENT_METHOD_MASTERCARD, 'Credit Card: Mastercard'),
+        (PAYMENT_METHOD_VISA, 'Credit Card: VISA')
+    )
+
+    STATE_UNFUNDED = 0
+    STATE_UNPAID = 1
+    STATE_PAID = 2
+
+    STATES = (
+        (STATE_UNFUNDED, 'Unfunded'),
+        (STATE_UNPAID, 'Unpaid'),
+        (STATE_PAID, 'Paid')
+    )
+
     account_number = models.PositiveIntegerField(
         db_index=True, blank=True, null=True, default='', help_text='Account number.'
     )
     actual = MoneyField(
         max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True, help_text='Actual amount paid.'
     )
+    check_number = models.PositiveIntegerField(blank=True, null=True, help_text='Check number if paid by check')
     date = models.DateField(db_index=True, help_text='Due date.')
     paid_date = models.DateField(blank=True, null=True, help_text='The date the bill was paid')
+    payment_method = models.PositiveSmallIntegerField(choices=PAYMENT_METHODS, null=True, help_text='How bill was paid')
+    state = models.PositiveSmallIntegerField(choices=STATES, default=STATE_UNFUNDED, help_text='State of the bill')
     total = MoneyField(
         max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True,
         help_text="Total amount of the bill if 'amount' is partial."
@@ -54,12 +79,49 @@ class Bill(StatementItem, models.Model):
     url = models.URLField(blank=True, null=True, help_text='Web site URL used to pay this bill.')
 
     class Meta:
-        ordering = ('date', 'name')
+        ordering = ('name',)
 
-    def __unicode__(self):
+    @property
+    def create_display(self):
         total = ' (total is {})'.format(self.total) if self.total else ''
 
         fstr = '{} for {}{} due on {}'.format(self.name, self.amount, total, DateFormat(self.date).format('F jS, Y'))
+
+        if self.paid_date:
+            fstr += ' and paid on ' + DateFormat(self.paid_date).format('F jS, Y')
+            fstr += ' ({})'.format(self.actual) if self.actual else ' (PIF)'
+
+        return unicode(fstr)
+
+    @property
+    def has_auto_pay(self):
+        return self._has_option('Auto Pay')
+
+    @property
+    def has_auto_transfer(self):
+        return self._has_option('Auto Transfer')
+
+    @property
+    def tracker_display(self):
+        return u'{} for {} due on {}'.format(self.name, self.amount, DateFormat(self.date).format('F jS, Y'))
+
+    @property
+    def tracker_display_paid(self):
+        amount_paid = self.actual if self.actual else self.amount_due
+        return u'{} paid {} on {}'.format(self.name, amount_paid, DateFormat(self.paid_date).format('F jS, Y'))
+
+    def _has_option(self, name):
+        option = Option.objects.get(template_type='bill', name=name)
+        return option in self.options.all()
+
+    def __unicode__(self):
+        state = 'unfunded' if (self.state == self.STATE_UNFUNDED) else 'unpaid' \
+            if (self.state == self.STATE_UNPAID) else 'paid'
+        total = ' (total is {})'.format(self.total) if self.total else ''
+
+        fstr = '[{}] {} for {}{} due on {}'.format(
+            state, self.name, self.amount, total, DateFormat(self.date).format('F jS, Y')
+        )
 
         if self.paid_date:
             fstr += ' and paid on ' + DateFormat(self.paid_date).format('F jS, Y')

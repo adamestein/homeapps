@@ -14,7 +14,7 @@ APP = {
         },
         {
             'desc': 'View statement',
-            'link': 'view_statement_list',
+            'link': 'list_statements',
             'title': 'View Previous Statements'
         },
         {},
@@ -32,6 +32,12 @@ APP = {
             'desc': 'List all templates',
             'link': 'list_templates',
             'title': 'List Templates'
+        },
+        {},
+        {
+            'desc': 'Track payments from a statement',
+            'link': 'trackable_list',
+            'title': 'Track Payments'
         }
     ]
 }
