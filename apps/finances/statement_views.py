@@ -63,22 +63,30 @@ class BaseStatementView(ModelFormMixin, ProcessFormView):
     def form_valid(self, multiform):
         statement = multiform.forms['statement'].save()
 
+        saved_ids = []
         for form in multiform.forms['account']:
             account = form.save(commit=False)
             account.statement = statement
             account.save()
+            saved_ids.append(account.id)
+        Account.objects.filter(statement=statement).exclude(id__in=saved_ids).delete()      # Delete 'deleted' items
 
+        saved_ids = []
         for form in multiform.forms['bill']:
             bill = form.save(commit=False)
             bill.statement = statement
             bill.save()
             form.save_m2m()
+            saved_ids.append(bill.id)
+        Bill.objects.filter(statement=statement).exclude(id__in=saved_ids).delete()      # Delete 'deleted' items
 
+        saved_ids = []
         for form in multiform.forms['income']:
             income = form.save(commit=False)
             income.statement = statement
             income.save()
             form.save_m2m()
+        Income.objects.filter(statement=statement).exclude(id__in=saved_ids).delete()      # Delete 'deleted' items
 
         return super(BaseStatementView, self).form_valid(multiform)
 

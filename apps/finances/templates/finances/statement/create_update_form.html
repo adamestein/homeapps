@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Finances: {% if update %}Update{% else %}Create{% endif %} Statement{% endblock %}
+{% block title %}Finances: {% if object %}Update{% else %}Create{% endif %} Statement{% endblock %}
 
 {% block css %}
     {{ block.super }}
@@ -38,6 +38,7 @@
     <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{% static 'js/jquery-impromptu.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/popr.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/datadumper.js' %}"></script>
 
     <script type="text/javascript">
         // Options to use for all date pickers
@@ -92,9 +93,9 @@
             $('#confirmDialog').dialog({
                 autoOpen: false,
                 buttons: {
-                    "{% if update %}Update{% else %}Create{% endif %} Statement": function () {
+                    "{% if object %}Update{% else %}Create{% endif %} Statement": function () {
                         $(this).dialog("close");
-                        $("#busy_text").text("{% if update %}Updating{% else %}Creating{% endif %} Statement");
+                        $("#busy_text").text("{% if object %}Updating{% else %}Creating{% endif %} Statement");
                         $("body").addClass("busy");
                         $("form").submit();
                     },
@@ -110,7 +111,7 @@
             $("#submit_button").click(function(e) {
                 var missing = {};
 
-                // [data-show='1']
+                // Figure out which items types weren't used so the user can be told what's missing from the statement
                 $(".popr-item[data-pk!=''][data-show='1']").each(function(index, poprItem) {
                     var type = $(poprItem).data("type");
 
@@ -119,6 +120,7 @@
                     }
 
                     missing[type].push($(poprItem).text().trim());
+                    console.log('Missing = [' + Dumper(missing) + ']');
                 });
 
                 var keys = Object.keys(missing);
@@ -196,7 +198,9 @@
             totalForms.val(parseInt(totalForms.val()) - 1);
 
             // If no more items, show the 'no' message
+            console.log('Table Type = [' + tableType + '], Len = [' + $("#" + tableType).find("div").length + ']');
             if ($("#" + tableType).find("div").length == 0) {
+                console.log('Setting to [' + "#no_" + tableType + "_message" + ']');
                 $("#no_" + tableType + "_message").show();
             } else {
                 var regex = new RegExp(tableType + "-\\d+");
@@ -414,12 +418,12 @@
     </script>
 {% endblock %}
 
-{% block header %}{% if update %}Update{% else %}Create{% endif %} Statement{% endblock %}
+{% block header %}{% if object %}Update{% else %}Create{% endif %} Statement{% endblock %}
 
 {% block content %}
     <p>
-        Fill out the form below and click <strong>{% if update %}Update{% else %}Create{% endif %}</strong> to
-        {% if update %}update the statement{% else %}generate a new statement{% endif %}. Click the green plus
+        Fill out the form below and click <strong>{% if object %}Update{% else %}Create{% endif %}</strong> to
+        {% if object %}update the statement{% else %}generate a new statement{% endif %}. Click the green plus
         sign (<img src="{% static 'admin/img/icon_addlink.gif' %}" />) to add an item to this statement.  Click the
         red x sign (<img src="{% static 'admin/img/icon_deletelink.gif' %}" />) to delete the item.
     </p>
@@ -447,7 +451,7 @@
 
             <div id="account">
                 {% ifequal form.account|length 0 %}
-                    <p id="no_account_message">
+                    <p id="no_account_message" {% if form.account|length > 0 %}style="display: none;"{% endif %}>
                         There are currently no accounts to list.
                     </p>
                 {% endifequal %}
@@ -468,11 +472,9 @@
             {{ form.bill.non_form_errors }}
 
             <div id="bill">
-                {% ifequal form.bill|length 0 %}
-                    <p id="no_bill_message">
-                        There are currently no bills to list.
-                    </p>
-                {% endifequal %}
+                <p id="no_bill_message" {% if form.bill|length > 0 %}style="display: none;"{% endif %}>
+                    There are currently no bills to list.
+                </p>
             </div>
         </fieldset>
 
@@ -490,16 +492,14 @@
             {{ form.income.non_form_errors }}
 
             <div id="income">
-                {% ifequal form.income|length 0 %}
-                    <p id="no_income_message">
-                        There are currently no income transactions to list.
-                    </p>
-                {% endifequal %}
+                <p id="no_income_message" {% if form.income|length > 0 %}style="display: none;"{% endif %}>
+                    There are currently no income transactions to list.
+                </p>
             </div>
         </fieldset>
 
         <div class="buttons">
-            <input id="submit_button" type="submit" value="{% if update %}Update{% else %}Create{% endif %}"
+            <input id="submit_button" type="submit" value="{% if object %}Update{% else %}Create{% endif %}"
                    disabled="disabled" />
             <input type="reset" value="Reset" />
         </div>
