@@ -1,0 +1,69 @@
+{% extends "easy_pdf/base.html" %}
+
+{% block extra_style %}
+    <style type="text/css">
+        .row1 {
+            background-color: #C0C0C0; color: black;
+        }
+
+        .row2 {
+            background-color: #E8E8E8; color: black;
+        }
+
+        table.statement {
+            border-bottom: 1px solid black;
+            border-top: 1px solid black;
+            padding: 0.5em 0.5em 0 0.5em;
+        }
+
+        table.totals {
+            padding: 0.5em 0.5em 0 0.5em;
+            text-align: right;
+            width: 50em;
+        }
+
+        .option {
+            padding-left: 4em;
+        }
+
+        .options {
+            font-size: 80%;
+        }
+    </style>
+{% endblock %}
+
+{% block page_header %}<h1 style="text-align: center;">Statement for {{ object }}</h1>{% endblock %}
+
+{% block content %}
+    <table>
+        {% with data=object.account_set.all label="Accounts" total=total.account %}
+            {% include "finances/statement/_section_table_print.html" %}
+        {% endwith %}
+    </table>
+
+    <br style="height: 2em;" />
+
+    <table>
+        {% with data=object.bill_set.all label="Bills" total=total.bill %}
+            {% include "finances/statement/_section_table_print.html" %}
+        {% endwith %}
+    </table>
+
+    <br style="height: 2em;" />
+
+    <table>
+        {% with data=object.income_set.all label="Income" total=total.income %}
+            {% include "finances/statement/_section_table_print.html" %}
+        {% endwith %}
+    </table>
+
+    <p style="font-style: italic; font-weight: bold; margin-top: 2em;">
+        The amount left over after paying bills is
+        {% with left_over=diff.amount %}
+            <span style="color: {% if left_over < 0 %}red{% else %}green{% endif %};">
+                ${{ left_over }}
+            </span>
+        {% endwith %}
+    </p>
+
+{% endblock %}

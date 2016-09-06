@@ -52,7 +52,14 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
+            var pdf = $("#pdf");
+
             $(".option").tooltip();
+            pdf.tooltip();
+
+            pdf.click(function() {
+                window.open("{% url 'statement_pdf' object.id %}");
+            });
         });
     </script>
 {% endblock %}
@@ -60,7 +67,12 @@
 {% block header %}Statement for {{ object.date|date:"F d, Y" }}{% endblock %}
 
 {% block content %}
-    <table>
+    <div style="float: right;">
+         <img id="pdf" src="{% static 'img/pdf.png' %}" alt="[create PDF]" style="cursor: pointer;"
+              title="Create PDF version of statement">
+    </div>
+
+    <table style="clear: right;">
         {% with data=object.account_set.all label="Accounts" total=total.account %}
             {% include "finances/statement/_section_table.html" %}
         {% endwith %}

@@ -5,8 +5,8 @@ from . import APP
 from .models import AccountTemplate, Statement
 from .statement_forms import CreateUpdateStatementMultiForm
 from .statement_views import (
-    StatementCreateView, StatementDetailView, StatementListView, StatementSectionForm, StatementSectionFormValidation,
-    StatementUpdateView
+    StatementCreateView, StatementDetailView, StatementListView, StatementPDFView, StatementSectionForm,
+    StatementSectionFormValidation, StatementUpdateView
 )
 from .template_forms import CreateTemplateMultiForm, UpdateTemplateForm
 from .template_views import TemplateCreateView, TemplateUpdateView, TemplateListView
@@ -71,6 +71,12 @@ urlpatterns = patterns(
             template_name='finances/statement/list.html'
         ),
         name='list_statements'
+    ),
+
+    url(
+        '^statement/pdf/(?P<pk>[\d]+)/$',
+        StatementPDFView.as_view(),
+        name='statement_pdf'
     ),
 
     url(

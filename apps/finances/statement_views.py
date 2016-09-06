@@ -1,6 +1,7 @@
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
+from easy_pdf.views import PDFTemplateView
 from moneyed import Money, USD
 
 from django.db.models import Q
@@ -12,6 +13,7 @@ from .statement_forms import AccountForm, BillForm, IncomeForm
 
 from library.views.generic import AppCreateView, AppDetailView, AppListView, AppUpdateView
 from library.views.generic.mixins.ajax import AJAXResponseMixin
+from library.views.generic.mixins.auth import LoginRequiredMixin
 
 from django.views.generic.edit import ModelFormMixin, ProcessFormView
 
@@ -128,20 +130,8 @@ class StatementDetailView(AppDetailView):
     def get_context_data(self, **kwargs):
         context = super(StatementDetailView, self).get_context_data(**kwargs)
 
-        bills = self.object.bill_set.all()
-        income = self.object.income_set.all()
-
-        bill_sum = sum([bill.amount for bill in bills]) if bills.count() else Money(0, USD)
-        income_sum = sum([income.amount for income in income]) if income.count() else Money(0, USD)
-
-        context.update({
-            'diff': income_sum - bill_sum,
-            'total': {
-                'account': sum([account.amount for account in self.object.account_set.all()]),
-                'bill': bill_sum,
-                'income': income_sum
-            }
-        })
+        # Add calculated values to the context
+        _calculations(self.object, context)
 
         return context
 
@@ -166,6 +156,25 @@ class StatementListView(AppListView):
         context.update({
             "action": self.action
         })
+        return context
+
+
+class StatementPDFView(LoginRequiredMixin, PDFTemplateView):
+    template_name = 'finances/statement/pdf.html'
+
+    def get_context_data(self, **kwargs):
+        statement = Statement.objects.get(pk=kwargs['pk'])
+
+        context = super(StatementPDFView, self).get_context_data(
+            object=statement,
+            pagesize='letter',
+            title='Statement for {}'.format(statement),
+            **kwargs
+        )
+
+        # Add calculated values to the context
+        _calculations(statement, context)
+
         return context
 
 
@@ -311,3 +320,20 @@ class StatementUpdateView(BaseStatementView, AppUpdateView):
 
     def get_object(self):
         return Statement.objects.get(pk=self.kwargs.get(self.pk_url_kwarg))
+
+
+def _calculations(statement, context):
+    bills = statement.bill_set.all()
+    income = statement.income_set.all()
+
+    bill_sum = sum([bill.amount for bill in bills]) if bills.count() else Money(0, USD)
+    income_sum = sum([income.amount for income in income]) if income.count() else Money(0, USD)
+
+    context.update({
+        'diff': income_sum - bill_sum,
+        'total': {
+            'account': sum([account.amount for account in statement.account_set.all()]),
+            'bill': bill_sum,
+            'income': income_sum
+        }
+    })

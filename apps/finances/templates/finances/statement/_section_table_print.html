@@ -1,5 +1,5 @@
 <tr>
-    <td><span style="font-size: 1.6em"><strong>{{ label }}</strong></span></td>
+    <td style="font-size: 130%;"><strong>{{ label }}</strong></td>
 </tr>
 
 <tr>
@@ -7,19 +7,19 @@
         <td>
             <table class="statement">
                 {% for row in data %}
-                    <tr class="{% cycle 'row1' 'row2' %}">
-                        <td>
-                            {{ row.name }}
+                    <tr>
+                        <td class="{% cycle 'row1' 'row2' as rowcolors %}">
+                            <span>{{ row.name }}</span>
                             {% if row.options %}
                                 <ul class="options">
                                     {% for option in row.options.all %}
-                                        <li title="{{ option.description }}">{{ option.name }}</li>
+                                        <li class="option" title="{{ option.description }}">{{ option.name }}</li>
                                     {% endfor %}
                                 </ul>
                             {% endif %}
                         </td>
 
-                        <td style="text-align: right;">
+                        <td class="{{ rowcolors }}" style="text-align: right;">
                             {{ row.amount }}
                         </td>
                     </tr>
@@ -28,8 +28,8 @@
 
             <table class="totals">
                 <tr>
-                    <td class="totals"><strong>Total =</strong></td>
-                    <td style="text-align: right;"><strong>{{ total }}</strong></td>
+                    <td><strong>Total =</strong></td>
+                    <td style="width: 10%;"><strong>{{ total }}</strong></td>
                 </tr>
             </table>
         </td>

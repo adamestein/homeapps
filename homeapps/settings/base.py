@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3rd Party Apps
+    'easy_pdf',
     'south',
     'system_globals',
     'tekextensions',
