@@ -1,4 +1,6 @@
 from datetime import date
+import re
+from urlparse import urlsplit
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -140,15 +142,19 @@ class BillTemplate(Template):
     due_day = models.PositiveSmallIntegerField(
         blank=True, null=True, help_text='Day of the month this bill is due (0 means last day of the month).'
     )
-    total = MoneyField(
-        max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True,
-        help_text="Total amount of the bill if 'amount' is partial."
-    )
     options = models.ManyToManyField(
         'Option', help_text='Options for the bill.', blank=True, limit_choices_to={'template_type': 'bill'}
     )
     snap_section = models.PositiveSmallIntegerField(help_text='Snap section in which this template should be shown')
     url = models.URLField(blank=True, null=True, help_text='Web site URL used to pay this bill.')
+
+    @property
+    def short_url(self):
+        parts = urlsplit(self.url)
+        url = '{}://{}/'.format(parts.scheme, parts.netloc)
+        if len(self.url) > len(url):
+            url += '...'
+        return unicode(url)
 
     def __unicode__(self):
         fstr = self.name

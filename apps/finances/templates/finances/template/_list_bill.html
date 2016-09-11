@@ -3,7 +3,6 @@
         <span class="cell primary">Name</span>
         <span class="cell">Acct Number</span>
         <span class="cell">Amount</span>
-        <span class="cell">Total</span>
         <span class="cell">Due Day</span>
         <span class="cell">URL</span>
         <span class="cell">Snap #</span>
@@ -26,11 +25,6 @@
                     {{ template.amount }}
                 {% endif %}
             </span>
-            <span class="cell" data-label="Total">
-                {% if template.total %}
-                    {{ template.total }}
-                {% endif %}
-            </span>
             <span class="cell" data-label="Due Day">
                 {% if template.due_day %}
                     {{ template.due_day }}
@@ -38,7 +32,7 @@
             </span>
             <span class="cell" data-label="URL">
                 {% if template.url %}
-                    <a href="{{ template.url }}" target="_blank">{{ template.url }}</a>
+                    <a href="{{ template.url }}" target="_blank">{{ template.short_url }}</a>
                 {% endif %}
             </span>
             <span class="cell" data-label="Snap #">
