@@ -15,7 +15,7 @@ class CreateAccountTemplateForm(UserAndNameMixin, forms.ModelForm):
 
 class CreateBillTemplateForm(UserAndNameMixin, OptionForm, forms.ModelForm):
     class Meta:
-        fields = ['name', 'account_number', 'amount', 'total', 'due_day', 'url', 'options', 'snap_section']
+        fields = ['name', 'account_number', 'amount', 'due_day', 'url', 'options', 'snap_section']
         model = BillTemplate
 
     def __init__(self, *args, **kwargs):
