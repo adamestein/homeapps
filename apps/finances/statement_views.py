@@ -206,7 +206,6 @@ class StatementSectionForm(AJAXResponseMixin, TemplateView):
                         'amount': template.amount,
                         'name': template.name,
                         'options': template.options.all(),
-                        'total': template.total,
                         'url': template.url
                     },
                     prefix=prefix
