@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}Finances: Statement for {{ object.date|date:"F d, Y" }}{% endblock %}
 
@@ -39,7 +40,7 @@
             width: 88%;
         }
 
-        .options {
+        .extra_info {
             font-size: 80%;
         }
     </style>
@@ -67,9 +68,11 @@
 {% block header %}Statement for {{ object.date|date:"F d, Y" }}{% endblock %}
 
 {% block content %}
-    <div style="float: right;">
-         <img id="pdf" src="{% static 'img/pdf.png' %}" alt="[create PDF]" style="cursor: pointer;"
-              title="Create PDF version of statement">
+    <div style="width: 50em;">
+        <div style="float: right;">
+             <img id="pdf" src="{% static 'img/pdf.png' %}" alt="[create PDF]" style="cursor: pointer;"
+                  title="Create PDF version of statement">
+        </div>
     </div>
 
     <table style="clear: right;">
@@ -94,7 +97,7 @@
         The amount left over after paying bills is
         {% with left_over=diff.amount %}
             <span style="color: {% if left_over < 0 %}red{% else %}green{% endif %};">
-                ${{ left_over }}
+                ${{ left_over|intcomma }}
             </span>
         {% endwith %}
     </p>

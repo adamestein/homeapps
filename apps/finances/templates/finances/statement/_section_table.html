@@ -10,8 +10,18 @@
                     <tr class="{% cycle 'row1' 'row2' %}">
                         <td>
                             {{ row.name }}
+
+                            {% if row.date %}
+                                <div class="extra_info">
+                                    <em>
+                                        [{% ifequal row.model_name "bill" %}Due:{% else %}Deposited:{% endifequal %}
+                                        {{ row.date }}]
+                                    </em>
+                                </div>
+                            {% endif %}
+
                             {% if row.options %}
-                                <ul class="options">
+                                <ul class="extra_info">
                                     {% for option in row.options.all %}
                                         <li title="{{ option.description }}">{{ option.name }}</li>
                                     {% endfor %}

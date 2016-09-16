@@ -65,30 +65,9 @@ class BaseStatementView(ModelFormMixin, ProcessFormView):
     def form_valid(self, multiform):
         statement = multiform.forms['statement'].save()
 
-        saved_ids = []
-        for form in multiform.forms['account']:
-            account = form.save(commit=False)
-            account.statement = statement
-            account.save()
-            saved_ids.append(account.id)
-        Account.objects.filter(statement=statement).exclude(id__in=saved_ids).delete()      # Delete 'deleted' items
-
-        saved_ids = []
-        for form in multiform.forms['bill']:
-            bill = form.save(commit=False)
-            bill.statement = statement
-            bill.save()
-            form.save_m2m()
-            saved_ids.append(bill.id)
-        Bill.objects.filter(statement=statement).exclude(id__in=saved_ids).delete()      # Delete 'deleted' items
-
-        saved_ids = []
-        for form in multiform.forms['income']:
-            income = form.save(commit=False)
-            income.statement = statement
-            income.save()
-            form.save_m2m()
-        Income.objects.filter(statement=statement).exclude(id__in=saved_ids).delete()      # Delete 'deleted' items
+        self._save_data(statement, multiform.forms['account'], Account, save_m2m=False)
+        self._save_data(statement, multiform.forms['bill'], Bill)
+        self._save_data(statement, multiform.forms['income'], Income)
 
         return super(BaseStatementView, self).form_valid(multiform)
 
@@ -115,6 +94,17 @@ class BaseStatementView(ModelFormMixin, ProcessFormView):
     def _get_income_choices(self):
         snap_section_query = Q(snap_section=self.snap_section) | Q(snap_section=0)
         return IncomeTemplate.objects.filter(snap_section_query, user=self.request.user, disabled=False)
+
+    def _save_data(self, statement, forms, model, save_m2m=True):
+        saved_ids = []
+        for form in forms:
+            instance = form.save(commit=False)
+            instance.statement = statement
+            instance.save()
+            if save_m2m:
+                form.save_m2m()
+            saved_ids.append(instance.id)
+        model.objects.filter(statement=statement).exclude(id__in=saved_ids).delete()      # Delete 'deleted' items
 
 
 class StatementCreateView(BaseStatementView, AppCreateView):

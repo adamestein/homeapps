@@ -34,6 +34,10 @@ class StatementItem(Auth, Base, models.Model):
     class Meta:
         abstract = True
 
+    @property
+    def model_name(self):
+        return self._meta.model_name
+
 
 class Template(Auth, Base, models.Model):
     disabled = models.BooleanField(default=False, help_text='Check if this template is not to be used.')
