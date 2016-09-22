@@ -27,7 +27,7 @@ class TrackableList(AppListView):
     def get_queryset(self):
         # Look for statements that have any bills in an unfunded or unpaid state
         state_query = Q(bill__state=Bill.STATE_UNFUNDED) | Q(bill__state=Bill.STATE_UNPAID)
-        return Statement.objects.filter(state_query, user=self.request.user)
+        return Statement.objects.filter(state_query, user=self.request.user).distinct()
 
 
 class TrackerUpdateView(AppUpdateView):

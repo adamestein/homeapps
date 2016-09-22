@@ -238,7 +238,7 @@
     <div>
         <h2>Paid Bills</h2>
 
-        <select id="paid" size="10" title="Unpaid bills">
+        <select id="paid" size="10" title="Paid bills">
             {% for form in formset %}
                 {% ifequal form.instance.state PAID %}
                     <option value="{{ form.instance.id }}" data-name="{{ form.instance.name|slugify }}">
