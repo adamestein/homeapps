@@ -43,13 +43,15 @@ class Bill(StatementItem, models.Model):
     PAYMENT_METHOD_MASTERCARD = 2
     PAYMENT_METHOD_VISA = 3
     PAYMENT_METHOD_ACCOUNT_TRANSFER = 4
+    PAYMENT_METHOD_ACH_DIRECT_DEBIT = 5
 
     PAYMENT_METHODS = (
         (PAYMENT_METHOD_ACCOUNT_TRANSFER, 'Account Transfer'),
+        (PAYMENT_METHOD_ACH_DIRECT_DEBIT, 'ACH - Direct Debit'),
         (PAYMENT_METHOD_CHECK, 'Check'),
         (PAYMENT_METHOD_DISCOVER, 'Credit Card: Discover'),
         (PAYMENT_METHOD_MASTERCARD, 'Credit Card: Mastercard'),
-        (PAYMENT_METHOD_VISA, 'Credit Card: VISA')
+        (PAYMENT_METHOD_VISA, 'Credit Card: VISA'),
     )
 
     STATE_UNFUNDED = 0
