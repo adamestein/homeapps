@@ -38,7 +38,6 @@
     <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{% static 'js/jquery-impromptu.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/popr.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/datadumper.js' %}"></script>
 
     <script type="text/javascript">
         // Options to use for all date pickers
@@ -120,7 +119,6 @@
                     }
 
                     missing[type].push($(poprItem).text().trim());
-                    console.log('Missing = [' + Dumper(missing) + ']');
                 });
 
                 var keys = Object.keys(missing);
@@ -198,9 +196,7 @@
             totalForms.val(parseInt(totalForms.val()) - 1);
 
             // If no more items, show the 'no' message
-            console.log('Table Type = [' + tableType + '], Len = [' + $("#" + tableType).find("div").length + ']');
             if ($("#" + tableType).find("div").length == 0) {
-                console.log('Setting to [' + "#no_" + tableType + "_message" + ']');
                 $("#no_" + tableType + "_message").show();
             } else {
                 var regex = new RegExp(tableType + "-\\d+");
@@ -265,7 +261,7 @@
                     if ($(input).attr("type") != "hidden") {
                         formVals[$(input).attr('name')] = $(input).val();
                         if ($(input).attr('name').indexOf("name") > -1) {
-                            name = $(input).val();
+                            name = escapeQuote($(input).val());
                         }
                     }
                 });
