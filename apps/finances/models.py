@@ -14,7 +14,7 @@ from library.ordinal import ordinal
 
 class Account(StatementItem, models.Model):
     account_number = models.CharField(
-        db_index=True, default='', help_text='Account number.', max_length=30
+        blank=True, db_index=True, default='', help_text='Account number.', max_length=30
     )
 
     class Meta:
@@ -32,7 +32,7 @@ class Account(StatementItem, models.Model):
 
 class AccountTemplate(Template):
     account_number = models.CharField(
-        db_index=True, default='', help_text='Account number.', max_length=30
+        blank=True, db_index=True, default='', help_text='Account number.', max_length=30
     )
 
 
@@ -64,7 +64,7 @@ class Bill(StatementItem, models.Model):
     )
 
     account_number = models.CharField(
-        db_index=True, default='', help_text='Account number.', max_length=30
+        blank=True, db_index=True, default='', help_text='Account number.', max_length=30
     )
     actual = MoneyField(
         max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True, help_text='Actual amount paid.'
@@ -137,7 +137,7 @@ class Bill(StatementItem, models.Model):
 
 class BillTemplate(Template):
     account_number = models.CharField(
-        db_index=True, default='', help_text='Account number.', max_length=30
+        blank=True, db_index=True, default='', help_text='Account number.', max_length=30
     )
     amount = MoneyField(
         max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True, help_text='Amount of the bill.'
@@ -173,7 +173,7 @@ class BillTemplate(Template):
 
 class Income(StatementItem, models.Model):
     account_number = models.CharField(
-        db_index=True, default='', help_text='Account number.', max_length=30
+        blank=True, db_index=True, default='', help_text='Account number.', max_length=30
     )
     date = models.DateField(db_index=True, help_text="Transaction date (date it was deposited).",)
     options = models.ManyToManyField(
@@ -192,7 +192,7 @@ class Income(StatementItem, models.Model):
 
 class IncomeTemplate(Template):
     account_number = models.CharField(
-        db_index=True, default='', help_text='Account number.', max_length=30
+        blank=True, db_index=True, default='', help_text='Account number.', max_length=30
     )
     amount = MoneyField(
         max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True, help_text='Income amount.'
