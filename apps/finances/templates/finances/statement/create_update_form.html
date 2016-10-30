@@ -325,7 +325,7 @@
 
             var dataName = 'data-name="' + name + '"';
             var divBegin = '<div ' + dataName + '>';
-            var nameSlug = name.replace(/ /g, "_");
+            var nameSlug = name.replace(/ /g, "_").replace(/\./g, "_");
 
             var buttonID = "id_" + tableType + "-" + nameSlug;
 
