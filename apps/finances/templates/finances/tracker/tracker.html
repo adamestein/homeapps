@@ -29,7 +29,6 @@
 
     <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{% static 'js/jquery-impromptu.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/datadumper.js' %}"></script>
 
     <script type="text/javascript">
         // Options to use for all date pickers
@@ -46,13 +45,21 @@
         };
 
         $(document).ready(function() {
-            $(".unfunded").click(function() {
-                updateBill($(this), {{ UNPAID }});
-            });
+            /*
+                For some reason, the jQuery ready() function is called multiple times. Can't figure out why, so
+                we'll prevent multiple click handlers by ensuring we only do it once.
+             */
+            if (window.already_here === undefined) {
+                $(".unfunded").click(function () {
+                    updateBill($(this), {{ UNPAID }});
+                });
 
-            $(".unpaid").click(function() {
-                handleUnpaid($(this));
-            });
+                $(".unpaid").click(function () {
+                    handleUnpaid($(this));
+                });
+
+                window.already_here = true;
+            }
         });
 
         function handleUnpaid(bill) {
