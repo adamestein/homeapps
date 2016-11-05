@@ -29,6 +29,7 @@
 
     <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{% static 'js/jquery-impromptu.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/datadumper.js' %}"></script>
 
     <script type="text/javascript">
         // Options to use for all date pickers
@@ -94,7 +95,7 @@
             var popup = $("#popup");
 
             // Set the actual amount paid to the amount of the bill as the initial value
-            popup.find("input[id*='actual_0']").val(bill.data("amount").replace('$', ''));
+            popup.find("input[id*='actual_0']").val(bill.data("amount").replace('$', '').replace(',', ''));
 
             // Add date picker to any date fields in the popup with the initial value of today's date
             popup.find("input[id$='date']").datepicker(datePickerOptions).datepicker("setDate", new Date());
