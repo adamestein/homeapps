@@ -19,12 +19,15 @@ class AccountFormSet(BaseModelFormSet):
 
 
 class BillForm(forms.ModelForm):
+    # Can't pass the options set in the template through statement creation/update, so we'll pass the option PKs
+    # in a string
+    option_list = forms.CharField(widget=forms.HiddenInput())
+
     class Meta:
-        fields = ['name', 'account_number', 'amount', 'total', 'date', 'url', 'options']
+        fields = ['name', 'account_number', 'amount', 'total', 'date', 'url']
         model = Bill
         widgets = {
-            'date': forms.DateInput(format='%m/%d/%Y'),
-            'options': forms.MultipleHiddenInput
+            'date': forms.DateInput(format='%m/%d/%Y')
         }
 
 
@@ -35,12 +38,15 @@ class BillFormSet(BaseModelFormSet):
 
 
 class IncomeForm(forms.ModelForm):
+    # Can't pass the options set in the template through statement creation/update, so we'll pass the option PKs
+    # in a string
+    option_list = forms.CharField(widget=forms.HiddenInput())
+
     class Meta:
-        fields = ['name', 'account_number', 'amount', 'date', 'options']
+        fields = ['name', 'account_number', 'amount', 'date']
         model = Income
         widgets = {
-            'date': forms.DateInput(format='%m/%d/%Y'),
-            'options': forms.MultipleHiddenInput
+            'date': forms.DateInput(format='%m/%d/%Y')
         }
 
 

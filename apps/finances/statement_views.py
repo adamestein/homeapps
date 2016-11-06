@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.utils.dateformat import DateFormat
 from django.views.generic import TemplateView
 
-from .models import Account, AccountTemplate, Bill, BillTemplate, Income, IncomeTemplate, Statement
+from .models import Account, AccountTemplate, Bill, BillTemplate, Income, IncomeTemplate, Option, Statement
 from .statement_forms import AccountForm, BillForm, IncomeForm
 
 from library.views.generic import AppCreateView, AppDetailView, AppListView, AppUpdateView
@@ -65,7 +65,7 @@ class BaseStatementView(ModelFormMixin, ProcessFormView):
     def form_valid(self, multiform):
         statement = multiform.forms['statement'].save()
 
-        self._save_data(statement, multiform.forms['account'], Account, save_m2m=False)
+        self._save_data(statement, multiform.forms['account'], Account)
         self._save_data(statement, multiform.forms['bill'], Bill)
         self._save_data(statement, multiform.forms['income'], Income)
 
@@ -95,14 +95,18 @@ class BaseStatementView(ModelFormMixin, ProcessFormView):
         snap_section_query = Q(snap_section=self.snap_section) | Q(snap_section=0)
         return IncomeTemplate.objects.filter(snap_section_query, user=self.request.user, disabled=False)
 
-    def _save_data(self, statement, forms, model, save_m2m=True):
+    def _save_data(self, statement, forms, model):
         saved_ids = []
         for form in forms:
             instance = form.save(commit=False)
             instance.statement = statement
             instance.save()
-            if save_m2m:
-                form.save_m2m()
+            option_list = form.cleaned_data.get('option_list', None)
+            # Options from the template are stored as a string of joined Option pks, so know we need to add those
+            # options (if any) to thew new instance
+            if option_list:
+                for option_pk in option_list.split(','):
+                    instance.options.add(Option.objects.get(pk=option_pk))
             saved_ids.append(instance.id)
         model.objects.filter(statement=statement).exclude(id__in=saved_ids).delete()      # Delete 'deleted' items
 
@@ -195,7 +199,7 @@ class StatementSectionForm(AJAXResponseMixin, TemplateView):
                         'account_number': template.account_number,
                         'amount': template.amount,
                         'name': template.name,
-                        'options': template.options.all(),
+                        'option_list': ','.join(str(pk) for pk in template.options.all().values_list('pk', flat=True)),
                         'url': template.url
                     },
                     prefix=prefix
@@ -214,7 +218,7 @@ class StatementSectionForm(AJAXResponseMixin, TemplateView):
                         'account_number': template.account_number,
                         'amount': template.amount,
                         'name': template.name,
-                        'options': template.options.all()
+                        'option_list': ','.join(str(pk) for pk in template.options.all().values_list('pk', flat=True))
                     },
                     prefix=prefix
                 )
@@ -251,32 +255,13 @@ class StatementSectionFormValidation(AJAXResponseMixin, TemplateView):
         elif table_type == 'bill':
             form = BillForm(self.request.POST, prefix=prefix)
             if form.is_valid():
-                info = {
-                    'button_text': str(
-                        Bill(
-                            account_number=form.cleaned_data['account_number'],
-                            amount=form.cleaned_data['amount'],
-                            date=form.cleaned_data['date'],
-                            name=form.cleaned_data['name'],
-                            total=form.cleaned_data['total']
-                        ).create_display
-                    )
-                }
+                info = {'button_text': str(form.save(commit=False).create_display)}
             else:
                 info = {'errors': str(form)}
         elif table_type == 'income':
             form = IncomeForm(self.request.POST, prefix=prefix)
             if form.is_valid():
-                info = {
-                    'button_text': str(
-                        Income(
-                            account_number=form.cleaned_data['account_number'],
-                            amount=form.cleaned_data['amount'],
-                            date=form.cleaned_data['date'],
-                            name=form.cleaned_data['name']
-                        )
-                    )
-                }
+                info = {'button_text': str(form.save(commit=False))}
             else:
                 info = {'errors': str(form)}
         else:
@@ -307,7 +292,7 @@ class StatementUpdateView(BaseStatementView, AppUpdateView):
         })
         return kwargs
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         return Statement.objects.get(pk=self.kwargs.get(self.pk_url_kwarg))
 
 
