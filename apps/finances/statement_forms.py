@@ -21,7 +21,7 @@ class AccountFormSet(BaseModelFormSet):
 class BillForm(forms.ModelForm):
     # Can't pass the options set in the template through statement creation/update, so we'll pass the option PKs
     # in a string
-    option_list = forms.CharField(widget=forms.HiddenInput())
+    option_list = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     class Meta:
         fields = ['name', 'account_number', 'amount', 'total', 'date', 'url']
@@ -29,6 +29,18 @@ class BillForm(forms.ModelForm):
         widgets = {
             'date': forms.DateInput(format='%m/%d/%Y')
         }
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+
+        if instance:
+            kwargs.update(
+                initial={
+                    'option_list': ','.join(str(pk) for pk in instance.options.all().values_list('pk', flat=True))
+                }
+            )
+
+        super(BillForm, self).__init__(*args, **kwargs)
 
 
 class BillFormSet(BaseModelFormSet):
@@ -40,7 +52,7 @@ class BillFormSet(BaseModelFormSet):
 class IncomeForm(forms.ModelForm):
     # Can't pass the options set in the template through statement creation/update, so we'll pass the option PKs
     # in a string
-    option_list = forms.CharField(widget=forms.HiddenInput())
+    option_list = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     class Meta:
         fields = ['name', 'account_number', 'amount', 'date']
@@ -48,6 +60,18 @@ class IncomeForm(forms.ModelForm):
         widgets = {
             'date': forms.DateInput(format='%m/%d/%Y')
         }
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+
+        if instance:
+            kwargs.update(
+                initial={
+                    'option_list': ','.join(str(pk) for pk in instance.options.all().values_list('pk', flat=True))
+                }
+            )
+
+        super(IncomeForm, self).__init__(*args, **kwargs)
 
 
 class IncomeFormSet(BaseModelFormSet):

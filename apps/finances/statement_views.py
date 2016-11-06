@@ -1,5 +1,6 @@
 from datetime import date
 
+# noinspection PyPackageRequirements
 from dateutil.relativedelta import relativedelta
 from easy_pdf.views import PDFTemplateView
 from moneyed import Money, USD
@@ -95,7 +96,8 @@ class BaseStatementView(ModelFormMixin, ProcessFormView):
         snap_section_query = Q(snap_section=self.snap_section) | Q(snap_section=0)
         return IncomeTemplate.objects.filter(snap_section_query, user=self.request.user, disabled=False)
 
-    def _save_data(self, statement, forms, model):
+    @staticmethod
+    def _save_data(statement, forms, model):
         saved_ids = []
         for form in forms:
             instance = form.save(commit=False)
