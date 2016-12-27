@@ -46,6 +46,7 @@
         };
 
         $(document).ready(function() {
+            console.log('Document Ready');
             /*
                 For some reason, the jQuery ready() function is called multiple times. Can't figure out why, so
                 we'll prevent multiple click handlers by ensuring we only do it once.
@@ -152,6 +153,9 @@
                     'new_state': new_state
                 },
                 function() {
+                    // Remove any previous handlers
+                    bill.off();
+
                     // Figure out which <select> the bill is moving to (a bill can only move to unpaid or paid)
                     var stateName = (new_state == {{ UNPAID }}) ? "unpaid" : "paid";
                     var select = $("#" + stateName);
@@ -176,7 +180,7 @@
 
                     if (new_state == {{ UNPAID }}) {
                         // Item moved, need to redo the click handler for the new section
-                        $(".unpaid").click(function() {
+                        bill.click(function() {
                             handleUnpaid($(this));
                         });
                     }
