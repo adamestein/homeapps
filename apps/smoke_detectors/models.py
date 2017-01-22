@@ -55,7 +55,7 @@ class SmokeDetector(models.Model):
         ordering = ['location']
 
     def __unicode__(self):
-        return u'Smoke detector in {}'.format(self.location)
+        return self.location
 
     @property
     def last_event(self):

@@ -18,7 +18,7 @@ urlpatterns = patterns(
             app=APP['name'],
             form_class=SmokeDetectorForm,
             model=SmokeDetector,
-            success_message='Smoke detector in %(location)s successfully added',
+            success_message='Smoke detector \'%(location)s\' successfully added',
             success_url=reverse_lazy('list_smoke_detectors'),
             template_name='smoke_detectors/smokedetector_form.html'
         ),
