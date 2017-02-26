@@ -38,8 +38,16 @@
     <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{% static 'js/jquery-impromptu.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/popr.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/datadumper.js' %}"></script>
 
     <script type="text/javascript">
+        /*
+            This value is used to give new line items a unique value. That way, we can have multiple items in the
+            same section (like bills) with the exact same name. Existing items use the database row ID value, this
+            is only for new items so the values will be negative as to not clash with the database IDs.
+         */
+        var globalItemID = -1;
+
         // Options to use for all date pickers
         var datePickerOptions = {
             buttonImage: "{% static 'img/calendar.gif' %}",
@@ -178,6 +186,7 @@
              */
 
             var formSet = $("#" + tableType + "_formset");
+            var id = $(button).parent().data('id');
             var menu = $("div").find("[data-box-id='" + tableType + "']");
             var name = $(button).parent().data('name');
 
@@ -188,7 +197,7 @@
             // Remove the button and formset
             $(button).parent().remove();
             formSet.children().filter(function() {
-                return $(this).attr("data-name") == name;
+                return $(this).attr("data-id") == id;
             }).remove();
 
             // Update formset
@@ -255,16 +264,22 @@
         function restoreButtons(tableType) {
             $("#" + tableType + "_formset").find("> div").each(function(index1, div) {
                 var formVals = {};
+                var id;
                 var name = null;
 
                 $(div).find("input, select").each(function(index2, input) {
                     if ($(input).attr("type") != "hidden") {
+                        id = $(input).parent().data("id");
                         formVals[$(input).attr('name')] = $(input).val();
                         if ($(input).attr('name').indexOf("name") > -1) {
                             name = escapeQuote($(input).val());
                         }
+                        preifx = $(input).attr('name');
                     }
                 });
+
+                // Add the ID using the same prefix
+                formVals["id"] = id;
 
                 var sectionInfo = {
                     "pk": $(".popr-item:contains('" + name + "')").data("pk"),
@@ -272,7 +287,7 @@
                     "total_forms": index1
                 };
 
-                validateForm(null, "Ok", null, formVals, sectionInfo, true);
+                validateForm(null, "Ok", null, formVals, sectionInfo, true, false);
             });
         }
 
@@ -288,7 +303,7 @@
                     },
                     focus: "input[name='" + focus + "']",   // Seems to only work for "text" inputs in FF
                     submit: function(event, value, message, formVals) {
-                        validateForm(event, value, message, formVals, sectionInfo, editMode)
+                        validateForm(event, value, message, formVals, sectionInfo, editMode, true)
                     }
                 }
             );
@@ -317,10 +332,11 @@
         }
 
         function updateButtonSection(editMode, tableType, info, sectionInfo, updateFormSet) {
+            var id = info["id"];
             var name = escapeQuote(info["name"]);
 
-            var dataName = 'data-name="' + name + '"';
-            var divBegin = '<div ' + dataName + '>';
+            var data = 'data-id="' + id + '" data-name="' + name + '"';
+            var divBegin = '<div ' + data + '>';
             var nameSlug = name.replace(/ /g, "_").replace(/\./g, "_");
 
             var buttonID = "id_" + tableType + "-" + nameSlug;
@@ -355,7 +371,7 @@
             $.prompt.close();
             if (editMode) {
                 // Need to remove the existing button before we add the new one
-                $("#" + tableType).find("[data-name='" + name + "']").remove();
+                $("#" + tableType).find("[data-id='" + id + "']").remove();
             } else {
                 /*
                     Only need to hide the "no" message for new entries. It will already be hidden
@@ -365,6 +381,7 @@
             }
 
             if (updateFormSet) {
+                console.log('Added to formset');
                 $("#" + tableType + "_formset").append(divBegin + info["form"] + '</div>');
             }
             insertListItem("#" + tableType, name, buttonHTML);
@@ -378,7 +395,7 @@
         }
 
         // Validate the values from the popup form
-        function validateForm(event, value, message, formVals, sectionInfo, editMode) {
+        function validateForm(event, value, message, formVals, sectionInfo, editMode, updateFormSet) {
             if (value == "Ok") {
                 if (event) {
                     // Don't let the popup disappear until we know everything is alright
@@ -400,7 +417,13 @@
                                 $("[id$=date]").datepicker(datePickerOptions);
                             }
                         } else {
-                            updateButtonSection(editMode, tableType, info, sectionInfo, true);
+                            if (formVals["id"]) {
+                                info["id"] = formVals["id"];
+                            } else {
+                                info["id"] = globalItemID;
+                                globalItemID -= 1;
+                            }
+                            updateButtonSection(editMode, tableType, info, sectionInfo, updateFormSet);
                         }
                     }
                 ).fail(function(jqXHR, textStatus, errorThrown) {
@@ -502,7 +525,7 @@
 
         <div id="account_formset" style="display: none;">
             {% for subform in form.account %}
-                <div data-name="{{ subform.name.value }}">
+                <div data-id="{{ subform.id.value }}" data-name="{{ subform.name.value }}">
                     {{ subform }}
                 </div>
             {% endfor %}
@@ -510,7 +533,7 @@
 
         <div id="bill_formset" style="display: none;">
             {% for subform in form.bill %}
-                <div data-name="{{ subform.name.value }}">
+                <div data-id="{{ subform.id.value }}" data-name="{{ subform.name.value }}">
                     {{ subform }}
                 </div>
             {% endfor %}
@@ -518,7 +541,7 @@
 
         <div id="income_formset" style="display: none;">
             {% for subform in form.income %}
-                <div data-name="{{ subform.name.value }}">
+                <div data-id="{{ subform.id.value }}" data-name="{{ subform.name.value }}">
                     {{ subform }}
                 </div>
             {% endfor %}
