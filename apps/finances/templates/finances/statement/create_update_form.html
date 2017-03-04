@@ -38,7 +38,7 @@
     <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{% static 'js/jquery-impromptu.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/popr.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/datadumper.js' %}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/speakingurl/13.0.0/speakingurl.min.js"></script>
 
     <script type="text/javascript">
         /*
@@ -303,6 +303,7 @@
                     },
                     focus: "input[name='" + focus + "']",   // Seems to only work for "text" inputs in FF
                     submit: function(event, value, message, formVals) {
+                        formVals["id"] = info["id"];
                         validateForm(event, value, message, formVals, sectionInfo, editMode, true)
                     }
                 }
@@ -337,9 +338,9 @@
 
             var data = 'data-id="' + id + '" data-name="' + name + '"';
             var divBegin = '<div ' + data + '>';
-            var nameSlug = name.replace(/ /g, "_").replace(/\./g, "_");
+            var nameSlug = getSlug(name);
 
-            var buttonID = "id_" + tableType + "-" + nameSlug;
+            var buttonID = "id_" + tableType + "-" + id + "-" + nameSlug;
 
             var buttonHTML = divBegin +
                              '  <button id="' + buttonID + '">' +
@@ -381,7 +382,6 @@
             }
 
             if (updateFormSet) {
-                console.log('Added to formset');
                 $("#" + tableType + "_formset").append(divBegin + info["form"] + '</div>');
             }
             insertListItem("#" + tableType, name, buttonHTML);
@@ -417,6 +417,7 @@
                                 $("[id$=date]").datepicker(datePickerOptions);
                             }
                         } else {
+                            console.log('Form ID = [' + formVals["id"] + ']');
                             if (formVals["id"]) {
                                 info["id"] = formVals["id"];
                             } else {
