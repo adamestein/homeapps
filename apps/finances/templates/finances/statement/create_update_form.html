@@ -301,10 +301,18 @@
                         Ok: "Ok",
                         Cancel: "Cancel"
                     },
-                    focus: "input[name='" + focus + "']",   // Seems to only work for "text" inputs in FF
                     submit: function(event, value, message, formVals) {
                         formVals["id"] = info["id"];
                         validateForm(event, value, message, formVals, sectionInfo, editMode, true)
+                    },
+                    loaded: function() {
+                        // Need to have a little delay before setting the focus or it doesn't get set correctly
+                        setTimeout(
+                            function() {
+                                $("input[name$='" + focus + "']").focus();
+                            },
+                            500
+                        )
                     }
                 }
             );
