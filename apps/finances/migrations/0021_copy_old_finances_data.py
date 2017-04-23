@@ -54,6 +54,7 @@ class Migration(DataMigration):
                     date=row['due_date'],
                     name=row['name'],
                     paid_date=row['paid_date'],
+                    state=2,
                     statement=statements[row['statement_id']],
                     user=user,
                     total=row['total'],
@@ -101,6 +102,7 @@ class Migration(DataMigration):
 
         cur.close()
         conn.close()
+
 
     def backwards(self, orm):
         "Write your backwards methods here."
