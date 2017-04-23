@@ -112,7 +112,7 @@ class Bill(StatementItem, models.Model):
 
     @property
     def tracker_display_paid(self):
-        amount_paid = self.actual if self.actual else self.amount_due
+        amount_paid = self.actual if self.actual else self.amount
         return u'{} paid {} on {}'.format(self.name, amount_paid, DateFormat(self.paid_date).format('F jS, Y'))
 
     def _has_option(self, name):
