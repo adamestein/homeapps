@@ -3,4 +3,5 @@
 echo ""
 echo "Installing required Python packages"
 source $OPENSHIFT_HOMEDIR/python/virtenv/bin/activate
+pip install --upgrade pip
 pip install -r $OPENSHIFT_REPO_DIR/requirements.txt
