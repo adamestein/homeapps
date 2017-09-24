@@ -28,11 +28,7 @@ DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
 
-from socket import gethostname
-ALLOWED_HOSTS = [
-    gethostname(),                          # For internal OpenShift load balancer security purposes.
-    os.environ.get('OPENSHIFT_APP_DNS'),    # Dynamically map to the OpenShift gear name.
-]
+ALLOWED_HOSTS = ['.pythonanywhere.com']
 
 INSTALLED_APPS = [
     # Django
@@ -92,11 +88,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 # noinspection PyUnresolvedReferences
-STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'wsgi', 'static'))
+STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'static'))
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.normpath(os.path.join(BASE_DIR, '..', 'static'))
+    os.path.normpath(os.path.join(BASE_DIR, '..', 'apps', 'static'))
 ]
 
 STATICFILES_FINDERS = [

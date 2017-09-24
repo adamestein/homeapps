@@ -1,7 +1,7 @@
 import os
 
-if 'OPENSHIFT_REPO_DIR' in os.environ:
-    # Running on the Openshift production server
+if 'https_proxy' in os.environ:
+    # Running on the PythonAnywhere production server
     from .prod import *
 else:
     # Running on the dev server
