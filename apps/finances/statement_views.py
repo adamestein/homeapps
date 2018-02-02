@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from easy_pdf.views import PDFTemplateView
 from moneyed import Money, USD
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.utils.dateformat import DateFormat
 from django.views.generic import TemplateView
@@ -14,7 +15,6 @@ from .statement_forms import AccountForm, BillForm, IncomeForm
 
 from library.views.generic import AppCreateView, AppDetailView, AppListView, AppUpdateView
 from library.views.generic.mixins.ajax import AJAXResponseMixin
-from library.views.generic.mixins.auth import LoginRequiredMixin
 
 from django.views.generic.edit import ModelFormMixin, ProcessFormView
 

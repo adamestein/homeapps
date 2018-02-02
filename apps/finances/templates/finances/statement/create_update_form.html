@@ -48,6 +48,10 @@
          */
         var globalItemID = -1;
 
+        // Keep track on number of items loaded so we know when to turn off the busy screen
+        var numItemsLoaded = 0;
+        var totalItems = 0;
+
         // Options to use for all date pickers
         var datePickerOptions = {
             buttonImage: "{% static 'img/calendar.gif' %}",
@@ -158,7 +162,18 @@
                 Need to redo the buttons if we have any form data. The easiest thing to do is to call the
                 validation function and let the code create the button text like it did the first time. There
                 should be no errors otherwise the form data wouldn't be here to collect.
+
+                To correctly show the busy screen when loading, start it now and have the function that
+                actually creates the line item determine when to turn it off (when the number of loaded items
+                equals the total number of items that we count here).
             */
+            $.each(["account", "bill", "income"], function(index, tableType) {
+                totalItems += $("#" + tableType + "_formset").find("> div").length;
+            });
+            if (totalItems) {
+                $("#busy_text").text("Retrieving Statement Data");
+                $("body").addClass("busy");
+            }
             $.each(["account", "bill", "income"], function(index, tableType) {
                 restoreButtons(tableType);
             });
@@ -167,7 +182,7 @@
         // Create the HTML for the popup
         function createPopupHTML(pk, form, tableType) {
             var html;
-            var title = ((pk == "") ? "Create New " : "Edit ") + tableType.substr(0,1).toUpperCase() + tableType.substr(1);
+            var title = ((pk === "") ? "Create New " : "Edit ") + tableType.substr(0,1).toUpperCase() + tableType.substr(1);
 
             html =  '<div id="popup">' +
                     '<h2 style="margin-bottom: 1em; text-align: center;">' + title + '</h2>' +
@@ -191,13 +206,13 @@
             var name = $(button).parent().data('name');
 
             menu.children().filter(function() {
-                return escapeQuote($(this).text().trim()) == name;
+                return escapeQuote($(this).text().trim()) === name;
             }).attr("data-show", "1").show();
 
             // Remove the button and formset
             $(button).parent().remove();
             formSet.children().filter(function() {
-                return $(this).attr("data-id") == id;
+                return $(this).attr("data-id") === id;
             }).remove();
 
             // Update formset
@@ -205,7 +220,7 @@
             totalForms.val(parseInt(totalForms.val()) - 1);
 
             // If no more items, show the 'no' message
-            if ($("#" + tableType).find("div").length == 0) {
+            if ($("#" + tableType).find("div").length === 0) {
                 $("#no_" + tableType + "_message").show();
             } else {
                 var regex = new RegExp(tableType + "-\\d+");
@@ -256,7 +271,7 @@
                 }
             });
 
-            if (inserted == false) {
+            if (inserted === false) {
                 $(sectionID).append(buttonHTML);
             }
         }
@@ -268,7 +283,7 @@
                 var name = null;
 
                 $(div).find("input, select").each(function(index2, input) {
-                    if ($(input).attr("type") != "hidden") {
+                    if ($(input).attr("type") !== "hidden") {
                         id = $(input).parent().data("id");
                         formVals[$(input).attr('name')] = $(input).val();
                         if ($(input).attr('name').indexOf("name") > -1) {
@@ -292,7 +307,7 @@
         }
 
         function showEditPopup(pk, info, sectionInfo, tableType, editMode) {
-            var focus = (pk == "") ? "name" : "amount_0";
+            var focus = (pk === "") ? "name" : "amount_0";
 
             $.prompt(
                 createPopupHTML(pk, info["form"].replace(/id_/g, "popup_id_"), tableType),
@@ -317,7 +332,7 @@
                 }
             );
 
-            if (tableType == "bill" || tableType == "income") {
+            if (tableType === "bill" || tableType === "income") {
                 var dateID = "#popup_id_" + tableType + "-" + sectionInfo["total_forms"] + "-date";
                 $(dateID).datepicker(datePickerOptions);
             }
@@ -355,7 +370,7 @@
                                   info["button_text"] +
                              '  </button>' +
                              '  <img style="cursor: pointer; margin-left: 0.5em;" ' +
-                             '       src="{% static 'admin/img/icon_deletelink.gif' %}" ' +
+                             '       src="{% static 'admin/img/icon-deletelink.svg' %}" ' +
                              '       alt="[Delete ' + tableType + ']" ' +
                              '       title="Delete ' + tableType + ' from list" ' +
                              '       onclick="deleteListItem(this, \'' + tableType + '\');" />' +
@@ -400,11 +415,16 @@
                 event.preventDefault();
                 showEditPopup(sectionInfo["pk"], info, sectionInfo, tableType, true);
             });
+
+            numItemsLoaded += 1;
+            if (numItemsLoaded === totalItems) {
+                $("body").removeClass("busy");
+            }
         }
 
         // Validate the values from the popup form
         function validateForm(event, value, message, formVals, sectionInfo, editMode, updateFormSet) {
-            if (value == "Ok") {
+            if (value === "Ok") {
                 if (event) {
                     // Don't let the popup disappear until we know everything is alright
                     event.preventDefault();
@@ -421,7 +441,7 @@
 
                         if (info["errors"]) {
                             $("#popup").html(createPopupHTML(tableType, info["errors"], tableType));
-                            if (tableType == "bill" || tableType == "income") {
+                            if (tableType === "bill" || tableType === "income") {
                                 $("[id$=date]").datepicker(datePickerOptions);
                             }
                         } else {
@@ -451,8 +471,8 @@
     <p>
         Fill out the form below and click <strong>{% if object %}Update{% else %}Create{% endif %}</strong> to
         {% if object %}update the statement{% else %}generate a new statement{% endif %}. Click the green plus
-        sign (<img src="{% static 'admin/img/icon_addlink.gif' %}" />) to add an item to this statement.  Click the
-        red x sign (<img src="{% static 'admin/img/icon_deletelink.gif' %}" />) to delete the item.
+        sign (<img src="{% static 'admin/img/icon-addlink.svg' %}" />) to add an item to this statement.  Click the
+        red x sign (<img src="{% static 'admin/img/icon-deletelink.svg' %}" />) to delete the item.
     </p>
 
     <hr />
@@ -469,7 +489,7 @@
                 <strong>Accounts</strong>
 
                 <span class="popr" data-id="account">
-                    <img src="{% static 'admin/img/icon_addlink.gif' %}" alt="[Add Account]" title="Add Account" />
+                    <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="[Add Account]" title="Add Account" />
                 </span>
             </legend>
 
@@ -490,7 +510,7 @@
                 <strong>Bills</strong>
 
                 <span class="popr" data-id="bill">
-                    <img src="{% static 'admin/img/icon_addlink.gif' %}" alt="[Add Bill Transaction]"
+                    <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="[Add Bill Transaction]"
                          title="Add Bill Transaction" />
                 </span>
             </legend>
@@ -510,7 +530,7 @@
                 <strong>Income</strong>
 
                 <span class="popr" data-id="income">
-                    <img src="{% static 'admin/img/icon_addlink.gif' %}" alt="[Add Income Transaction]"
+                    <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="[Add Income Transaction]"
                          title="Add Income Transaction" />
                 </span>
             </legend>

@@ -1,3 +1,6 @@
 -r requirements.txt
-bpython==0.15
-django-extensions==1.6.1
+bpython==0.16
+django-extensions==1.9.7
+greenlet==0.4.12
+pipdeptree==0.4.3
+pyinotify==0.9.6

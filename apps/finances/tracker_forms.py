@@ -30,7 +30,5 @@ class TrackerBillForm(forms.ModelForm):
         used_check = 'payment_method' in cleaned_data and cleaned_data['payment_method'] == Bill.PAYMENT_METHOD_CHECK
         if used_check and cleaned_data['check_number'] is None:
             # If payment is by check, need to specify the check number
-            self._errors['check_number'] = self.error_class(['Need to specify the number'])
-            del cleaned_data['check_number']
+            self.add_error('check_number', 'Need to specify the number')
 
-        return cleaned_data

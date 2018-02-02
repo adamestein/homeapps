@@ -1,5 +1,5 @@
-from django.conf.urls import patterns, url
-from django.core.urlresolvers import reverse_lazy
+from django.conf.urls import url
+from django.urls import reverse_lazy
 
 from . import APP
 from .models import AccountTemplate, Statement
@@ -14,9 +14,7 @@ from .tracker_view import ChangeBillState, SavePaymentInfo, TrackableList, Track
 
 from library.views.generic import AppTemplateView
 
-urlpatterns = patterns(
-    'finances',
-
+urlpatterns = [
     url('^$', AppTemplateView.as_view(template_name='finances/home.html'), name='finances'),
 
     url(
@@ -165,4 +163,4 @@ urlpatterns = patterns(
         SavePaymentInfo.as_view(),
         name='save_payment_info'
     )
-)
+]

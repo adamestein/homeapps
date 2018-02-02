@@ -2,8 +2,9 @@ from datetime import date
 from urlparse import urlsplit
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
+from django.urls import reverse
 from django.utils.dateformat import DateFormat
 
 from djmoney.models.fields import MoneyField
@@ -224,7 +225,7 @@ class Option(models.Model):
 
 class Preference(models.Model):
     user = models.OneToOneField(User)
-    snap_days = models.CommaSeparatedIntegerField(max_length=5)
+    snap_days = models.CharField(max_length=5, validators=[validate_comma_separated_integer_list])
 
     def __unicode__(self):
         days = [int(day) for day in self.snap_days.split(',')]

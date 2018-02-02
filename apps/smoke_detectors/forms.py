@@ -7,6 +7,7 @@ from .models import BatteryChangeEvent, SmokeDetector
 
 class BatteryChangeEventForm(forms.ModelForm):
     class Meta:
+        exclude = []
         model=BatteryChangeEvent
         widgets = {
             'date': forms.DateInput(format='%m/%d/%Y')
@@ -15,6 +16,7 @@ class BatteryChangeEventForm(forms.ModelForm):
 
 class SmokeDetectorForm(forms.ModelForm):
     class Meta:
+        exclude = []
         model=SmokeDetector
         widgets = {
             'battery_type': SelectWithPopUp(model='BatteryInfo'),

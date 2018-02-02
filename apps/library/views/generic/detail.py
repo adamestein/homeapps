@@ -1,7 +1,7 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import DetailView
 
-from .mixins.auth import LoginRequiredMixin
 from .mixins.navigation import NavigationContextMixin
 
 

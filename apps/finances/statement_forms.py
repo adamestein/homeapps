@@ -91,8 +91,10 @@ class StatementForm(forms.ModelForm):
     def clean_date(self):
         if self.instance.id is None:
             if Statement.objects.filter(date=self.cleaned_data['date']).exists():
-                raise ValidationError('A statement for {} already exists'.format(
-                    self.cleaned_data['date'].strftime('%B %d, %Y'))
+                raise ValidationError(
+                    'A statement for %(date)s already exists',
+                    code='exists',
+                    params={'date': self.cleaned_data['date'].strftime('%B %d, %Y')}
                 )
 
         return self.cleaned_data['date']

@@ -1,9 +1,9 @@
 from django import forms
+from django.apps import apps
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models.loading import get_model
 from django.views.generic import CreateView, FormView, UpdateView
 
-from .mixins.auth import LoginRequiredMixin
 from .mixins.messages import AppSuccessMessageMixin
 from .mixins.navigation import NavigationContextMixin
 
@@ -17,7 +17,7 @@ class AppDeleteMultipleView(LoginRequiredMixin, NavigationContextMixin, AppSucce
     queryset = None
 
     def form_valid(self, form):
-        model = get_model(form.cleaned_data['model_module'], form.cleaned_data['model_name'])
+        model = apps.get_model(form.cleaned_data['model_module'], form.cleaned_data['model_name'])
         for obj in form.cleaned_data['obj_list']:
             model.objects.get(pk=obj).delete()
 

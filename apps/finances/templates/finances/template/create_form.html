@@ -12,6 +12,8 @@
 {% block js %}
     {{ block.super }}
 
+    <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.init.js' %}"></script>
     {{ form.media }}
 
     <script type="text/javascript">
@@ -27,23 +29,23 @@
         });
 
         function formDisplay(selected) {
-            if (selected == "") {
+            if (selected === "") {
                 // Picked the 'nothing selected' choice
                 $("#account").hide();
                 $("#bill").hide();
                 $("#income").hide();
                 $("#submit").prop("disabled", true);
-            } else if (selected == "account") {
+            } else if (selected === "account") {
                 $("#account").show();
                 $("#bill").hide();
                 $("#income").hide();
                 $("#submit").prop("disabled", false);
-            } else if (selected == "bill") {
+            } else if (selected === "bill") {
                 $("#account").hide();
                 $("#bill").show();
                 $("#income").hide();
                 $("#submit").prop("disabled", false);
-            } else if (selected == "income") {
+            } else if (selected === "income") {
                 $("#account").hide();
                 $("#bill").hide();
                 $("#income").show();
@@ -70,7 +72,7 @@
 
     <hr />
 
-    <form method="post">
+    <form method="post" name="myform" novalidate>
         {% csrf_token %}
 
         <table>

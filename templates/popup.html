@@ -12,6 +12,8 @@
 {% block js %}
     {{ block.super }}
 
+    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'admin/js/jquery.init.js' %}"></script>
     <script src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
 {% endblock %}
 

@@ -1,5 +1,5 @@
-from django.conf.urls import patterns, url
-from django.core.urlresolvers import reverse_lazy
+from django.conf.urls import url
+from django.urls import reverse_lazy
 
 from . import APP
 from .forms import BatteryChangeEventForm, SmokeDetectorForm
@@ -7,9 +7,7 @@ from .models import BatteryChangeEvent, SmokeDetector
 
 from library.views.generic import AppCreateView, AppDeleteMultipleView, AppListView, AppTemplateView, AppUpdateView
 
-urlpatterns = patterns(
-    'smoke_detectors',
-
+urlpatterns = [
     url('^$', AppTemplateView.as_view(template_name='smoke_detectors/home.html'), name='smoke_detectors'),
 
     url(
@@ -82,4 +80,4 @@ urlpatterns = patterns(
         ),
         name='list_smoke_detectors'
     )
-)
+]

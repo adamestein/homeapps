@@ -11,7 +11,7 @@ body.busy .busy_modal {
 }
 
 .busy_modal {
-    background: rgba( 80, 80, 80, .6 ) 50% 50% no-repeat;
+    background: rgba(80, 80, 80, .6);
     cursor:     wait;
     display:    none;
     height:     100%;

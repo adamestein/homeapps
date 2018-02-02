@@ -1,6 +1,6 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 
-from .mixins.auth import LoginRequiredMixin
 from .mixins.navigation import NavigationContextMixin
 
 

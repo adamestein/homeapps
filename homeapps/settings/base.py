@@ -26,9 +26,23 @@ SECRET_KEY = '_#jzncdt0xc_%&*knkr5i=!*qesmi=pte7$a&lmw2jb34+n4kd'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-TEMPLATE_DEBUG = DEBUG
-
-ALLOWED_HOSTS = ['.pythonanywhere.com']
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
 INSTALLED_APPS = [
     # Django
@@ -42,7 +56,6 @@ INSTALLED_APPS = [
 
     # 3rd Party Apps
     'easy_pdf',
-    'south',
     'system_globals',
     'tekextensions',
 
@@ -53,7 +66,7 @@ INSTALLED_APPS = [
     'utilities'
 ]
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     # Django middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -102,30 +115,32 @@ STATICFILES_FINDERS = [
 
 # Templates
 
-TEMPLATE_LOADERS = [
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-]
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.normpath(os.path.join(BASE_DIR, '..', 'templates'))],
+        'OPTIONS': {
+            'context_processors': [
+                # Django context processors
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
 
-TEMPLATE_CONTEXT_PROCESSORS = [
-    # Django context processors
-    'django.contrib.auth.context_processors.auth',
-    'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.static',
+                # 3rd Party processors
+                'tekextensions.context_processors.static_url_prefix',
 
-    # 3rd Party processors
-    'tekextensions.context_processors.static_url_prefix',
-
-    # Home Apps context processors
-    'finances.context_processors.bill_states',
-    'library.context_processors.apps',
-    'library.context_processors.version'
-]
-
-TEMPLATE_DIRS = [
-    os.path.normpath(os.path.join(BASE_DIR, '..', 'templates'))
+                # Home Apps context processors
+                'finances.context_processors.bill_states',
+                'library.context_processors.apps',
+                'library.context_processors.version'
+            ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader'
+            ]
+        }
+    }
 ]
 
 # Version information
 
-VERSION = '3.0.1'
+VERSION = '4.0'

@@ -1,7 +1,8 @@
 from base import *
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+
+ALLOWED_HOSTS = ['zookeeper.steinhome.net']
 
 DATABASES = {
     'default': {

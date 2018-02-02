@@ -6,6 +6,7 @@ from .admin_forms import AdminBillForm
 from .models import Account, AccountTemplate, Bill, BillTemplate, Income, IncomeTemplate, Option, Preference, Statement
 
 
+@admin.register(Bill)
 class BillAdmin(admin.ModelAdmin):
     form = AdminBillForm
 
@@ -20,9 +21,9 @@ class PreferenceInline(admin.StackedInline):
 class UpdatedUserAdmin(UserAdmin):
     inlines = (PreferenceInline, )
 
+
 admin.site.register(Account)
 admin.site.register(AccountTemplate)
-admin.site.register(Bill, BillAdmin)
 admin.site.register(BillTemplate)
 admin.site.register(Income)
 admin.site.register(IncomeTemplate)

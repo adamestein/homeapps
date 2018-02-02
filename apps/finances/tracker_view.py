@@ -31,6 +31,10 @@ class TrackableList(AppListView):
 
 
 class TrackerUpdateView(AppUpdateView):
+    # Somehow TrackerUpdateView (and hence AppUpdateView) is derived from ModelFormMixin and so therefore
+    # needs an attribute called 'fields' (even though in this case, it's not used)
+    fields = []
+
     def get_context_data(self, **kwargs):
         # Any bill that is in the unfunded (default) state and has the Auto Transfer option automatically goes
         # into the unpaid state since the bill will be funded automatically
