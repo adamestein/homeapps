@@ -8,7 +8,10 @@ DATABASES = {
         'NAME': 'adamstein$default',
         'USER': 'adamstein',
         'PASSWORD': 'Uo96GnFjrwWtcCG',
-        'HOST': 'adamstein.mysql.pythonanywhere-services.com'
+        'HOST': 'adamstein.mysql.pythonanywhere-services.com',
+        'OPTIONS': {
+            'init_command': 'SET sql_mode="STRICT_ALL_TABLES"'
+        }
     }
 }
 

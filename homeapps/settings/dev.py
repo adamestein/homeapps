@@ -10,7 +10,10 @@ DATABASES = {
         'NAME': 'homeapps',
         'USER': 'homeapps',
         'PASSWORD': 'homeapps',
-        'HOST': 'localhost'
+        'HOST': 'localhost',
+        'OPTIONS': {
+            'init_command': 'SET sql_mode="STRICT_ALL_TABLES"'
+        }
     }
 }
 
