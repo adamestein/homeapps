@@ -1,12 +1,12 @@
-Django==1.11.10
+Django==1.11.16
 django-betterforms==1.1.4
 django-easy-pdf==0.1.1
 django-money==0.9.1
 django-system-globals==0.0.5
-html5lib==1.0b8
+html5lib==1.0.1
 https://github.com/adamestein/django-tekextensions/archive/v0.0.7.zip
 MySQL-python==1.2.5
 py-moneyed==0.6.0
 python-dateutil==2.5.3
 reportlab==3.3.0
-xhtml2pdf==0.0.6
+xhtml2pdf==0.2.3
