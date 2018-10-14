@@ -143,4 +143,4 @@ TEMPLATES = [
 
 # Version information
 
-VERSION = '4.0'
+VERSION = '4.1'
