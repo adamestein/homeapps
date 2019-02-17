@@ -1,4 +1,4 @@
-Django==1.11.18
+Django==1.11.20
 django-betterforms==1.1.4
 django-easy-pdf==0.1.1
 django-money==0.9.1
