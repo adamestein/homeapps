@@ -188,7 +188,7 @@ class Income(StatementItem, models.Model):
     )
 
     class Meta:
-        ordering = ('date', 'name')
+        ordering = ('name',)
 
     def __unicode__(self):
         fstr = '{} for {} deposited on {}'.format(self.name, self.amount, DateFormat(self.date).format('F jS, Y'))
