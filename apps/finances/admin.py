@@ -9,6 +9,7 @@ from .models import Account, AccountTemplate, Bill, BillTemplate, Income, Income
 @admin.register(Bill)
 class BillAdmin(admin.ModelAdmin):
     form = AdminBillForm
+    search_fields = ['account_number', 'check_number', 'name']
 
 
 # Define an inline admin descriptor for the Preference model which acts a bit like a singleton

@@ -302,7 +302,7 @@ def _calculations(statement, context):
     bills = statement.bill_set.all()
     income = statement.income_set.all()
 
-    bill_sum = sum([bill.amount for bill in bills]) if bills.count() else Money(0, USD)
+    bill_sum = sum([bill.get_amount for bill in bills]) if bills.count() else Money(0, USD)
     income_sum = sum([income.amount for income in income]) if income.count() else Money(0, USD)
 
     context.update({

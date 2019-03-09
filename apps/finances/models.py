@@ -100,6 +100,10 @@ class Bill(StatementItem, models.Model):
         return unicode(fstr)
 
     @property
+    def get_amount(self):
+        return self.actual if self.state == Bill.STATE_PAID else self.amount
+
+    @property
     def has_auto_pay(self):
         return self._has_option('Auto Pay')
 

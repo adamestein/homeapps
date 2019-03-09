@@ -14,8 +14,12 @@
                             {% if row.date %}
                                 <div class="extra_info">
                                     <em>
-                                        [{% ifequal row.model_name "bill" %}Due:{% else %}Deposited:{% endifequal %}
-                                        {{ row.date }}]
+                                        {% if row.paid_date %}
+                                            [Paid: {{ row.paid_date }}]
+                                        {% else %}
+                                            [{% ifequal row.model_name "bill" %}Due:{% else %}Deposited:{% endifequal %}
+                                            {{ row.date }}]
+                                        {% endif %}
                                     </em>
                                 </div>
                             {% endif %}
@@ -30,7 +34,7 @@
                         </td>
 
                         <td style="text-align: right;">
-                            {{ row.amount }}
+                            {% if row.actual %}{{ row.actual }}{% else %}{{ row.amount }}{% endif %}
                         </td>
                     </tr>
                 {% endfor %}
