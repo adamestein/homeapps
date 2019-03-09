@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/jquery-impromptu.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/tipTip.css' %}" />
 
     <style>
         h2 {
@@ -29,7 +30,7 @@
 
     <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{% static 'js/jquery-impromptu.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/datadumper.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tipTip.minified.js' %}"></script>
 
     <script type="text/javascript">
         // Options to use for all date pickers
@@ -61,6 +62,8 @@
 
                 window.already_here = true;
             }
+
+            $(".tooltip").tipTip();
         });
 
         function handleUnpaid(bill) {
@@ -84,7 +87,7 @@
                     },
                     focus: "input[name$='payment_method']",
                     submit: function(event, value, message, formVals) {
-                        if (value == "Ok") {
+                        if (value === "Ok") {
                             savePaymentInfo(bill, formVals);
                             return false;
                         }
@@ -118,7 +121,7 @@
                 "{% url 'save_payment_info' %}",
                 formVals,
                 function(feedback) {
-                    if (feedback == '""') {
+                    if (feedback === '""') {
                         $.prompt.close();
 
                         // Copy the values from the popup form to the actual hidden form
@@ -156,7 +159,7 @@
                     bill.off();
 
                     // Figure out which <select> the bill is moving to (a bill can only move to unpaid or paid)
-                    var stateName = (new_state == {{ UNPAID }}) ? "unpaid" : "paid";
+                    var stateName = (new_state === {{ UNPAID }}) ? "unpaid" : "paid";
                     var select = $("#" + stateName);
 
                     var inserted = false;
@@ -170,14 +173,14 @@
                         }
                     });
 
-                    if (inserted == false) {
+                    if (inserted === false) {
                         select.append(bill);
                     }
 
                     // Update the class since it's in a new section
                     bill.attr('class', stateName);
 
-                    if (new_state == {{ UNPAID }}) {
+                    if (new_state === {{ UNPAID }}) {
                         // Item moved, need to redo the click handler for the new section
                         bill.click(function() {
                             handleUnpaid($(this));
@@ -217,14 +220,21 @@
     <div style="margin-bottom: 2em; margin-top: 2em;">
         <h2>Unfunded Bills</h2>
 
-        <select id="unfunded" size="10" title="Unfunded bills">
+        <select id="unfunded" size="10">
             {% for form in formset %}
                 {% ifequal form.instance.state UNFUNDED %}
-                    <option class="unfunded" value="{{ form.instance.id }}"
-                            data-amount="{{ form.instance.amount }}"
-                            data-name="{{ form.instance.name|slugify }}">
-                        {{ form.instance.tracker_display }}
-                    </option>
+                    {% if form.instance.options.all %}
+                        <option class="tooltip unfunded" data-amount="{{ form.instance.amount }}"
+                                data-name="{{ form.instance.name|slugify }}"
+                                title="{{ form.instance.options.html_display_list }}" value="{{ form.instance.id }}">
+                            &#10687; {{ form.instance.tracker_display }}
+                        </option>
+                    {% else %}
+                        <option data-name="{{ form.instance.name|slugify }}" style="padding-left: 0.17in;"
+                                value="{{ form.instance.id }}">
+                            {{ form.instance.tracker_display }}
+                        </option>
+                    {% endif %}
                 {% endifequal %}
             {% endfor %}
         </select>
@@ -233,14 +243,22 @@
     <div style="margin-bottom: 2em;">
         <h2>Unpaid Bills</h2>
 
-        <select id="unpaid" size="10" title="Unpaid bills">
+        <select id="unpaid" size="10">
             {% for form in formset %}
                 {% ifequal form.instance.state UNPAID %}
-                    <option class="unpaid" value="{{ form.instance.id }}"
-                            data-amount="{{ form.instance.amount }}"
-                            data-name="{{ form.instance.name|slugify }}">
-                        {{ form.instance.tracker_display }}
-                    </option>
+                    {% if form.instance.options.all %}
+                        <option class="tooltip unpaid" data-amount="{{ form.instance.amount }}"
+                                data-name="{{ form.instance.name|slugify }}"
+                                title="{{ form.instance.options.html_display_list }}" value="{{ form.instance.id }}">
+                            &#10687; {{ form.instance.tracker_display }}
+                        </option>
+                    {% else %}
+                        <option class="unpaid" data-amount="{{ form.instance.amount }}"
+                                data-name="{{ form.instance.name|slugify }}" style="padding-left: 0.17in;"
+                                value="{{ form.instance.id }}">
+                            {{ form.instance.tracker_display }}
+                        </option>
+                    {% endif %}
                 {% endifequal %}
             {% endfor %}
         </select>
@@ -249,12 +267,21 @@
     <div>
         <h2>Paid Bills</h2>
 
-        <select id="paid" size="10" title="Paid bills">
+        <select id="paid" size="10">
             {% for form in formset %}
                 {% ifequal form.instance.state PAID %}
-                    <option value="{{ form.instance.id }}" data-name="{{ form.instance.name|slugify }}">
-                        {{ form.instance.tracker_display_paid }}
-                    </option>
+                    {% if form.instance.options.all %}
+                        <option class="tooltip" data-name="{{ form.instance.name|slugify }}"
+                                title="{{ form.instance.options.html_display_list }}" value="{{ form.instance.id }}">
+                            &#10687; {{ form.instance.tracker_display_paid }}
+                        </option>
+                    {% else %}
+                        <option data-name="{{ form.instance.name|slugify }}" style="padding-left: 0.17in;"
+                                value="{{ form.instance.id }}">
+                            {{ form.instance.tracker_display_paid }}
+                        </option>
+                    {% endif %}
+
                 {% endifequal %}
             {% endfor %}
         </select>

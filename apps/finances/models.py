@@ -9,6 +9,8 @@ from django.utils.dateformat import DateFormat
 
 from djmoney.models.fields import MoneyField
 
+from finances.manager import OptionManager
+
 from library.abstract_models import Auth, StatementItem, Template
 from library.ordinal import ordinal
 
@@ -218,6 +220,8 @@ class Option(models.Model):
     template_type = models.CharField(max_length=7, choices=TEMPLATE_CHOICES[1:])    # Don't include 'account'
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=100)
+
+    objects = OptionManager()
 
     @property
     def short_label(self):
