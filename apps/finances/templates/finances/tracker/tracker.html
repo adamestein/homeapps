@@ -234,7 +234,7 @@
                             &#10687; {{ form.instance.tracker_display }}
                         </option>
                     {% else %}
-                        <option data-name="{{ form.instance.name|slugify }}" style="padding-left: 0.17in;"
+                        <option class="unfunded" data-name="{{ form.instance.name|slugify }}" style="padding-left: 0.17in;"
                                 value="{{ form.instance.id }}">
                             {{ form.instance.tracker_display }}
                         </option>
