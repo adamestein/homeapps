@@ -16,13 +16,3 @@ def apps(request):
         sorted_dict[name] = app_list[name]
 
     return {'apps': sorted_dict}
-
-
-# noinspection PyUnusedLocal
-def version(request):
-    if settings.DEBUG:
-        mode = "(Development) "
-    else:
-        mode = ""
-
-    return {'version': 'Home Apps {}v{}'.format(mode, settings.VERSION)}

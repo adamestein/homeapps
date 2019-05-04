@@ -109,7 +109,9 @@
         <div style="margin-bottom: 1em;"></div>
 
         <div id="footer">
-            <h5 style="float: left;">{{ version }}</h5>
+            <h5 style="float: left;">
+                {% if settings.DEBUG %}[Development] {% endif %}Home Apps v{{ settings.VERSION }}
+            </h5>
             <h5>&copy; <a href="mailto:adam@csh.rit.edu">Adam Stein</a>.  All rights reserved.</h5>
         </div>
     </body>

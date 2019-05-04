@@ -111,7 +111,11 @@
                 var url = $("#" + bill.data("name") + " input[id$='url']").val();
 
                 if (url.length) {
-                    window.open(url);
+                    {% if settings.DEBUG %}
+                        alert('[DEBUG MODE]\nOpen new window to "' + url + '"');
+                    {% else %}
+                        window.open(url);
+                    {% endif %}
                 }
             }
         }
@@ -154,7 +158,7 @@
                     'bill_id': bill.val(),
                     'new_state': new_state
                 },
-                function() {
+                function(paid_text) {
                     // Remove any previous handlers
                     bill.off();
 
@@ -163,6 +167,11 @@
                     var select = $("#" + stateName);
 
                     var inserted = false;
+
+                    // Only the paid state has different text, so we'll update if bill moved into paid state
+                    if (stateName === "paid") {
+                        bill.text(paid_text);
+                    }
 
                     // Move it so it fits into the new <select> alphabetically
                     select.find("option").each(function(index, value) {
@@ -234,7 +243,8 @@
                             &#10687; {{ form.instance.tracker_display }}
                         </option>
                     {% else %}
-                        <option class="unfunded" data-name="{{ form.instance.name|slugify }}" style="padding-left: 0.17in;"
+                        <option class="unfunded" data-amount="{{ form.instance.amount }}"
+                                data-name="{{ form.instance.name|slugify }}" style="padding-left: 0.17in;"
                                 value="{{ form.instance.id }}">
                             {{ form.instance.tracker_display }}
                         </option>

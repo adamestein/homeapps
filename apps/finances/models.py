@@ -114,6 +114,10 @@ class Bill(StatementItem, models.Model):
         return self._has_option('Auto Transfer')
 
     @property
+    def in_paid_state(self):
+        return self.state == Bill.STATE_PAID
+
+    @property
     def tracker_display(self):
         return u'{} for {} due on {}'.format(self.name, self.amount, DateFormat(self.date).format('F jS, Y'))
 

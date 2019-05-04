@@ -2,6 +2,7 @@ import re
 
 from django.db.models import Q
 from django.forms.models import modelformset_factory
+from django.http import HttpResponse
 from django.views.generic import TemplateView
 
 from library.views.generic import AppListView, AppUpdateView
@@ -12,15 +13,23 @@ from .tracker_forms import TrackerBillForm
 
 
 class ChangeBillState(AJAXResponseMixin, TemplateView):
+    bill = None
+    is_paid_state = False
+
     def get_context_data(self, **kwargs):
         return {}
 
     def post(self, request, *args, **kwargs):
-        bill = Bill.objects.get(pk=request.POST['bill_id'])
-        bill.state = int(request.POST['new_state'])
-        bill.save()
+        self.bill = Bill.objects.get(pk=request.POST['bill_id'])
+        self.bill.state = int(request.POST['new_state'])
+        self.bill.save()
+
+        self.is_paid_state = self.bill.in_paid_state
 
         return super(ChangeBillState, self).post(request, *args, **kwargs)
+
+    def render_to_response(self, context, **response_kwargs):
+        return HttpResponse(self.bill.tracker_display_paid if self.is_paid_state else '')
 
 
 class TrackableList(AppListView):

@@ -126,12 +126,12 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 
                 # 3rd Party processors
+                'django_settings_export.settings_export',
                 'tekextensions.context_processors.static_url_prefix',
 
                 # Home Apps context processors
                 'finances.context_processors.bill_states',
-                'library.context_processors.apps',
-                'library.context_processors.version'
+                'library.context_processors.apps'
             ],
             'loaders': [
                 'django.template.loaders.filesystem.Loader',
@@ -141,6 +141,13 @@ TEMPLATES = [
     }
 ]
 
+# List of settings to export to templates (django-settings-export)
+
+SETTINGS_EXPORT = [
+    'DEBUG',
+    'VERSION'
+]
+
 # Version information
 
-VERSION = '4.2.1'
+VERSION = '4.2.2'
