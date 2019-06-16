@@ -158,7 +158,10 @@
                     'bill_id': bill.val(),
                     'new_state': new_state
                 },
-                function(paid_text) {
+                function(encoded) {
+                    // info[0] = updated text to display, info[1] = if symbol is needed to popup options
+                    var info = JSON.parse(encoded);
+
                     // Remove any previous handlers
                     bill.off();
 
@@ -170,7 +173,12 @@
 
                     // Only the paid state has different text, so we'll update if bill moved into paid state
                     if (stateName === "paid") {
-                        bill.text(paid_text);
+                        bill.text(info[0]);
+
+                        // Since we overrode the text, need to add the symbol back if necessary
+                        if (info[1] === true) {
+                            bill.html("&#10687; " + bill.text());
+                        }
                     }
 
                     // Move it so it fits into the new <select> alphabetically

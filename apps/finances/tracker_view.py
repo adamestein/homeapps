@@ -1,3 +1,4 @@
+import json
 import re
 
 from django.db.models import Q
@@ -29,7 +30,8 @@ class ChangeBillState(AJAXResponseMixin, TemplateView):
         return super(ChangeBillState, self).post(request, *args, **kwargs)
 
     def render_to_response(self, context, **response_kwargs):
-        return HttpResponse(self.bill.tracker_display_paid if self.is_paid_state else '')
+        text = self.bill.tracker_display_paid if self.is_paid_state else ''
+        return HttpResponse(json.dumps([text, self.bill.options.all().count() > 0]))
 
 
 class TrackableList(AppListView):
