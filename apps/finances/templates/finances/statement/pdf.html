@@ -1,7 +1,12 @@
 {% extends "easy_pdf/base.html" %}
+{% load humanize %}
 
 {% block extra_style %}
     <style type="text/css">
+        #footer {
+            bottom: 0;
+        }
+
         .row1 {
             background-color: #C0C0C0; color: black;
         }
@@ -61,9 +66,10 @@
         The amount left over after paying bills is
         {% with left_over=diff.amount %}
             <span style="color: {% if left_over < 0 %}red{% else %}green{% endif %};">
-                ${{ left_over }}
+                ${{ left_over|intcomma }}
             </span>
         {% endwith %}
     </p>
 
+    <div id="footer">Created: {% now "F j, Y @ h:ia" %}</div>
 {% endblock %}

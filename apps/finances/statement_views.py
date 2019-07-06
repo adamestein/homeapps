@@ -171,6 +171,9 @@ class StatementPDFView(LoginRequiredMixin, PDFTemplateView):
         # Add calculated values to the context
         _calculations(statement, context)
 
+        # Set download filename to the statement date
+        self.pdf_filename = statement.date.strftime('%Y-%m-%d') + '.pdf'
+
         return context
 
 

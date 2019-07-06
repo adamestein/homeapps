@@ -9,6 +9,7 @@ from .models import Account, AccountTemplate, Bill, BillTemplate, Income, Income
 @admin.register(Bill)
 class BillAdmin(admin.ModelAdmin):
     form = AdminBillForm
+    list_filter = ('state',)
     search_fields = ['account_number', 'check_number', 'name']
 
 
