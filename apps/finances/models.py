@@ -73,6 +73,9 @@ class Bill(StatementItem, models.Model):
         max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True, help_text='Actual amount paid.'
     )
     check_number = models.PositiveIntegerField(blank=True, null=True, help_text='Check number if paid by check')
+    confirmation_number = models.CharField(
+        blank=True, null=True, max_length=30, help_text='Confirmation number for payment'
+    )
     date = models.DateField(db_index=True, help_text='Due date.')
     paid_date = models.DateField(blank=True, null=True, help_text='The date the bill was paid')
     payment_method = models.PositiveSmallIntegerField(choices=PAYMENT_METHODS, null=True, help_text='How bill was paid')

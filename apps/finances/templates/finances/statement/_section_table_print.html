@@ -9,7 +9,18 @@
                 {% for row in data %}
                     <tr>
                         <td class="{% cycle 'row1' 'row2' as rowcolors %}">
-                            <span>{{ row.name }}</span>
+                            <span>
+                                {{ row.name }}
+
+                                {% if row.date %}
+                                    {% if row.paid_date %}
+                                        <span class="paid">[Paid: {{  row.paid_date }}]</span>
+                                    {% else %}
+                                        <span class="due">[Due: {{ row.date }}]</span>
+                                    {% endif %}
+                                {% endif %}
+                            </span>
+
                             {% if row.options %}
                                 <ul class="options">
                                     {% for option in row.options.all %}

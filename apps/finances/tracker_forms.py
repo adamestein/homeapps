@@ -8,7 +8,7 @@ class TrackerBillForm(forms.ModelForm):
     pk = forms.IntegerField(widget=forms.HiddenInput())
 
     class Meta:
-        fields = ['actual', 'paid_date', 'payment_method', 'check_number', 'url']
+        fields = ['actual', 'paid_date', 'payment_method', 'check_number', 'confirmation_number', 'url']
         model = Bill
         widgets = {
             'paid_date': forms.DateInput(format='%m/%d/%Y'),
