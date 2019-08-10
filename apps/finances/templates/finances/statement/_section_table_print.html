@@ -18,7 +18,7 @@
                                     {% elif row.model_name == "bill" %}
                                         <span class="due">[Due: {{ row.date }}]</span>
                                     {% else %}
-                                        <span class="paid">[Deposited: {{  row.paid_date }}]</span>
+                                        <span class="paid">[Deposited: {{  row.date }}]</span>
                                     {% endif %}
                                 {% endif %}
                             </span>
