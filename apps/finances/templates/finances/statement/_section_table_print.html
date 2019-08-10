@@ -15,8 +15,10 @@
                                 {% if row.date %}
                                     {% if row.paid_date %}
                                         <span class="paid">[Paid: {{  row.paid_date }}]</span>
-                                    {% else %}
+                                    {% elif row.model_name == "bill" %}
                                         <span class="due">[Due: {{ row.date }}]</span>
+                                    {% else %}
+                                        <span class="paid">[Deposited: {{  row.paid_date }}]</span>
                                     {% endif %}
                                 {% endif %}
                             </span>
