@@ -29,7 +29,7 @@ urlpatterns = [
     ),
 
     url(
-        '^statement/detail/(?P<pk>\d+)$',
+        r'^statement/detail/(?P<pk>\d+)$',
         StatementDetailView.as_view(
             app=APP['name'],
             model=Statement,
@@ -50,7 +50,7 @@ urlpatterns = [
     ),
 
     url(
-        '^statement/edit/(?P<pk>[\d]+)$',
+        r'^statement/edit/(?P<pk>[\d]+)$',
         StatementUpdateView.as_view(
             app=APP['name'],
             form_class=CreateUpdateStatementMultiForm,
@@ -72,7 +72,7 @@ urlpatterns = [
     ),
 
     url(
-        '^statement/pdf/(?P<pk>[\d]+)/$',
+        r'^statement/pdf/(?P<pk>[\d]+)/$',
         StatementPDFView.as_view(),
         name='statement_pdf'
     ),
@@ -84,7 +84,7 @@ urlpatterns = [
     ),
 
     url(
-        '^statement/section_form/validation/$',
+        r'^statement/section_form/validation/$',
         StatementSectionFormValidation.as_view(),
         name='statement_section_form_validation'
     ),
@@ -112,7 +112,7 @@ urlpatterns = [
     ),
 
     url(
-        '^template/edit/(?P<template_type>[a-z]+)/(?P<pk>[\d]+)$',
+        r'^template/edit/(?P<template_type>[a-z]+)/(?P<pk>[\d]+)$',
         TemplateUpdateView.as_view(
             app=APP['name'],
             form_class=UpdateTemplateForm,

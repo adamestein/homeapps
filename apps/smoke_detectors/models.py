@@ -11,8 +11,8 @@ class BatteryChangeEvent(models.Model):
     class Meta:
         ordering = ['date']
 
-    def __unicode__(self):
-        return u'Change battery event on {}'.format(date.strftime(self.date, '%A %B %d, %Y'))
+    def __str__(self):
+        return 'Change battery event on {}'.format(date.strftime(self.date, '%A %B %d, %Y'))
 
 
 # Battery information
@@ -31,8 +31,8 @@ class BatteryInfo(models.Model):
     class Meta:
         verbose_name_plural = 'Batteries'
 
-    def __unicode__(self):
-        return u'{} of type {}'.format(self.number, self.type)
+    def __str__(self):
+        return '{} of type {}'.format(self.number, self.type)
 
 
 # Smoke detector location
@@ -42,7 +42,7 @@ class Location(models.Model):
     class Meta:
         ordering = ['location']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.location
 
 
@@ -54,8 +54,8 @@ class SmokeDetector(models.Model):
     class Meta:
         ordering = ['location']
 
-    def __unicode__(self):
-        return unicode(self.location)
+    def __str__(self):
+        return str(self.location)
 
     @property
     def last_event(self):

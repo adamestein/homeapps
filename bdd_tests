@@ -1,0 +1,80 @@
+#!/bin/bash
+
+args=""
+include=()
+program="$(basename "$0")"
+
+while [ $# -gt 0 ]
+do
+    case $1 in
+        --browser)  shift
+                    browser="--behave_browser $1"
+                    shift
+                    ;;
+        --help)     echo "usage: $program [--browser browser] [--include feature [--include feature] ...]
+ [app [app] ...]"
+                    exit 0;;
+        --include)  shift
+                    include+=("--behave_include $1")
+                    shift
+                    ;;
+        *)          args="$args $1"
+                    shift
+                    ;;
+    esac
+done
+
+if [ -n "$args" ]
+then
+    APPS="$args"
+else
+    APPS="\
+library \
+"
+fi
+
+echo -n "Updating Python packages ... "
+pip -q -q -q install -r dev-requirements.txt
+status=$?
+echo "done"
+echo ""
+
+if [ $status -ne 0 ]
+then
+    echo "$program: error running pip" 1>&2
+    exit $?
+fi
+
+echo -n "Updating from Git ... "
+git pull -q
+status=$?
+echo "done"
+echo ""
+
+if [ $status -ne 0 ]
+then
+    echo "$program: error running git" 1>&2
+    exit $?
+fi
+
+date
+echo ""
+
+echo "Running tests for: $APPS"
+
+if [ ${#include[@]} -gt 0 ]
+then
+    for feature in "${include[@]}"
+    do
+        echo ""
+        ./manage.py test --noinput --bdd-tests-only --behave_no-capture $browser $feature $APPS
+    done
+else
+    echo ""
+    ./manage.py test --noinput --bdd-tests-only --behave_no-capture $browser $APPS
+fi
+
+echo ""
+
+exit 0
+

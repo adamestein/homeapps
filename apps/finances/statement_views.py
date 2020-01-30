@@ -43,19 +43,19 @@ class BaseStatementView(ModelFormMixin, ProcessFormView):
         next_diff = [abs(calc_date - target_date) for calc_date in next_dates]
 
         values = [min(prev_diff), min(current_diff), min(next_diff)]
-        index_min = min(xrange(len(values)), key=values.__getitem__)
+        index_min = min(range(len(values)), key=values.__getitem__)
 
         if index_min == 0:
             # Previous month has the closest date
-            index_min = min(xrange(len(prev_diff)), key=prev_diff.__getitem__)
+            index_min = min(range(len(prev_diff)), key=prev_diff.__getitem__)
             closest_date = prev_dates[index_min]
         elif index_min == 1:
             # Current month has the closest date
-            index_min = min(xrange(len(current_diff)), key=current_diff.__getitem__)
+            index_min = min(range(len(current_diff)), key=current_diff.__getitem__)
             closest_date = current_dates[index_min]
         else:
             # Next month has the closest date
-            index_min = min(xrange(len(next_diff)), key=next_diff.__getitem__)
+            index_min = min(range(len(next_diff)), key=next_diff.__getitem__)
             closest_date = next_dates[index_min]
 
         # Snap section is 1-based
@@ -172,7 +172,7 @@ class StatementPDFView(LoginRequiredMixin, PDFTemplateView):
         _calculations(statement, context)
 
         # Set download filename to the statement date
-        self.pdf_filename = statement.date.strftime('%Y-%m-%d') + '.pdf'
+        self.pdf_filename = statement.date.strftime('%Y-%m-%d.pdf')
 
         return context
 

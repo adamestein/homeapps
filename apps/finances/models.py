@@ -1,5 +1,5 @@
 from datetime import date
-from urlparse import urlsplit
+from urllib.parse import urlsplit
 
 from django.contrib.auth.models import User
 from django.core.validators import validate_comma_separated_integer_list
@@ -27,9 +27,9 @@ class Account(StatementItem, models.Model):
     def str_format(cls, name, account_number, amount, item_date=None):
         acct_num = ' (acct #{})'.format(account_number) if account_number else ''
         date_val = ' as of {}'.format(DateFormat(item_date).format('F jS, Y')) if item_date else ''
-        return u'{}{} with {}{}'.format(name, acct_num, amount, date_val)
+        return '{}{} with {}{}'.format(name, acct_num, amount, date_val)
 
-    def __unicode__(self):
+    def __str__(self):
         return Account.str_format(self.name, self.account_number, self.amount, self.statement.date)
 
 
@@ -102,7 +102,7 @@ class Bill(StatementItem, models.Model):
             fstr += ' and paid on ' + DateFormat(self.paid_date).format('F jS, Y')
             fstr += ' ({})'.format(self.actual) if self.actual else ' (PIF)'
 
-        return unicode(fstr)
+        return fstr
 
     @property
     def get_amount(self):
@@ -122,18 +122,18 @@ class Bill(StatementItem, models.Model):
 
     @property
     def tracker_display(self):
-        return u'{} for {} due on {}'.format(self.name, self.amount, DateFormat(self.date).format('F jS, Y'))
+        return '{} for {} due on {}'.format(self.name, self.amount, DateFormat(self.date).format('F jS, Y'))
 
     @property
     def tracker_display_paid(self):
         amount_paid = self.actual if self.actual else self.amount
-        return u'{} paid {} on {}'.format(self.name, amount_paid, DateFormat(self.paid_date).format('F jS, Y'))
+        return '{} paid {} on {}'.format(self.name, amount_paid, DateFormat(self.paid_date).format('F jS, Y'))
 
     def _has_option(self, name):
         option = Option.objects.get(template_type='bill', name=name)
         return option in self.options.all()
 
-    def __unicode__(self):
+    def __str__(self):
         state = 'unfunded' if (self.state == self.STATE_UNFUNDED) else 'unpaid' \
             if (self.state == self.STATE_UNPAID) else 'paid'
         total = ' (total is {})'.format(self.total) if self.total else ''
@@ -146,7 +146,7 @@ class Bill(StatementItem, models.Model):
             fstr += ' and paid on ' + DateFormat(self.paid_date).format('F jS, Y')
             fstr += ' ({})'.format(self.actual) if self.actual else ' (PIF)'
 
-        return unicode(fstr)
+        return fstr
 
 
 class BillTemplate(Template):
@@ -171,9 +171,9 @@ class BillTemplate(Template):
         url = '{}://{}/'.format(parts.scheme, parts.netloc)
         if len(self.url) > len(url):
             url += '...'
-        return unicode(url)
+        return url
 
-    def __unicode__(self):
+    def __str__(self):
         fstr = self.name
 
         if self.amount:
@@ -182,7 +182,7 @@ class BillTemplate(Template):
         if self.due_day:
             fstr += ' due on the {} of the month'.format(DateFormat(date(1, 1, self.due_day)).format('jS'))
 
-        return unicode(fstr)
+        return fstr
 
 
 class Income(StatementItem, models.Model):
@@ -197,11 +197,11 @@ class Income(StatementItem, models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         fstr = '{} for {} deposited on {}'.format(self.name, self.amount, DateFormat(self.date).format('F jS, Y'))
         if self.account_number:
             fstr += ' into account #{}'.format(self.account_number)
-        return unicode(fstr)
+        return fstr
 
 
 class IncomeTemplate(Template):
@@ -232,21 +232,21 @@ class Option(models.Model):
 
     @property
     def short_label(self):
-        return u'{} - {}'.format(self.name, self.description)
+        return '{} - {}'.format(self.name, self.description)
 
-    def __unicode__(self):
-        return u'{}: {} - {}'.format(self.template_type, self.name, self.description)
+    def __str__(self):
+        return '{}: {} - {}'.format(self.template_type, self.name, self.description)
 
 
 class Preference(models.Model):
     user = models.OneToOneField(User)
     snap_days = models.CharField(max_length=5, validators=[validate_comma_separated_integer_list])
 
-    def __unicode__(self):
+    def __str__(self):
         days = [int(day) for day in self.snap_days.split(',')]
 
         if len(days) == 1:
-            return u'Snap day set to the {} of the month'.format(ordinal(days[0]))
+            return 'Snap day set to the {} of the month'.format(ordinal(days[0]))
         else:
             text = 'Snap days set to the '
 
@@ -262,7 +262,7 @@ class Preference(models.Model):
                         text += '{}'.format(ordinal(int(day)))
 
             text += ' of the month'
-            return unicode(text)
+            return text
 
 
 class Statement(Auth, models.Model):
@@ -275,5 +275,5 @@ class Statement(Auth, models.Model):
     def get_absolute_url(self):
         return reverse('statement_detail', kwargs={'pk': self.pk})
 
-    def __unicode__(self):
-        return unicode(DateFormat(self.date).format('F jS, Y'))
+    def __str__(self):
+        return DateFormat(self.date).format('F jS, Y')

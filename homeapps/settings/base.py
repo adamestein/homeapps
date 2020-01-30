@@ -141,6 +141,9 @@ TEMPLATES = [
     }
 ]
 
+# Redirect users to home page after login
+LOGIN_REDIRECT_URL = '/'
+
 # List of settings to export to templates (django-settings-export)
 
 SETTINGS_EXPORT = [
@@ -150,4 +153,4 @@ SETTINGS_EXPORT = [
 
 # Version information
 
-VERSION = '4.4.2'
+VERSION = '5.0'

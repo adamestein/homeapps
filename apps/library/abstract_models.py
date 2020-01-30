@@ -13,8 +13,9 @@ class Auth(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
-        # Before we can save the instance, we need to fill in the user field so that we know who the instance belongs to
-        self.user = get_user()
+        if not getattr(self, 'user', None):
+            # Before we can save the instance, we need to fill in the user field so that we know who the instance belongs to
+            self.user = get_user()
         super(Auth, self).save(*args, **kwargs)
 
 
@@ -47,5 +48,5 @@ class Template(Auth, Base, models.Model):
         ordering = ('name', )
         unique_together = ("name", "user")
 
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
