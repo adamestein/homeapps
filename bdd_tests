@@ -29,6 +29,7 @@ then
     APPS="$args"
 else
     APPS="\
+finances \
 library \
 "
 fi

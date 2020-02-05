@@ -7,8 +7,18 @@ from selenium.webdriver.common.action_chains import ActionChains
 from finances.models import AccountTemplate, BillTemplate, IncomeTemplate
 
 
+@when('the user checks "{label}"')
+def check(context, label):
+    context.browser.check(label.lower())
+
+
+@when('the user chooses template type "{template_type}"')
+def choose_template_type(context, template_type):
+    context.browser.select('template_type-template_type', template_type.lower())
+
+
 @when('the user chooses the existing "{section}" item "{name}"')
-def choose_existing(context, section, name):
+def choose_existing_item(context, section, name):
     if section == 'account':
         template_id = AccountTemplate.objects.get(name=name).id
     elif section == 'bill':
@@ -43,16 +53,51 @@ def hover(context, year, statement_date):
     context.browser.find_link_by_text(statement_date).first.click()
 
 
+@when('the user selects {template_type} template "{name}"')
+def select_template(context, template_type, name):
+    context.browser.find_by_id(f'{template_type.lower()}-button').first.click()
+    context.browser.find_by_id(f'{template_type.lower()}-menu').find_by_text(name).first.click()
+
+
+@when('the user selects option "{option}"')
+def select_option(context, option):
+    if context.browser.find_by_id('id_options'):
+        context.browser.select(
+            'options',
+            context.browser.find_by_xpath(f'//select/option[normalize-space(text())="{option}"]').value
+        )
+    else:
+        context.browser.select(
+            f'{context.browser.find_by_id("id_template_type-template_type").first.value}-options',
+            context.browser.find_by_xpath(f'//select/option[normalize-space(text())="{option}"]').value
+        )
+
+
 @when('the user sets the "{item}" to "{value}"')
 def set_value(context, item, value):
-    # Try finding a visible element 4 times (up to 4 seconds)
-    for _ in range(10):
-        # Only one form element should be visible, so we just look for the first one that's visible and use that
-        for elem in context.browser.find_by_tag('form[class="jqiform "]').find_by_text(f'{item}:'):
-            if elem.visible:
-                context.browser.find_by_id(elem['for']).first.value = value
-                return
+    if context.browser.find_by_xpath(f'//h1[normalize-space(text())="Update Template"]'):
+        if item == 'Amount':
+            item = 'amount_0'
 
-        sleep(1)
+        context.browser.find_by_id(f'id_{item.lower().replace(" ", "_")}').first.value = value
+    else:
+        template_type = context.browser.find_by_id('id_template_type-template_type')
+        if template_type:
+            if item == 'Amount':
+                item = 'amount_0'
 
-    assert False, f'set_value: failed to set "{item}" with the value "{value}"'
+            context.browser.find_by_id(
+                f'id_{template_type.first.value}-{item.lower().replace(" ", "_")}'
+            ).first.value = value
+        else:
+            # Try finding a visible element 4 times (up to 4 seconds)
+            for _ in range(10):
+                # Only one form element should be visible, so we just look for the first one that's visible and use that
+                for elem in context.browser.find_by_tag('form[class="jqiform "]').find_by_text(f'{item}:'):
+                    if elem.visible:
+                        context.browser.find_by_id(elem['for']).first.value = value
+                        return
+
+                sleep(1)
+
+            assert False, f'set_value: failed to set "{item}" with the value "{value}"'
