@@ -150,4 +150,4 @@ SETTINGS_EXPORT = [
 
 # Version information
 
-VERSION = '4.4.2'
+VERSION = '4.4.3'
