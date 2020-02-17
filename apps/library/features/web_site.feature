@@ -1,5 +1,6 @@
 Feature: Web Site
 
+    @wip
     Scenario: Not Authenticated
         Given the user goes to the home page
         Then the page is verified to be correct
@@ -13,6 +14,7 @@ Feature: Web Site
         When the user clicks "Login"
         Then the page is verified to be correct
 
+        @wip
     Scenario: Bad Login
         Given the user goes to the home page
         And the user clicks "Login"

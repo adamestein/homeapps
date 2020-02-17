@@ -73,6 +73,33 @@ def select_option(context, option):
         )
 
 
+@when('the user selects Payment method "{option}"')
+def select_payment_method(context, option):
+    # Can't use the normal Splinter select() function as there are two 'Payment method' widgets with the same name,
+    # one visible, one not. That way, the HTML can be copied into the popup when needed. It's this popup version
+    # that's visible and the one we want to affect.
+    context.browser.find_by_xpath(
+        f'//*[@id="popup_id_form-0-payment_method"]/option[normalize-space(text())="{option}"]'
+    ).first.click()
+
+
+@when('the user selects statement "{name}"')
+def select_statement(context, name):
+    context.browser.find_by_id('statement_list-button').first.click()
+
+    for elem in context.browser.find_by_text(name):
+        if elem.tag_name == 'li':
+            elem.click()
+
+
+@when('the user selects the "{section}" bill "{label}"')
+def select_bill(context, section, label):
+    # Clicking via Splinter doesn't trigger the click event, so we click via JavaScript
+    elem = context.browser.find_by_id(section.lower()).find_by_xpath(f'//option[contains(text(), "{label}")]').first
+    section = section.lower()
+    context.browser.execute_script(f'$(".{section}[value=\'{elem.value}\']").click();')
+
+
 @when('the user sets the "{item}" to "{value}"')
 def set_value(context, item, value):
     if context.browser.find_by_xpath(f'//h1[normalize-space(text())="Update Template"]'):

@@ -23,11 +23,6 @@ def before_all(context):
         user=context.user
     )
 
-
-def before_feature(context, feature):
-    # Set up to verify pages by image comparison
-    context.master_image_dir = f'{context.top_dir}tests/finances/{slugify(feature.name.lower())}'
-
     context.bill_option_1 = Option.objects.create(
         description='sample bill option 1',
         name='option 1',
@@ -51,6 +46,11 @@ def before_feature(context, feature):
         name='option 2',
         template_type='income'
     )
+
+
+def before_feature(context, feature):
+    # Set up to verify pages by image comparison
+    context.master_image_dir = f'{context.top_dir}tests/finances/{slugify(feature.name.lower())}'
 
 
 # noinspection PyUnusedLocal

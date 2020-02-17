@@ -23,6 +23,7 @@ def get_screenshot(context, full_page=True, remove_caret=True, remove_mouse=True
             }
             '''
         )
+        sleep(1)
 
     screenshot = get_fullpage_screenshot_as_png(context) if full_page else context.browser.driver.get_screenshot_as_png()
 

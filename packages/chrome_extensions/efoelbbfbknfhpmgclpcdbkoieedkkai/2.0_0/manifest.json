@@ -1,0 +1,29 @@
+{
+   "background": {
+      "scripts": [ "background.js" ]
+   },
+   "browser_action": {
+      "default_icon": {
+         "128": "cloud-computing128.png",
+         "16": "cloud-computing16.png",
+         "32": "cloud-computing32.png",
+         "64": "cloud-computing64.png"
+      },
+      "default_title": "Always Clear Downloads"
+   },
+   "description": "A Google Chrome Extension to always clear the downloads list of all completed downloads.",
+   "icons": {
+      "128": "cloud-computing128.png",
+      "16": "cloud-computing16.png",
+      "32": "cloud-computing32.png",
+      "64": "cloud-computing64.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArIZZRgCnrvTkkZvVT12SRnQWE/EP3UhWq1bpyijaj9xKVUR2VfX50bDLEWgDoWyWVPwFK4rFgr4AAO4OJYi0wv1rN84H49ZtfE8zjPRdH3mdrUF2s/rrgGBC8gztkWlt8k5kRVCHMKCrW8yaV/rGuCA0CB4RElFJfV7NEEk4uQgGXb83hIG9xTL0GEaHbymZxc8yPypfKGSHMlHuKRlcjBErmlhCMUbLxSw0/YX2cDopSOSgsIN/7AYVhFKoINzxsI7tTpGgpqeDG+66yWg8GfD8yPGk0c/6eROdRjab5AG4ML6r8WwRcWevV0A6xWoR1NszDC8tRxX6+/R2HyJ/VwIDAQAB",
+   "manifest_version": 2,
+   "name": "Always Clear Downloads in Chrome",
+   "options_page": "options.html",
+   "permissions": [ "browsingData", "downloads", "downloads.shelf", "storage", "contextMenus" ],
+   "short_name": "Always Clear Downloads",
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "2.0"
+}

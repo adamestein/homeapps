@@ -64,6 +64,9 @@ def before_all(context):
     if not context.config.log_capture:
         logging.basicConfig(level=logging.DEBUG)
 
+    # Save the top directory location, used to find files
+    context.top_dir = re.sub('apps/library/testing/bdd/environment.pyc?', '', __file__)
+
     # Default to Chrome if not set
     browser = "chrome" if not context.config.browser else context.config.browser
 
@@ -72,14 +75,20 @@ def before_all(context):
 
         options = Options()
 
-        # Turn off Chrome asking to save the password and strict W3C mode
+        # Need the 'Always Clear Downloads in Chrome' extension so that the download bar doesn't appear. If it does,
+        # it changes the size of the HTML body window so that any tests that run after would have a smaller screen
+        # shot than they should which screws up comparisons against master images.
+        options.add_argument(
+            f'--load-extension={context.top_dir}packages/chrome_extensions/efoelbbfbknfhpmgclpcdbkoieedkkai/2.0_0'
+        )
+
         options.add_experimental_option(
             'prefs',
             {
-                'credentials_enable_service': False,
+                'credentials_enable_service': False,    # Stop asking to save the password
                 'download.default_directory': context.tmp_dir.name,
                 'profile': {'password_manager_enabled': False},
-                'w3c': False
+                'w3c': False    # Strict W3C mode
             }
         )
 
@@ -97,9 +106,6 @@ def before_all(context):
     curse(date, 'today', classmethod(lambda cls: date(2020, 1, 8)))
     curse(datetime, 'now', classmethod(lambda cls, tz=None: datetime(2020, 1, 8)))
     curse(datetime, 'today', classmethod(lambda cls: datetime(2020, 1, 8)))
-
-    # Save the top directory location, used to find files
-    context.top_dir = re.sub('apps/library/testing/bdd/environment.pyc?', '', __file__)
 
     settings.DEBUG = True
     settings.VERSION = '<version>'      # So that we don't have to update master images ever time version changes

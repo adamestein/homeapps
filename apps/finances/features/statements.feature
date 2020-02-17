@@ -64,6 +64,9 @@ Feature: Statements
         When the user clicks "Create"
         Then the page is verified to be correct
 
+        When the user clicks "Create Statement"
+        Then the page is verified to be correct
+
     Scenario: Edit Statement
         Given the user goes to the home page
         And the user clicks "Login"

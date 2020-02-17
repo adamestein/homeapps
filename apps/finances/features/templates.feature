@@ -1,6 +1,5 @@
 Feature: Templates
 
-    @wip
     Scenario: Create Account Template
         Given the user goes to the home page
         And the user clicks "Login"
@@ -21,7 +20,6 @@ Feature: Templates
         And the user clicks "Create"
         Then the page is verified to be correct
 
-    @wip
     Scenario: Create Bill Template
         Given the user goes to the home page
         And the user clicks "Login"
@@ -48,7 +46,6 @@ Feature: Templates
         And the user clicks "Create"
         Then the page is verified to be correct
 
-    @wip
     Scenario: Create Income Template
         Given the user goes to the home page
         And the user clicks "Login"
@@ -72,7 +69,6 @@ Feature: Templates
         And the user clicks "Create"
         Then the page is verified to be correct
 
-    @wip
     Scenario: Edit Account Template (edit values)
         Given the user goes to the home page
         And the user clicks "Login"
@@ -93,7 +89,6 @@ Feature: Templates
         And the user clicks "Update"
         Then the page is verified to be correct
 
-    @wip
     Scenario: Edit Account Template (disable)
         Given the user goes to the home page
         And the user clicks "Login"
@@ -113,7 +108,6 @@ Feature: Templates
         And the user clicks "Update"
         Then the page is verified to be correct
 
-    @wip
     Scenario: Edit Bill Template (edit values)
         Given the user goes to the home page
         And the user clicks "Login"
@@ -140,7 +134,6 @@ Feature: Templates
         And the user clicks "Update"
         Then the page is verified to be correct
 
-    @wip
     Scenario: Edit Bill Template (disable)
         Given the user goes to the home page
         And the user clicks "Login"
@@ -160,7 +153,6 @@ Feature: Templates
         And the user clicks "Update"
         Then the page is verified to be correct
 
-    @wip
     Scenario: Edit Income Template (edit values)
         Given the user goes to the home page
         And the user clicks "Login"
@@ -184,7 +176,6 @@ Feature: Templates
         And the user clicks "Update"
         Then the page is verified to be correct
 
-    @wip
     Scenario: Edit Income Template (disable)
         Given the user goes to the home page
         And the user clicks "Login"
@@ -204,7 +195,6 @@ Feature: Templates
         And the user clicks "Update"
         Then the page is verified to be correct
 
-    @wip
     Scenario: List Templates
         Given the user goes to the home page
         And the user clicks "Login"

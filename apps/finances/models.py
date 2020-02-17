@@ -130,8 +130,12 @@ class Bill(StatementItem, models.Model):
         return '{} paid {} on {}'.format(self.name, amount_paid, DateFormat(self.paid_date).format('F jS, Y'))
 
     def _has_option(self, name):
-        option = Option.objects.get(template_type='bill', name=name)
-        return option in self.options.all()
+        try:
+            option = Option.objects.get(template_type='bill', name=name)
+        except Option.DoesNotExist:
+            return False
+        else:
+            return option in self.options.all()
 
     def __str__(self):
         state = 'unfunded' if (self.state == self.STATE_UNFUNDED) else 'unpaid' \
