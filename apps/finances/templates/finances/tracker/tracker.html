@@ -32,9 +32,13 @@
     <script type="text/javascript" src="{% static 'js/jquery-impromptu.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery.tipTip.minified.js' %}"></script>
 
+    {% if settings.DEBUG %}
+        <script type="text/javascript" src="{% static 'js/mocks.js' %}"></script>
+    {% endif %}
+
     <script type="text/javascript">
         // Options to use for all date pickers
-        var datePickerOptions = {
+        let datePickerOptions = {
             buttonImage: "{% static 'img/calendar.gif' %}",
             buttonImageOnly: true,
             buttonText: "Select date",
@@ -52,11 +56,9 @@
                 we'll prevent multiple click handlers by ensuring we only do it once.
              */
             if (window.already_here === undefined) {
-                $(".unfunded").click(function () {
+                $("#content").on('click', ".unfunded", function() {
                     updateBill($(this), {{ UNPAID }});
-                });
-
-                $(".unpaid").click(function () {
+                }).on("click", ".unpaid", function() {
                     handleUnpaid($(this));
                 });
 
@@ -67,9 +69,9 @@
         });
 
         function handleUnpaid(bill) {
-            var form_html = $("#" + bill.data("name")).html().replace(/"id_/g, '"popup_id_');
+            let form_html = $("#" + bill.data("name")).html().replace(/"id_/g, '"popup_id_');
 
-            var html =  '<div id="popup">' +
+            let html =  '<div id="popup">' +
                         '    <h2 style="padding-bottom: 1.5em; text-align: center;">Payment Information</h2>' +
                         '    <p>' +
                         '        Fill in the form after the payment has been made and click ' +
@@ -95,7 +97,7 @@
                 }
             );
 
-            var popup = $("#popup");
+            let popup = $("#popup");
 
             // Set the actual amount paid to the amount of the bill as the initial value
             popup.find("input[id*='actual_0']").val(bill.data("amount").replace('$', '').replace(',', ''));
@@ -108,7 +110,7 @@
                 user can pay it
              */
             if ($("#" + bill.data("name") + " input[id$='has_auto_pay']").val() === "False") {
-                var url = $("#" + bill.data("name") + " input[id$='url']").val();
+                let url = $("#" + bill.data("name") + " input[id$='url']").val();
 
                 if (url.length) {
                     {% if settings.DEBUG %}
@@ -160,16 +162,16 @@
                 },
                 function(encoded) {
                     // info[0] = updated text to display, info[1] = if symbol is needed to popup options
-                    var info = JSON.parse(encoded);
+                    let info = JSON.parse(encoded);
 
                     // Remove any previous handlers
                     bill.off();
 
                     // Figure out which <select> the bill is moving to (a bill can only move to unpaid or paid)
-                    var stateName = (new_state === {{ UNPAID }}) ? "unpaid" : "paid";
-                    var select = $("#" + stateName);
+                    let stateName = (new_state === {{ UNPAID }}) ? "unpaid" : "paid";
+                    let select = $("#" + stateName);
 
-                    var inserted = false;
+                    let inserted = false;
 
                     // Only the paid state has different text, so we'll update if bill moved into paid state
                     if (stateName === "paid") {
@@ -196,13 +198,6 @@
 
                     // Update the class since it's in a new section
                     bill.attr('class', stateName);
-
-                    if (new_state === {{ UNPAID }}) {
-                        // Item moved, need to redo the click handler for the new section
-                        bill.click(function() {
-                            handleUnpaid($(this));
-                        });
-                    }
                 }
             ).fail(function(jqXHR, textStatus, errorThrown) {
                 $.prompt.close();

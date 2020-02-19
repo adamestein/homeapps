@@ -20,7 +20,7 @@ p {text-align: justify;}
 #main-menu  li {margin-top: 2px; margin-bottom: 2px; display: block;}
 #main-menu a {width: 95%; display: block; margin: 0; padding: 3px;}
 
-#content {margin-left: 22%; margin-right: 22%;}
+#content {margin-left: 22%;}
 
 #footer {clear: both; padding: 2px; padding-right: 5px;}
 h5 {margin: 0;}

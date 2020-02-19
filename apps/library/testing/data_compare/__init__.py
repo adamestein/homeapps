@@ -1,0 +1,2 @@
+class DataCompareException(Exception):
+    pass

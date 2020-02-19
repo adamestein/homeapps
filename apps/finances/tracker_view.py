@@ -70,7 +70,7 @@ class SavePaymentInfo(AJAXResponseMixin, TemplateView):
         # getting the prefix form that key name. Couldn't get the id field to show up in the form, so the pk
         # field was added which is set to the id value.
         p = re.compile('(form-[0-9]+)-.*')
-        prefix = p.search(filter(lambda x: x.endswith('-pk'), self.request.POST.keys())[0]).group(1)
+        prefix = p.search([x for x in list(self.request.POST.keys()) if x.endswith('-pk')][0]).group(1)
 
         form = TrackerBillForm(
             self.request.POST, prefix=prefix, instance=Bill.objects.get(pk=self.request.POST[prefix + '-pk'])
