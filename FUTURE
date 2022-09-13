@@ -1,0 +1,24 @@
+BUG
+---
+1) When created Jan 31, dates came up for January instead of February even though statement date
+   was correct (ie the month being used for dates is the current month, not the statement date month)
+2) Problems in Tracker when more than 1 bill has the same name
+
+3.1
+---
+1) Figure out max check # and auto put max + 1 into popup Payment Information box when check is selected
+2) When all bills in tracker in Paid Bills, send message that all done
+3) Ability to have notes when printing PDF statement. Store notes with statement, have ability to add/
+modify on statement view.
+4) Show which bills are ACH vs Checking
+
+X.x
+---
+1) Color code tracker items to show when almost due
+2) Medical (medial/dental/etc.) categories (whatever is used in taxes)
+3) Search (by name, by category, etc.)
+    o date range
+    o list summation of values
+
+- Add Cash as payment option
+
