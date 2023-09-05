@@ -2,7 +2,7 @@ from .base import *
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['smeg.steinhome.net']
+ALLOWED_HOSTS = ['smeg']
 
 DATABASES = {
     'default': {

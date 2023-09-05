@@ -10,4 +10,4 @@ mysqlclient==1.4.4
 py-moneyed==0.6.0
 python-dateutil==2.5.3
 reportlab==3.6.13
-xhtml2pdf==0.2.3
+xhtml2pdf==0.2.11
