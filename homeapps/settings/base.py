@@ -153,4 +153,4 @@ SETTINGS_EXPORT = [
 
 # Version information
 
-VERSION = '5.2'
+VERSION = '5.3'
