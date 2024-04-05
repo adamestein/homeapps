@@ -9,19 +9,23 @@
                 {% for row in data %}
                     <tr>
                         <td class="{% cycle 'row1' 'row2' as rowcolors %}">
-                            <span>
-                                {{ row.name }}
+                            <div>
+                                <div class="name">{{ row.name }}</div>
 
                                 {% if row.date %}
+                                    {% if row.model_name == "bill" and row.total %}
+                                        <div class="total">(Total: {{ row.total }})</div>
+                                    {% endif %}
+
                                     {% if row.paid_date %}
-                                        <span class="paid">[Paid: {{  row.paid_date }}]</span>
+                                        <div class="paid">[Paid: {{  row.paid_date }}]</div>
                                     {% elif row.model_name == "bill" %}
-                                        <span class="due">[Due: {{ row.date }}]</span>
+                                        <div class="due">[Due: {{ row.date }}]</div>
                                     {% else %}
-                                        <span class="paid">[Deposited: {{  row.date }}]</span>
+                                        <div class="paid">[Deposited: {{  row.date }}]</div>
                                     {% endif %}
                                 {% endif %}
-                            </span>
+                            </div>
 
                             {% if row.options %}
                                 <ul class="options">
