@@ -247,7 +247,7 @@ class Option(models.Model):
 
 
 class Preference(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     snap_days = models.CharField(max_length=5, validators=[validate_comma_separated_integer_list])
 
     def __str__(self):

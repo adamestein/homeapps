@@ -7,7 +7,7 @@ from library.middleware.save_requests import get_user
 
 
 class Auth(models.Model):
-    user = models.ForeignKey(User, help_text='To which user this item belongs.')
+    user = models.ForeignKey(User, help_text='To which user this item belongs.', on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
@@ -30,7 +30,9 @@ class StatementItem(Auth, Base, models.Model):
     amount = MoneyField(
         max_digits=10, decimal_places=2, default_currency='USD', help_text='Current amount in this account.'
     )
-    statement = models.ForeignKey('finances.Statement', help_text = 'To which statement this belongs.')
+    statement = models.ForeignKey(
+        'finances.Statement', help_text = 'To which statement this belongs.', on_delete=models.CASCADE
+    )
 
     class Meta:
         abstract = True
