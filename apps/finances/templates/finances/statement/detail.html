@@ -59,7 +59,7 @@
             pdf.tooltip();
 
             pdf.click(function() {
-                window.open("{% url 'statement_pdf' object.id %}");
+                window.open("{% url 'finances:statement_pdf' object.id %}");
             });
         });
     </script>

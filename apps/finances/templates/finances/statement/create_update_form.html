@@ -86,10 +86,10 @@
                 };
 
                 $.post(
-                    "{% url 'get_statement_section_form' %}",
+                    "{% url 'finances:get_statement_section_form' %}",
                     sectionInfo,
                     function(encoded) {
-                        var info = JSON.parse(encoded);
+                        let info = JSON.parse(encoded);
 
                         showEditPopup(pk, info, sectionInfo, info["table_type"], false);
                     }
@@ -433,11 +433,11 @@
                 formVals = $.extend(formVals, sectionInfo);
 
                 $.post(
-                    "{% url 'statement_section_form_validation' %}",
+                    "{% url 'finances:statement_section_form_validation' %}",
                     formVals,
                     function(encoded) {
-                        var info = JSON.parse(encoded);
-                        var tableType = sectionInfo["table_type"];
+                        let info = JSON.parse(encoded);
+                        let tableType = sectionInfo["table_type"];
 
                         if (info["errors"]) {
                             $("#popup").html(createPopupHTML(tableType, info["errors"], tableType));

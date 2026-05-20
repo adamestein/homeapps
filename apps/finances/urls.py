@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import include, path, re_path
 from django.urls import reverse_lazy
 
 from . import APP
@@ -14,11 +14,12 @@ from .tracker_view import ChangeBillState, SavePaymentInfo, TrackableList, Track
 
 from library.views.generic import AppTemplateView
 
+app_name = 'finances'
 urlpatterns = [
-    url('^$', AppTemplateView.as_view(template_name='finances/home.html'), name='finances'),
+    path('', AppTemplateView.as_view(template_name='finances/home.html'), name='finances'),
 
-    url(
-        '^statement/create/$',
+    path(
+        'statement/create/',
         StatementCreateView.as_view(
             app=APP['name'],
             form_class=CreateUpdateStatementMultiForm,
@@ -28,7 +29,7 @@ urlpatterns = [
         name='create_statement'
     ),
 
-    url(
+    re_path(
         r'^statement/detail/(?P<pk>\d+)$',
         StatementDetailView.as_view(
             app=APP['name'],
@@ -38,8 +39,8 @@ urlpatterns = [
         name='statement_detail'
     ),
 
-    url(
-        '^statement/edit/$',
+    path(
+        'statement/edit/',
         StatementListView.as_view(
             action='edit',
             app=APP['name'],
@@ -49,7 +50,7 @@ urlpatterns = [
         name='edit_statement_list'
     ),
 
-    url(
+    re_path(
         r'^statement/edit/(?P<pk>[\d]+)$',
         StatementUpdateView.as_view(
             app=APP['name'],
@@ -60,8 +61,8 @@ urlpatterns = [
         name='edit_statement'
     ),
 
-    url(
-        '^statement/list/$',
+    path(
+        'statement/list/',
         StatementListView.as_view(
             action='view',
             app=APP['name'],
@@ -71,26 +72,26 @@ urlpatterns = [
         name='list_statements'
     ),
 
-    url(
+    re_path(
         r'^statement/pdf/(?P<pk>[\d]+)/$',
         StatementPDFView.as_view(),
         name='statement_pdf'
     ),
 
-    url(
-        '^statement/section_form/$',
+    path(
+        'statement/section_form/',
         StatementSectionForm.as_view(),
         name='get_statement_section_form'
     ),
 
-    url(
-        r'^statement/section_form/validation/$',
+    path(
+        'statement/section_form/validation/',
         StatementSectionFormValidation.as_view(),
         name='statement_section_form_validation'
     ),
 
-    url(
-        '^template/create/$',
+    path(
+        'template/create/',
         TemplateCreateView.as_view(
             app=APP['name'],
             form_class=CreateTemplateMultiForm,
@@ -101,8 +102,8 @@ urlpatterns = [
         name='create_template'
     ),
 
-    url(
-        '^template/edit/$',
+    path(
+        'template/edit/',
         TemplateListView.as_view(
             app=APP['name'],
             queryset=AccountTemplate.objects.none(),        # All template lists will be loaded in get_context_data()
@@ -111,7 +112,7 @@ urlpatterns = [
         name='edit_template_list'
     ),
 
-    url(
+    re_path(
         r'^template/edit/(?P<template_type>[a-z]+)/(?P<pk>[\d]+)$',
         TemplateUpdateView.as_view(
             app=APP['name'],
@@ -123,8 +124,8 @@ urlpatterns = [
         name='edit_template'
     ),
 
-    url(
-        '^template/list/$',
+    path(
+        'template/list/',
         TemplateListView.as_view(
             app=APP['name'],
             queryset=AccountTemplate.objects.none(),        # All template lists will be loaded in get_context_data()
@@ -133,7 +134,7 @@ urlpatterns = [
         name='list_templates'
     ),
 
-    url(
+    re_path(
         r'^tracker/(?P<pk>\d+)$',
         TrackerUpdateView.as_view(
             app=APP['name'],
@@ -143,14 +144,14 @@ urlpatterns = [
         name='tracker'
     ),
 
-    url(
-        '^tracker/bill_state/$',
+    path(
+        'tracker/bill_state/',
         ChangeBillState.as_view(),
         name='change_bill_state'
     ),
 
-    url(
-        '^tracker/list/$',
+    path(
+        'tracker/list/',
         TrackableList.as_view(
             app=APP['name'],
             template_name='finances/tracker/list.html'
@@ -158,8 +159,8 @@ urlpatterns = [
         name='trackable_list'
     ),
 
-    url(
-        '^tracker/validate/$',
+    path(
+        'tracker/validate/',
         SavePaymentInfo.as_view(),
         name='save_payment_info'
     )

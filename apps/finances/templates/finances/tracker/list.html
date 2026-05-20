@@ -22,8 +22,8 @@
                         Don't have to worry about the blank choice being selected since as soon as a choice is made,
                         we redirect to the tracker page
                      */
-                    var url = "{% url 'tracker' 0 %}";
-                    window.location = url.replace(0, $(this).val());
+                    let url = "{% url 'finances:tracker' 0 %}";
+                    window.location = url.replace("0", $(this).val());
                 }
             });
         });

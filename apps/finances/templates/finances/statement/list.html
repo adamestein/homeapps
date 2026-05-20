@@ -35,9 +35,9 @@
 
                         // Get the URL to go to
                         {% ifequal action "edit" %}
-                            link = "{% url 'edit_statement' 0 %}";
+                            link = "{% url 'finances:edit_statement' 0 %}";
                         {% else %}
-                            link = "{% url 'statement_detail' 0 %}";
+                            link = "{% url 'finances:statement_detail' 0 %}";
                         {% endifequal %}
 
                         link = link.replace("0", ui.item.data('statement-id'));

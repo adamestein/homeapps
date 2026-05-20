@@ -124,7 +124,7 @@
 
         function savePaymentInfo(bill, formVals) {
             $.post(
-                "{% url 'save_payment_info' %}",
+                "{% url 'finances:save_payment_info' %}",
                 formVals,
                 function(feedback) {
                     if (feedback === '""') {
@@ -155,7 +155,7 @@
 
         function updateBill(bill, new_state) {
             $.post(
-                "{% url 'change_bill_state' %}",
+                "{% url 'finances:change_bill_state' %}",
                 {
                     'bill_id': bill.val(),
                     'new_state': new_state

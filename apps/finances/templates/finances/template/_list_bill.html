@@ -13,7 +13,7 @@
         <div class="row">
             <input type="radio" name="expand" title="expand">
             <span class="cell primary" data-label="Name">
-                <a href="{% url 'edit_template' 'bill' template.pk %}">{{ template.name }}</a>
+                <a href="{% url 'finances:edit_template' 'bill' template.pk %}">{{ template.name }}</a>
             </span>
             <span class="cell" data-label="Acct Number">
                 {% if template.account_number %}
