@@ -27,6 +27,5 @@ urlpatterns = [
 
     # Apps URL patterns
     url(r'^finances/', include('finances.urls')),
-    url(r'^smoke_detectors/', include('smoke_detectors.urls')),
     url(r'^utilities/', include('utilities.urls'))
 ]

@@ -62,7 +62,6 @@ INSTALLED_APPS = [
     # Apps
     'finances',
     'library',
-    'smoke_detectors',
     'utilities'
 ]
 
