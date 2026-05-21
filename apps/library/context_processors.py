@@ -1,14 +1,11 @@
 from collections import OrderedDict
-import json
 
-from system_globals.models import SystemGlobal
-
-from django.conf import settings
+from constance import config
 
 
 # noinspection PyUnusedLocal
 def apps(request):
-    app_list = json.loads(SystemGlobal.objects.get_value('apps'))
+    app_list = config.APPS
 
     # Put the dictionary in order by app name
     sorted_dict = OrderedDict()

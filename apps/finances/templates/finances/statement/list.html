@@ -31,14 +31,14 @@
                         $("#busy_text").text("Retrieving Statement Data");
                         $("body").addClass("busy");
 
-                        var link;
+                        let link;
 
                         // Get the URL to go to
-                        {% ifequal action "edit" %}
+                        {% if action == "edit" %}
                             link = "{% url 'finances:edit_statement' 0 %}";
                         {% else %}
                             link = "{% url 'finances:statement_detail' 0 %}";
-                        {% endifequal %}
+                        {% endif %}
 
                         link = link.replace("0", ui.item.data('statement-id'));
 

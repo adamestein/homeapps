@@ -25,6 +25,6 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
 
     # Apps URL patterns
-    path('finances/', include('finances.urls')),
-    path('utilities/', include('utilities.urls'))
+    path('finances/', include(('finances.urls', 'finances'), namespace='finances')),
+    path('utilities/', include(('utilities.urls', 'utilities'), namespace='utilities'))
 ]

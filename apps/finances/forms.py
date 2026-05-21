@@ -22,5 +22,5 @@ class OptionForm(forms.ModelForm):
 
     @staticmethod
     def option_label_from_instance(obj):
-        from django.utils.encoding import smart_text
-        return smart_text(obj.short_label)
+        from django.utils.encoding import smart_str
+        return smart_str(obj.short_label)

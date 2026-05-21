@@ -2,12 +2,12 @@ from .base import *
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['smeg']
+ALLOWED_HOSTS = ['smeg.local']
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'homeapps5',
+        'NAME': 'homeapps',
         'USER': 'homeapps',
         'PASSWORD': 'homeapps',
         'HOST': 'localhost',

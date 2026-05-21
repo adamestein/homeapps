@@ -497,11 +497,11 @@
             {{ form.account.non_form_errors }}
 
             <div id="account">
-                {% ifequal form.account|length 0 %}
-                    <p id="no_account_message" {% if form.account|length > 0 %}style="display: none;"{% endif %}>
+                {% if form.account|length == 0 %}
+                    <p id="no_account_message">
                         There are currently no accounts to list.
                     </p>
-                {% endifequal %}
+                {% endif %}
             </div>
         </fieldset>
 

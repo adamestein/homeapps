@@ -26,6 +26,9 @@ SECRET_KEY = '_#jzncdt0xc_%&*knkr5i=!*qesmi=pte7$a&lmw2jb34+n4kd'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+# Set the default primary key type as it changed in Django 3 to avoid warnings
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -55,8 +58,9 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
 
     # 3rd Party Apps
+    'constance',
+    'constance.backends.database',
     'easy_pdf',
-    'system_globals',
     'tekextensions',
 
     # Apps
@@ -123,6 +127,7 @@ TEMPLATES = [
                 # Django context processors
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
 
                 # 3rd Party processors
                 'django_settings_export.settings_export',
@@ -141,6 +146,7 @@ TEMPLATES = [
 ]
 
 # Redirect users to home page after login
+
 LOGIN_REDIRECT_URL = '/'
 
 # List of settings to export to templates (django-settings-export)
@@ -149,6 +155,18 @@ SETTINGS_EXPORT = [
     'DEBUG',
     'VERSION'
 ]
+
+# Constance setup
+
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+
+CONSTANCE_CONFIG = {
+    'APPS': (
+        {},
+        'Application configuration',
+        dict,
+    ),
+}
 
 # Version information
 

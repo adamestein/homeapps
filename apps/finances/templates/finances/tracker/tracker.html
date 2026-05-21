@@ -238,7 +238,7 @@
 
         <select id="unfunded" size="10">
             {% for form in formset %}
-                {% ifequal form.instance.state UNFUNDED %}
+                {% if form.instance.state == UNFUNDED %}
                     {% if form.instance.options.all %}
                         <option class="tooltip unfunded" data-amount="{{ form.instance.amount }}"
                                 data-name="{{ form.instance.name|slugify }}"
@@ -252,7 +252,7 @@
                             {{ form.instance.tracker_display }}
                         </option>
                     {% endif %}
-                {% endifequal %}
+                {% endif %}
             {% endfor %}
         </select>
     </div>
@@ -262,7 +262,7 @@
 
         <select id="unpaid" size="10">
             {% for form in formset %}
-                {% ifequal form.instance.state UNPAID %}
+                {% if form.instance.state == UNPAID %}
                     {% if form.instance.options.all %}
                         <option class="tooltip unpaid" data-amount="{{ form.instance.amount }}"
                                 data-name="{{ form.instance.name|slugify }}"
@@ -276,7 +276,7 @@
                             {{ form.instance.tracker_display }}
                         </option>
                     {% endif %}
-                {% endifequal %}
+                {% endif %}
             {% endfor %}
         </select>
     </div>
@@ -286,7 +286,7 @@
 
         <select id="paid" size="10">
             {% for form in formset %}
-                {% ifequal form.instance.state PAID %}
+                {% if form.instance.state == PAID %}
                     {% if form.instance.options.all %}
                         <option class="tooltip" data-name="{{ form.instance.name|slugify }}"
                                 title="{{ form.instance.options.html_display_list }}" value="{{ form.instance.id }}">
@@ -298,8 +298,7 @@
                             {{ form.instance.tracker_display_paid }}
                         </option>
                     {% endif %}
-
-                {% endifequal %}
+                {% endif %}
             {% endfor %}
         </select>
     </div>

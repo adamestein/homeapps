@@ -16,7 +16,7 @@ from library.views.generic import AppTemplateView
 
 app_name = 'finances'
 urlpatterns = [
-    path('', AppTemplateView.as_view(template_name='finances/home.html'), name='finances'),
+    path('', AppTemplateView.as_view(template_name='finances/home.html'), name='home'),
 
     path(
         'statement/create/',

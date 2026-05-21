@@ -21,7 +21,7 @@
                                         {% if row.paid_date %}
                                             [Paid: {{ row.paid_date }}]
                                         {% else %}
-                                            [{% ifequal row.model_name "bill" %}Due:{% else %}Deposited:{% endifequal %}
+                                            [{% if row.model_name == "bill" %}Due:{% else %}Deposited:{% endif %}
                                             {{ row.date }}]
                                         {% endif %}
                                     </em>

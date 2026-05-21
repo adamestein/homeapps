@@ -1,6 +1,4 @@
-import json
-
-from system_globals.models import SystemGlobal
+from constance import config
 
 from django.apps import apps as django_apps
 
@@ -16,6 +14,6 @@ def app_autodiscover():
         app_settings = getattr(app.module, 'APP', None)
         if app_settings:
             apps[app_settings['name']] = app_settings
-            apps[app_settings['name']].update({'url_name': app.label})
+            apps[app_settings['name']].update({'url_name': app.label + ':home'})
 
-    SystemGlobal.objects.set('apps', json.dumps(apps))
+    config.APPS = apps
