@@ -76,6 +76,9 @@ class Bill(StatementItem, models.Model):
     actual = MoneyField(
         max_digits=10, decimal_places=2, default_currency='USD', blank=True, null=True, help_text='Actual amount paid.'
     )
+    amount = MoneyField(
+        max_digits=10, decimal_places=2, default_currency='USD', help_text='Amount the bill is for.'
+    )
     check_number = models.PositiveIntegerField(blank=True, null=True, help_text='Check number if paid by check')
     confirmation_number = models.CharField(
         blank=True, null=True, max_length=30, help_text='Confirmation number for payment'
@@ -197,6 +200,9 @@ class Income(StatementItem, models.Model):
     account_number = models.CharField(
         blank=True, db_index=True, default='', help_text='Account number.', max_length=30
     )
+    amount = MoneyField(
+        max_digits=10, decimal_places=2, default_currency='USD', help_text='Income amount.'
+    )
     date = models.DateField(db_index=True, help_text="Transaction date (date it was deposited).",)
     options = models.ManyToManyField(
         'Option', help_text='Options for the income.', blank=True, limit_choices_to={'template_type': 'income'}
@@ -281,7 +287,7 @@ class Statement(Auth, models.Model):
         unique_together = (('user', 'date'), )
 
     def get_absolute_url(self):
-        return reverse('statement_detail', kwargs={'pk': self.pk})
+        return reverse('finances:statement_detail', kwargs={'pk': self.pk})
 
     def __str__(self):
         return DateFormat(self.date).format('F jS, Y')

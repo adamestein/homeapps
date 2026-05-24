@@ -32,10 +32,6 @@
     <script type="text/javascript" src="{% static 'js/jquery-impromptu.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery.tipTip.minified.js' %}"></script>
 
-    {% if settings.DEBUG %}
-        <script type="text/javascript" src="{% static 'js/mocks.js' %}"></script>
-    {% endif %}
-
     <script type="text/javascript">
         // Options to use for all date pickers
         let datePickerOptions = {
@@ -106,7 +102,7 @@
             popup.find("input[id$='date']").datepicker(datePickerOptions).datepicker("setDate", new Date());
 
             /*
-                If the user needs to manually pay a bill and it has a URL, open it in a new window so the
+                If the user needs to manually pay a bill, and it has a URL, open it in a new window so the
                 user can pay it
              */
             if ($("#" + bill.data("name") + " input[id$='has_auto_pay']").val() === "False") {

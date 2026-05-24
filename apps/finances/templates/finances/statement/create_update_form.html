@@ -46,14 +46,14 @@
             same section (like bills) with the exact same name. Existing items use the database row ID value, this
             is only for new items so the values will be negative as to not clash with the database IDs.
          */
-        var globalItemID = -1;
+        let globalItemID = -1;
 
         // Keep track on number of items loaded so we know when to turn off the busy screen
-        var numItemsLoaded = 0;
-        var totalItems = 0;
+        let numItemsLoaded = 0;
+        let totalItems = 0;
 
         // Options to use for all date pickers
-        var datePickerOptions = {
+        let datePickerOptions = {
             buttonImage: "{% static 'img/calendar.gif' %}",
             buttonImageOnly: true,
             buttonText: "Select date",
@@ -66,7 +66,7 @@
         };
 
         $(document).ready(function() {
-            var dateField = $("#id_statement-date");
+            let dateField = $("#id_statement-date");
 
             dateField.datepicker(datePickerOptions);
 
@@ -78,8 +78,8 @@
 
             // Click on the green plus sign to popup a form to fill out
             $(document).on('click', '.popr-item', function() {
-                var pk = $(this).data("pk");
-                var sectionInfo = {
+                let pk = $(this).data("pk");
+                let sectionInfo = {
                     "pk": pk,
                     "table_type": $(this).data("type"),
                     "total_forms": $("#id_" + $(this).data("type") + "-TOTAL_FORMS").val()
@@ -120,11 +120,11 @@
             });
 
             $("#submit_button").click(function(e) {
-                var missing = {};
+                let missing = {};
 
                 // Figure out which items types weren't used so the user can be told what's missing from the statement
                 $(".popr-item[data-pk!=''][data-show='1']").each(function(index, poprItem) {
-                    var type = $(poprItem).data("type");
+                    let type = $(poprItem).data("type");
 
                     if(!(type in missing)) {
                         missing[type] = [];
@@ -133,13 +133,13 @@
                     missing[type].push($(poprItem).text().trim());
                 });
 
-                var keys = Object.keys(missing);
+                let keys = Object.keys(missing);
 
                 if (keys.length > 0) {
                     e.preventDefault();
 
-                    var html = "";
-                    var mapping = {"account": "Accounts", "bill": "Bills", "income": "Income"};
+                    let html = "";
+                    let mapping = {"account": "Accounts", "bill": "Bills", "income": "Income"};
 
                     $.each(keys, function(index, key) {
                         html += "<h4 class='missing_section_header'>" + mapping[key] + "</h4><ul>";
@@ -181,8 +181,8 @@
 
         // Create the HTML for the popup
         function createPopupHTML(pk, form, tableType) {
-            var html;
-            var title = ((pk === "") ? "Create New " : "Edit ") + tableType.substr(0,1).toUpperCase() + tableType.substr(1);
+            let html;
+            let title = ((pk === "") ? "Create New " : "Edit ") + tableType.substr(0,1).toUpperCase() + tableType.substr(1);
 
             html =  '<div id="popup">' +
                     '<h2 style="margin-bottom: 1em; text-align: center;">' + title + '</h2>' +
@@ -200,10 +200,10 @@
                 going to worry about that.
              */
 
-            var formSet = $("#" + tableType + "_formset");
-            var id = $(button).parent().data('id');
-            var menu = $("div").find("[data-box-id='" + tableType + "']");
-            var name = $(button).parent().data('name');
+            let formSet = $("#" + tableType + "_formset");
+            let id = $(button).parent().data('id');
+            let menu = $("div").find("[data-box-id='" + tableType + "']");
+            let name = $(button).parent().data('name');
 
             menu.children().filter(function() {
                 return escapeQuote($(this).text().trim()) === name;
@@ -216,33 +216,33 @@
             }).remove();
 
             // Update formset
-            var totalForms = $("#id_" + tableType + "-TOTAL_FORMS");
+            let totalForms = $("#id_" + tableType + "-TOTAL_FORMS");
             totalForms.val(parseInt(totalForms.val()) - 1);
 
             // If no more items, show the 'no' message
             if ($("#" + tableType).find("div").length === 0) {
                 $("#no_" + tableType + "_message").show();
             } else {
-                var regex = new RegExp(tableType + "-\\d+");
+                let regex = new RegExp(tableType + "-\\d+");
 
                 // Make sure formset items are numbered 0-totalForms
                 formSet.find("div").each(function(index, value) {
-                    var pattern = tableType + "-" + index;
+                    let pattern = tableType + "-" + index;
 
                     $(value).find("label").each(function(index, value) {
-                        var newValue = $(value).attr("for").replace(regex, pattern);
+                        let newValue = $(value).attr("for").replace(regex, pattern);
                         $(value).attr("for", newValue);
                     });
 
                     $(value).find("input").each(function(index, value) {
-                        var newIDValue = $(value).attr("id").replace(regex, pattern);
-                        var newNameValue = $(value).attr("name").replace(regex, pattern);
+                        let newIDValue = $(value).attr("id").replace(regex, pattern);
+                        let newNameValue = $(value).attr("name").replace(regex, pattern);
                         $(value).attr("id", newIDValue).attr("name", newNameValue);
                     });
 
                     $(value).find("select").each(function(index, value) {
-                        var newIDValue = $(value).attr("id").replace(regex, pattern);
-                        var newNameValue = $(value).attr("name").replace(regex, pattern);
+                        let newIDValue = $(value).attr("id").replace(regex, pattern);
+                        let newNameValue = $(value).attr("name").replace(regex, pattern);
                         $(value).attr("id", newIDValue).attr("name", newNameValue);
                     });
                 });
@@ -261,7 +261,7 @@
 
         // Insert so that the list is alphabetical (by name)
         function insertListItem(sectionID, name, buttonHTML) {
-            var inserted = false;
+            let inserted = false;
 
             $(sectionID).find("div").each(function(index, value) {
                 if (name < $(value).data("name")) {
@@ -278,9 +278,9 @@
 
         function restoreButtons(tableType) {
             $("#" + tableType + "_formset").find("> div").each(function(index1, div) {
-                var formVals = {};
-                var id;
-                var name = null;
+                let formVals = {};
+                let id;
+                let name = null;
 
                 $(div).find("input, select").each(function(index2, input) {
                     if ($(input).attr("type") !== "hidden") {
@@ -296,7 +296,7 @@
                 // Add the ID using the same prefix
                 formVals["id"] = id;
 
-                var sectionInfo = {
+                let sectionInfo = {
                     "pk": $(".popr-item:contains('" + name + "')").data("pk"),
                     "table_type": tableType,
                     "total_forms": index1
@@ -307,7 +307,7 @@
         }
 
         function showEditPopup(pk, info, sectionInfo, tableType, editMode) {
-            var focus = (pk === "") ? "name" : "amount_0";
+            let focus = (pk === "") ? "name" : "amount_0";
 
             $.prompt(
                 createPopupHTML(pk, info["form"].replace(/id_/g, "popup_id_"), tableType),
@@ -333,15 +333,15 @@
             );
 
             if (tableType === "bill" || tableType === "income") {
-                var dateID = "#popup_id_" + tableType + "-" + sectionInfo["total_forms"] + "-date";
+                let dateID = "#popup_id_" + tableType + "-" + sectionInfo["total_forms"] + "-date";
                 $(dateID).datepicker(datePickerOptions);
             }
         }
 
         function submitButtonStatus() {
-            var date = $("#id_statement-date").val().length;
-            var items = 0;
-            var submitButton = $("#submit_button");
+            let date = $("#id_statement-date").val().length;
+            let items = 0;
+            let submitButton = $("#submit_button");
 
             $.each(["account", "bill", "income"], function(index, tableType) {
                 items += $("#" + tableType).find("div").length;
@@ -356,16 +356,16 @@
         }
 
         function updateButtonSection(editMode, tableType, info, sectionInfo, updateFormSet) {
-            var id = info["id"];
-            var name = escapeQuote(info["name"]);
+            let id = info["id"];
+            let name = escapeQuote(info["name"]);
 
-            var data = 'data-id="' + id + '" data-name="' + name + '"';
-            var divBegin = '<div ' + data + '>';
-            var nameSlug = getSlug(name);
+            let data = 'data-id="' + id + '" data-name="' + name + '"';
+            let divBegin = '<div ' + data + '>';
+            let nameSlug = getSlug(name);
 
-            var buttonID = "id_" + tableType + "-" + id + "-" + nameSlug;
+            let buttonID = "id_" + tableType + "-" + id + "-" + nameSlug;
 
-            var buttonHTML = divBegin +
+            let buttonHTML = divBegin +
                              '  <button id="' + buttonID + '">' +
                                   info["button_text"] +
                              '  </button>' +
@@ -381,13 +381,13 @@
                 on the drop down list because it's an edit and not a new entry.
              */
             if (sectionInfo['pk']) {
-                var menu = $("div").find("[data-box-id='" + tableType + "']");
+                let menu = $("div").find("[data-box-id='" + tableType + "']");
                 menu.find("[data-pk='" + sectionInfo['pk'] + "']").attr("data-show", "0").hide();
             }
 
             // Update the formset if a new entry
             if (!editMode) {
-                var totalForms = $("#id_" + tableType + "-TOTAL_FORMS");
+                let totalForms = $("#id_" + tableType + "-TOTAL_FORMS");
                 totalForms.val(parseInt(totalForms.val()) + 1);
             }
 

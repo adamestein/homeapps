@@ -236,7 +236,7 @@ class StatementSectionForm(AJAXResponseMixin, TemplateView):
         else:
             raise RuntimeError('StatementSectionForm:get_context_data(): unknown table type ({})'.format(table_type))
 
-        return {'form': str(form), 'table_type': table_type}
+        return {'form': str(form.as_table()), 'table_type': table_type}
 
 
 class StatementSectionFormValidation(AJAXResponseMixin, TemplateView):
