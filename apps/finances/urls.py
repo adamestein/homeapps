@@ -96,7 +96,7 @@ urlpatterns = [
             app=APP['name'],
             form_class=CreateTemplateMultiForm,
             success_message="Template '%(name)s' successfully created",
-            success_url=reverse_lazy('list_templates'),
+            success_url=reverse_lazy('finances:list_templates'),
             template_name='finances/template/create_form.html'
         ),
         name='create_template'
@@ -118,7 +118,7 @@ urlpatterns = [
             app=APP['name'],
             form_class=UpdateTemplateForm,
             success_message="Template '%(name)s' successfully updated",
-            success_url=reverse_lazy('list_templates'),
+            success_url=reverse_lazy('finances:list_templates'),
             template_name='finances/template/update_form.html'
         ),
         name='edit_template'
