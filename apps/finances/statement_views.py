@@ -9,14 +9,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.utils.dateformat import DateFormat
 from django.views.generic import TemplateView
+from django.views.generic.edit import ModelFormMixin, ProcessFormView
 
 from .models import Account, AccountTemplate, Bill, BillTemplate, Income, IncomeTemplate, Option, Statement
 from .statement_forms import AccountForm, BillForm, IncomeForm
 
 from library.views.generic import AppCreateView, AppDetailView, AppListView, AppUpdateView
 from library.views.generic.mixins.ajax import AJAXResponseMixin
-
-from django.views.generic.edit import ModelFormMixin, ProcessFormView
 
 
 class BaseStatementView(ModelFormMixin, ProcessFormView):

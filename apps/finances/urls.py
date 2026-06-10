@@ -1,4 +1,4 @@
-from django.urls import include, path, re_path
+from django.urls import path, re_path
 from django.urls import reverse_lazy
 
 from . import APP
@@ -23,7 +23,7 @@ urlpatterns = [
         StatementCreateView.as_view(
             app=APP['name'],
             form_class=CreateUpdateStatementMultiForm,
-            success_message="Statement for %(date)s successfully created",
+            success_message='Statement for %(date)s successfully created',
             template_name='finances/statement/create_update_form.html'
         ),
         name='create_statement'
@@ -113,7 +113,7 @@ urlpatterns = [
     ),
 
     re_path(
-        r'^template/edit/(?P<template_type>[a-z]+)/(?P<pk>[\d]+)$',
+        r'^template/edit/(?P<template_type>[a-z]+)/(?P<pk>\d+)$',
         TemplateUpdateView.as_view(
             app=APP['name'],
             form_class=UpdateTemplateForm,

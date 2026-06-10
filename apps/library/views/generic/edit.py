@@ -59,5 +59,9 @@ class AppDeleteMultipleView(LoginRequiredMixin, NavigationContextMixin, AppSucce
         return form_kwargs
 
 
+class AppFormView(LoginRequiredMixin, NavigationContextMixin, AppSuccessMessageMixin, FormView):
+    pass
+
+
 class AppUpdateView(LoginRequiredMixin, NavigationContextMixin, AppSuccessMessageMixin, UpdateView):
     pass

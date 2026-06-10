@@ -1,0 +1,17 @@
+{% load humanize %}
+
+{% if stats %}
+    <table>
+        <tr>
+            <th class="right_aligned">Average:</th>
+            <td class="right_aligned">${{ stats.average|floatformat:2|intcomma }}</td>
+        </tr>
+
+        <tr>
+            <th class="right_aligned">Total:</th>
+            <td class="right_aligned">${{ stats.total|intcomma }}</td>
+        </tr>
+    </table>
+{% else %}
+    <p>No data.</p>
+{% endif %}

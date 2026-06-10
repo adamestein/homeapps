@@ -1,0 +1,37 @@
+{% if graphs %}
+    <fieldset>
+        <legend>Cost</legend>
+
+        <div class="chart-container">
+            {{ graphs.amount|safe }}
+        </div>
+    </fieldset>
+
+    {% if data_type == "Electric/Gas" %}
+        <fieldset>
+            <legend>Electricity Usage</legend>
+
+            <div class="chart-container">
+                {{ graphs.electric_usage|safe }}
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Gas Usage</legend>
+
+            <div class="chart-container">
+                {{ graphs.gas_usage|safe }}
+            </div>
+        </fieldset>
+    {% else %}
+        <fieldset>
+            <legend>Water Usage</legend>
+
+            <div class="chart-container">
+                {{ graphs.water_usage|safe }}
+            </div>
+        </fieldset>
+    {% endif %}
+{% else %}
+    <p>No data.</p>
+{% endif %}

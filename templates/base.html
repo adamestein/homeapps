@@ -26,7 +26,7 @@
                 $(document).ready(function() {
                     // Get the CSRF token and set up jquery AJAX calls to pass the CSRF token if needed
 
-                    var csrftoken = Cookies.get('csrftoken');
+                    let csrftoken = Cookies.get('csrftoken');
 
                     $.ajaxSetup({
                         beforeSend: function(xhr, settings) {

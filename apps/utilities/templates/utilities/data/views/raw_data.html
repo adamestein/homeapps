@@ -1,0 +1,45 @@
+{% load humanize %}
+
+{% if object_list %}
+    <table>
+        {% if data_type == "Electric/Gas" %}
+            <tr>
+                <th>Month</th>
+                <th>Electric<br />(kilowatt-hours)</th>
+                <th>Gas<br />(ccf)</th>
+                <th>Statement Date</th>
+                <th>Amount</th>
+            </tr>
+
+            {% for data in object_list %}
+                <tr>
+                    <td>{{ data.statement_date|date:"F" }}</td>
+                    <td class="right_aligned">{{ data.electric_used|intcomma }}</td>
+                    <td class="right_aligned">{{ data.gas_used|intcomma }}</td>
+                    <td>{{ data.statement_date }}</td>
+                    <td class="right_aligned">${{ data.amount }}</td>
+                </tr>
+            {% endfor %}
+        {% elif data_type == "Water" %}
+            <tr>
+                <th>Month</th>
+                <th>Water<br />(units)</th>
+                <th>From Date</th>
+                <th>To Date</th>
+                <th>Amount</th>
+            </tr>
+
+            {% for data in object_list %}
+                <tr>
+                    <td>{{ data.to_date|date:"F" }}</td>
+                    <td class="right_aligned">{{ data.water_used|intcomma }}</td>
+                    <td>{{ data.from_date }}</td>
+                    <td>{{ data.to_date }}</td>
+                    <td class="right_aligned">${{ data.amount }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+{% else %}
+    <p>No data.</p>
+{% endif %}

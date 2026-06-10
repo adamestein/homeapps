@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Utilities: Add Statement{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
+
+    <style>
+        h2 {
+            text-align: center;
+        }
+
+        select {
+            width: 100%;
+        }
+
+        .ui-datepicker-trigger {
+            padding-left: 0.75em;
+        }
+    </style>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+
+    <script type="text/javascript">
+        // Options to use for all date pickers
+        let datePickerOptions = {
+            buttonImage: "{% static 'img/calendar.gif' %}",
+            buttonImageOnly: true,
+            buttonText: "Select date",
+            onSelect: function(dateText, inst) {
+                if (dateText !== inst.lastVal) {
+                    $(this).change();
+                }
+            },
+            showOn: "button"
+        };
+
+        $(document).ready(function() {
+            $("input[id*='date']").datepicker(datePickerOptions).datepicker();
+        });
+    </script>
+{% endblock %}
+
+{% block header %}
+    Add
+    {% if statement_type == "electric_gas" %}
+        Electricity & Gas
+    {% else %}
+        Water
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+
+        <table>{{ form.as_table }}</table>
+
+        <button style="margin-top: 2em;" type="submit">Save</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Utilities: View {{ data_type }} Data{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
+
+    <style>
+        .chart-container {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        #content {
+            display: flow-root;     /* Needed so main-menu doesn't affect tabs */
+        }
+
+        fieldset {
+            margin-bottom: 2em;
+        }
+
+        #tabs {
+            margin-top: 2em;
+        }
+
+        .right_aligned {
+            text-align: right;
+        }
+
+        table tr td {
+            padding-left: 0.5em;
+            padding-right: 0.5em;
+        }
+
+        table tr th {
+            padding-left: 0.5em;
+            padding-right: 0.5em;
+        }
+    </style>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+
+    <script type="text/javascript">
+        let activeTab = localStorage.getItem('activeTab');      // Keep the same tab on any reload
+
+        $(document).ready(function() {
+            $("#tabs").tabs({
+                active: activeTab !== null ? parseInt(activeTab, 10) : 0,
+                activate: function(event, ui) {
+                    localStorage.setItem('activeTab', $("#tabs").tabs("option", "active"));
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block header %}View {{ data_type }} Data{% endblock %}
+
+{% block content %}
+    <form method="get">
+        <select name="year" onchange="this.form.submit()">
+            <option value="">---------</option>
+
+            {% for year in years %}
+                <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <div id="tabs">
+        <ul>
+            <li><a href="#tab-1">Raw Data</a></li>
+            <li><a href="#tab-2">Stats</a></li>
+            <li><a href="#tab-3">Graphs</a></li>
+        </ul>
+
+        <div id="tab-1">{% include raw_data_template %}</div>
+        <div id="tab-2">{% include stats_template %}</div>
+        <div id="tab-3">{% include graphs_template %}</div>
+    </div>
+{% endblock %}
