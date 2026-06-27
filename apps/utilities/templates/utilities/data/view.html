@@ -23,6 +23,7 @@
 
         #tabs {
             margin-top: 2em;
+            visibility: hidden;
         }
 
         .right_aligned {
@@ -50,12 +51,20 @@
         let activeTab = localStorage.getItem('activeTab');      // Keep the same tab on any reload
 
         $(document).ready(function() {
-            $("#tabs").tabs({
+            let tabs = $("#tabs");
+
+            if (!tabs.length) {
+                return;
+            }
+
+            tabs.tabs({
                 active: activeTab !== null ? parseInt(activeTab, 10) : 0,
                 activate: function(event, ui) {
-                    localStorage.setItem('activeTab', $("#tabs").tabs("option", "active"));
+                    localStorage.setItem('activeTab', tabs.tabs("option", "active"));
                 }
             });
+
+            tabs.css("visibility", "visible");
         });
     </script>
 {% endblock %}
@@ -73,15 +82,17 @@
         </select>
     </form>
 
-    <div id="tabs">
-        <ul>
-            <li><a href="#tab-1">Raw Data</a></li>
-            <li><a href="#tab-2">Stats</a></li>
-            <li><a href="#tab-3">Graphs</a></li>
-        </ul>
+    {% if selected_year %}
+        <div id="tabs">
+            <ul>
+                <li><a href="#tab-1">Raw Data</a></li>
+                <li><a href="#tab-2">Stats</a></li>
+                <li><a href="#tab-3">Graphs</a></li>
+            </ul>
 
-        <div id="tab-1">{% include raw_data_template %}</div>
-        <div id="tab-2">{% include stats_template %}</div>
-        <div id="tab-3">{% include graphs_template %}</div>
-    </div>
+            <div id="tab-1">{% include raw_data_template %}</div>
+            <div id="tab-2">{% include stats_template %}</div>
+            <div id="tab-3">{% include graphs_template %}</div>
+        </div>
+    {% endif %}
 {% endblock %}
