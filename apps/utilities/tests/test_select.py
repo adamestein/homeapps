@@ -35,3 +35,27 @@ class SelectViewTests(TestCase):
         self.assertContains(response, '<option value="" selected="selected">---------</option>', html=True)
         self.assertContains(response, '$("#id_selected_type").change(function()')
         self.assertNotContains(response, '<button type="submit">Continue</button>', html=True)
+
+
+class StatementAddViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='test-user', password='password')
+        self.client.login(username='test-user', password='password')
+
+    def test_electric_gas_amount_field_has_autofocus(self):
+        response = self.client.get(reverse('utilities:add_statement', args=['electric_gas']))
+
+        self.assertContains(
+            response,
+            '<input type="number" name="amount" step="0.01" required autofocus id="id_amount">',
+            html=True
+        )
+
+    def test_water_amount_field_has_autofocus(self):
+        response = self.client.get(reverse('utilities:add_statement', args=['water']))
+
+        self.assertContains(
+            response,
+            '<input type="number" name="amount" step="0.01" required autofocus id="id_amount">',
+            html=True
+        )

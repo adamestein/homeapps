@@ -4,7 +4,13 @@ from django.db.models.fields import BLANK_CHOICE_DASH
 from .models import ElectricGasStatement, WaterStatement
 
 
-class ElectricGasStatementForm(forms.ModelForm):
+class StatementForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['amount'].widget.attrs['autofocus'] = True
+
+
+class ElectricGasStatementForm(StatementForm):
     class Meta:
         exclude = ('user',)
         model = ElectricGasStatement
@@ -29,7 +35,7 @@ class SelectForm(forms.Form):
             self.fields['selected_type'].choices = BLANK_CHOICE_DASH + self.choices
 
 
-class WaterStatementForm(forms.ModelForm):
+class WaterStatementForm(StatementForm):
     class Meta:
         exclude = ('user',)
         model = WaterStatement
