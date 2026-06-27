@@ -1,3 +1,5 @@
+from django.db import IntegrityError
+from django.contrib.messages import error
 from django.http import Http404
 from django.urls import reverse_lazy
 
@@ -24,6 +26,13 @@ class StatementAddView(AppCreateView):
             raise Http404(f'Unknown statement type: {statement_type}')
 
         return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            return super().form_valid(form)
+        except IntegrityError:
+            error(self.request, 'A statement already exists for that period')
+            return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
