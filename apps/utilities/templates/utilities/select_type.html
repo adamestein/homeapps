@@ -10,6 +10,20 @@
 
         {{ form.as_p }}
 
-        <button type="submit">Continue</button>
+        {% if not submit_on_select %}
+            <button type="submit">Continue</button>
+        {% endif %}
     </form>
+
+    {% if submit_on_select %}
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $("#id_selected_type").change(function() {
+                    if ($(this).val()) {
+                        $(this).closest("form").submit();
+                    }
+                });
+            });
+        </script>
+    {% endif %}
 {% endblock %}

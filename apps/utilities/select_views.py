@@ -22,4 +22,10 @@ class SelectView(AppFormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['type'] = self.select.capitalize()
+        context['submit_on_select'] = True
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super(SelectView, self).get_form_kwargs()
+        kwargs['include_empty_choice'] = True
+        return kwargs
