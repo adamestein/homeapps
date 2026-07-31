@@ -1,4 +1,4 @@
-Django==5.2.15
+Django==5.2.16
 django-betterforms==3.0.0
 django-constance==4.3.5
 django-money==3.5.4

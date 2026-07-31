@@ -10,6 +10,9 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 import os
 import sys
+import warnings
+
+from django.utils.deprecation import RemovedInDjango60Warning
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -28,6 +31,15 @@ DEBUG = False
 
 # Set the default primary key type as it changed in Django 3 to avoid warnings
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Opt into the Django 6.0 default scheme for URLField (assume https for scheme-less URLs).
+# The transitional setting warns about its own removal in Django 6.0; ignore just that message.
+warnings.filterwarnings(
+    'ignore',
+    message=r'.*FORMS_URLFIELD_ASSUME_HTTPS.*',
+    category=RemovedInDjango60Warning,
+)
+FORMS_URLFIELD_ASSUME_HTTPS = True
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -170,4 +182,4 @@ CONSTANCE_CONFIG = {
 
 # Version information
 
-VERSION = '6.3'
+VERSION = '6.4'
