@@ -10,6 +10,10 @@ p {text-align: justify;}
     text-align: center; margin: 0; padding-top: 2px; padding-bottom: 2px;  padding-left: 10px; padding-right: 10px;
 }
 
+#perm-links button {
+    font: inherit; text-align: center; margin: 0; padding-top: 2px; padding-bottom: 2px; padding-left: 10px; padding-right: 10px;
+}
+
 #cool-links {width: 19%; float: right;  margin-bottom: 25px; padding: 3px; padding-bottom: 60px;}
 #cool-links ul {margin: 0; padding: 0;}
 #cool-links li {margin-top: 5px; margin-bottom: 5px; display: block;}

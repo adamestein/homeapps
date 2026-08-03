@@ -18,7 +18,7 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            var template_type = $("#id_template_type-template_type");
+            let template_type = $("#id_template_type-template_type");
 
             template_type.change(function () {
                 formDisplay(template_type.find(":selected").val());
@@ -29,6 +29,8 @@
         });
 
         function formDisplay(selected) {
+            $("#fields_table").toggleClass("has-content", selected === "account" || selected === "bill" || selected === "income");
+
             if (selected === "") {
                 // Picked the 'nothing selected' choice
                 $("#account").hide();
@@ -75,9 +77,9 @@
     <form method="post" name="myform" novalidate>
         {% csrf_token %}
 
-        <table>
-            {{ form.template_type }}
+        {{ form.template_type }}
 
+        <table id="fields_table">
             <tbody id="account" style="display: none;">
                 {{ form.account.as_table }}
             </tbody>

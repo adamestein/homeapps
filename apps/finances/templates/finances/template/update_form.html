@@ -27,7 +27,7 @@
         {% csrf_token %}
 
         <table>
-            {{ form }}
+            {{ form.as_table }}
         </table>
 
         <div class="buttons">

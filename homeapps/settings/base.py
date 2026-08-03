@@ -182,4 +182,4 @@ CONSTANCE_CONFIG = {
 
 # Version information
 
-VERSION = '6.4'
+VERSION = '6.3'

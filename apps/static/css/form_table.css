@@ -11,6 +11,10 @@ table {
     border-collapse: collapse;
 }
 
+table.has-content {
+    margin-top: 1em;
+}
+
 td {
     padding-bottom: 0.5em;
 }

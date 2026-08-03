@@ -6,6 +6,8 @@ h3 {color: #30501f;}
 #perm-links ul {list-style: none;}
 #perm-links a {border: solid 1px #666666; background-color: #afaf80; color: #ffffff; font-weight: bold; text-decoration: none;}
 #perm-links a:hover {background-color: #8f8f60;}
+#perm-links button {border: solid 1px #666666; background-color: #afaf80; color: #880000; font-weight: bold;}
+#perm-links button:hover {background-color: #8f8f60; cursor: pointer;}
 
 #cool-links { border: solid 0px #000099}
 #cool-links ul {list-style: none;}

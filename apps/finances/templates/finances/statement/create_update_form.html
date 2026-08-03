@@ -201,7 +201,7 @@
              */
 
             let formSet = $("#" + tableType + "_formset");
-            let id = $(button).parent().data('id');
+            let id = $(button).parent().attr('data-id');
             let menu = $("div").find("[data-box-id='" + tableType + "']");
             let name = $(button).parent().data('name');
 
@@ -219,36 +219,49 @@
             let totalForms = $("#id_" + tableType + "-TOTAL_FORMS");
             totalForms.val(parseInt(totalForms.val()) - 1);
 
+            // If an existing (database) row was deleted, it no longer counts as an initial form
+            if (id > 0) {
+                let initialForms = $("#id_" + tableType + "-INITIAL_FORMS");
+                initialForms.val(parseInt(initialForms.val()) - 1);
+            }
+
             // If no more items, show the 'no' message
             if ($("#" + tableType).find("div").length === 0) {
                 $("#no_" + tableType + "_message").show();
             } else {
-                let regex = new RegExp(tableType + "-\\d+");
-
                 // Make sure formset items are numbered 0-totalForms
-                formSet.find("div").each(function(index, value) {
-                    let pattern = tableType + "-" + index;
-
-                    $(value).find("label").each(function(index, value) {
-                        let newValue = $(value).attr("for").replace(regex, pattern);
-                        $(value).attr("for", newValue);
-                    });
-
-                    $(value).find("input").each(function(index, value) {
-                        let newIDValue = $(value).attr("id").replace(regex, pattern);
-                        let newNameValue = $(value).attr("name").replace(regex, pattern);
-                        $(value).attr("id", newIDValue).attr("name", newNameValue);
-                    });
-
-                    $(value).find("select").each(function(index, value) {
-                        let newIDValue = $(value).attr("id").replace(regex, pattern);
-                        let newNameValue = $(value).attr("name").replace(regex, pattern);
-                        $(value).attr("id", newIDValue).attr("name", newNameValue);
-                    });
-                });
+                renumberFormset(tableType);
             }
 
             submitButtonStatus();
+        }
+
+        /*
+            Renumber the hidden formset rows to 0-totalForms so the posted formset is well-formed. The rows
+            are a mix of server-rendered fields (each wrapped in its own div) and popup-appended fields, so
+            match on the "<table>-<n>-" prefix of each element's id/name/for attribute instead of the DOM shape.
+         */
+        function renumberFormset(tableType) {
+            let regex = new RegExp(tableType + "-\\d+", "g");
+            let prefix = tableType + "-";
+
+            $("#" + tableType + "_formset").children("div").each(function(index) {
+                $(this).find("input, select, textarea, label").each(function() {
+                    let $element = $(this);
+                    let labelFor = $element.attr("for");
+                    if (labelFor !== undefined) {
+                        $element.attr("for", labelFor.replace(regex, prefix + index));
+                    }
+                    let elementID = $element.attr("id");
+                    if (elementID !== undefined) {
+                        $element.attr("id", elementID.replace(regex, prefix + index));
+                    }
+                    let elementName = $element.attr("name");
+                    if (elementName !== undefined) {
+                        $element.attr("name", elementName.replace(regex, prefix + index));
+                    }
+                });
+            });
         }
 
         /*
@@ -279,12 +292,12 @@
         function restoreButtons(tableType) {
             $("#" + tableType + "_formset").find("> div").each(function(index1, div) {
                 let formVals = {};
-                let id;
+                // The row div carries the real pk (or the negative id of a popup-created item) in its data-id
+                let id = $(div).attr("data-id");
                 let name = null;
 
                 $(div).find("input, select").each(function(index2, input) {
                     if ($(input).attr("type") !== "hidden") {
-                        id = $(input).parent().data("id");
                         formVals[$(input).attr('name')] = $(input).val();
                         if ($(input).attr('name').indexOf("name") > -1) {
                             name = escapeQuote($(input).val());
@@ -405,7 +418,23 @@
             }
 
             if (updateFormSet) {
-                $("#" + tableType + "_formset").append(divBegin + info["form"] + '</div>');
+                /*
+                    Every formset row needs an 'id' field: the real pk for existing items, blank for new ones
+                    so Django creates a fresh instance. The name is just a placeholder index that
+                    renumberFormset (below) rewrites to the row's actual position.
+                 */
+                let idField = '<input type="hidden" name="' + tableType + '-' + sectionInfo["total_forms"] + '-id" value="' + (id > 0 ? id : '') + '" />';
+
+                if (editMode) {
+                    // Update the existing row's fields in place instead of appending a duplicate
+                    let row = $("#" + tableType + "_formset").children("div[data-id='" + id + "']");
+                    row.attr("data-name", name);
+                    row.html(info["form"] + idField);
+                } else {
+                    $("#" + tableType + "_formset").append(divBegin + info["form"] + idField + '</div>');
+                }
+
+                renumberFormset(tableType);
             }
             insertListItem("#" + tableType, name, buttonHTML);
             submitButtonStatus();

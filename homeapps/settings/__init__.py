@@ -29,20 +29,6 @@ if 'test' in sys.argv or 'test_coverage' in sys.argv:
     # Need to set this here since tests.py will have no idea what DATABASES is.
     DATABASES["default"] = {'ENGINE': 'django.db.backends.sqlite3', 'NAME': '/tmp/default.db'}
 
-    # Set up so that we can run BDD tests. We use the Django Behave test runner so that we can run our normal unit
-    # tests in addition to the BDD tests.
-    INSTALLED_APPS += ('django_behave', )
-
-    if '--unit-tests-only' in sys.argv:
-        # Don't change Django's default test runner so only Django unit tests will run
-        del sys.argv[sys.argv.index('--unit-tests-only')]
-    elif '--bdd-tests-only' in sys.argv:
-        # Set up test runner to ONLY run bdd tests
-        TEST_RUNNER = 'django_behave.runner.DjangoBehaveOnlyTestSuiteRunner'
-        del sys.argv[sys.argv.index('--bdd-tests-only')]
-    else:
-        # Set up test runner to run both normal Django unit tests AND bdd tests
-        TEST_RUNNER = 'django_behave.runner.DjangoBehaveTestSuiteRunner'
 else:
     testing = False
 
